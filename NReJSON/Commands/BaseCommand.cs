@@ -2,16 +2,16 @@ using System.Linq;
 using System.Text;
 using StackExchange.Redis;
 
-namespace NReJSON
+namespace NReJSON.Commands
 {
-    internal class Command
+    internal abstract class BaseCommand
     {
         private const string EmptySpace = " ";
-        private readonly Commands.Json _jsonCommandType;
+        private readonly CommandType.Json _jsonCommandType;
         private readonly RedisKey[] _keys;
         private readonly string[] _arguments;
 
-        internal Command(Commands.Json jsonCommandType, RedisKey[] keys, params string[] arguments)
+        internal BaseCommand(CommandType.Json jsonCommandType, RedisKey[] keys, params string[] arguments)
         {
             _jsonCommandType = jsonCommandType;
             _keys = keys;
@@ -22,7 +22,7 @@ namespace NReJSON
         {
             var command = new StringBuilder();
 
-            command.Append(nameof(Commands.Json).ToUpperInvariant());
+            command.Append(nameof(CommandType.Json).ToUpperInvariant());
             command.Append(".");
             command.Append(_jsonCommandType.ToString());
             command.Append(EmptySpace);

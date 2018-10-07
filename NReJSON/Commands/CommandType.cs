@@ -1,8 +1,8 @@
-﻿namespace NReJSON
+﻿namespace NReJSON.Commands
 {
-    internal class Commands
+    internal class CommandType
     {
-        public enum Json
+        internal enum Json
         {
             DEL,
             GET,
