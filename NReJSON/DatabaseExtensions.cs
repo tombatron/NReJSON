@@ -17,10 +17,8 @@ namespace NReJSON
 
         }
 
-        public static void JsonSet(this IDatabase db)
-        {
-
-        }
+        public static string JsonSet(this IDatabase db, RedisKey key, string json, SetOption setOption = SetOption.Default) =>
+            (string)db.Execute(new Set(key, json, setOption));
 
         public static void JsonType(this IDatabase db)
         {
