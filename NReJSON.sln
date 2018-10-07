@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NReJSON", "NReJSON\NReJSON.csproj", "{4C558F46-656C-4201-B355-E0CA096A1EAB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NReJSON", "NReJSON\NReJSON.csproj", "{4C558F46-656C-4201-B355-E0CA096A1EAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NReJSON.Tests", "NReJSON.Tests\NReJSON.Tests.csproj", "{33DE391E-34B1-4D17-8D11-4E4352B87518}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NReJSON.Tests", "NReJSON.Tests\NReJSON.Tests.csproj", "{33DE391E-34B1-4D17-8D11-4E4352B87518}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NReJSON.IntegrationTests", "NReJSON.IntegrationTests\NReJSON.IntegrationTests.csproj", "{5AE938E5-2383-4D1F-82F7-26F99D9AD2CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{33DE391E-34B1-4D17-8D11-4E4352B87518}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33DE391E-34B1-4D17-8D11-4E4352B87518}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33DE391E-34B1-4D17-8D11-4E4352B87518}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AE938E5-2383-4D1F-82F7-26F99D9AD2CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AE938E5-2383-4D1F-82F7-26F99D9AD2CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AE938E5-2383-4D1F-82F7-26F99D9AD2CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AE938E5-2383-4D1F-82F7-26F99D9AD2CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

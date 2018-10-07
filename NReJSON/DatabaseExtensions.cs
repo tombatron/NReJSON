@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using NReJSON.Commands;
+﻿using NReJSON.Commands;
 using StackExchange.Redis;
 
 namespace NReJSON
