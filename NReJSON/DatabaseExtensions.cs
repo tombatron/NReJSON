@@ -1,14 +1,13 @@
-﻿using StackExchange.Redis;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using NReJSON.Commands;
+using StackExchange.Redis;
 
 namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        public static void JsonDelete(this IDatabase db, RedisKey key, string path = "")
-        {
-
-        }
+        public static int JsonDelete(this IDatabase db, RedisKey key, string path = "") =>
+            (int)db.Execute(new Delete(key, path));
 
         public static void JsonGet(this IDatabase db)
         {
@@ -37,12 +36,12 @@ namespace NReJSON
 
         public static void JsonMultiplyNumber(this IDatabase db)
         {
-            
+
         }
 
         public static void JsonAppendString(this IDatabase db)
         {
-            
+
         }
 
         public static void JsonStringLength(this IDatabase db)
@@ -52,7 +51,7 @@ namespace NReJSON
 
         public static void JsonArrayAppend(this IDatabase db)
         {
-           
+
         }
 
         public static void JsonArrayIndexOf(this IDatabase db)

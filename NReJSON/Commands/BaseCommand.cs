@@ -38,5 +38,10 @@ namespace NReJSON.Commands
         }
 
         public override string ToString() => GenerateCommandString();
+
+        public static implicit operator string(BaseCommand command)
+        {
+            return command.ToString();
+        }
     }
 }
