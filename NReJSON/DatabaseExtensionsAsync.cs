@@ -1,18 +1,24 @@
+using System.Threading;
 using System.Threading.Tasks;
 using StackExchange.Redis;
+using NReJSON.Commands;
 
 namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        public static Task JsonDeleteAsync(this IDatabase db)
+        public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = "")
         {
-            return Task.CompletedTask;
+            var result = await db.ExecuteAsync(new Delete(key, path)).ConfigureAwait(false);
+
+            return (int)result;
         }
 
-        public static Task JsonGetAsync(this IDatabase db)
+        public static async Task<string> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths)
         {
-            return Task.CompletedTask;
+            var result = await db.ExecuteAsync(new Get(key, paths)).ConfigureAwait(false);
+
+            return (string)result;
         }
 
         public static Task JsonMultiGetAsync(this IDatabase db)
