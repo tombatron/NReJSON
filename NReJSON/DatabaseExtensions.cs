@@ -9,10 +9,8 @@ namespace NReJSON
         public static int JsonDelete(this IDatabase db, RedisKey key, string path = "") =>
             (int)db.Execute(new Delete(key, path));
 
-        public static void JsonGet(this IDatabase db)
-        {
-
-        }
+        public static string JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
+            (string)db.Execute(new Get(key, paths));
 
         public static void JsonMultiGet(this IDatabase db)
         {
