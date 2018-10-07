@@ -5,17 +5,17 @@ namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        public static Task JsonDeleteAsync (this IDatabase db)
+        public static Task JsonDeleteAsync(this IDatabase db)
         {
             return Task.CompletedTask;
         }
 
-        public static Task JsonGetAsync (this IDatabase db)
+        public static Task JsonGetAsync(this IDatabase db)
         {
             return Task.CompletedTask;
         }
 
-        public static Task JsonMultiGetAsync (this IDatabase db)
+        public static Task JsonMultiGetAsync(this IDatabase db)
         {
             return Task.CompletedTask;
         }

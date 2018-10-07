@@ -5,7 +5,7 @@ namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        public static void JsonDelete(this IDatabase db)
+        public static void JsonDelete(this IDatabase db, RedisKey key, string path = "")
         {
 
         }
