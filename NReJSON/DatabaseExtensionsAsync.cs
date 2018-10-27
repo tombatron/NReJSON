@@ -9,16 +9,20 @@ namespace NReJSON
     {
         public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = "")
         {
-            var result = await db.ExecuteAsync(new Delete(key, path)).ConfigureAwait(false);
+            var deleteCommand = new Delete(key, path);
 
-            return (int)result;
+            var deleteResult = await db.ExecuteAsync(deleteCommand.CommandName, deleteCommand.Arguments).ConfigureAwait(false);
+
+            return (int)deleteResult;
         }
 
         public static async Task<string> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths)
         {
-            var result = await db.ExecuteAsync(new Get(key, paths)).ConfigureAwait(false);
+            var getCommand = new Get(key, paths);
 
-            return (string)result;
+            var getResult = await db.ExecuteAsync(getCommand.CommandName, getCommand.Arguments).ConfigureAwait(false);
+
+            return getResult.ToString();
         }
 
         public static Task JsonMultiGetAsync(this IDatabase db)

@@ -8,9 +8,9 @@ namespace NReJSON.IntegrationTests
         private readonly ConnectionMultiplexer _muxer;
         protected readonly IDatabase _db;
 
-        public BaseIntegrationTest()
+        protected BaseIntegrationTest()
         {
-            _muxer = ConnectionMultiplexer.Connect("127.0.0.1:6379");
+            _muxer = ConnectionMultiplexer.Connect("127.0.0.1");
             _db = _muxer.GetDatabase(1);
         }
 

@@ -1,23 +1,41 @@
-﻿using NReJSON.Commands;
+﻿using System;
+using System.Linq;
 using StackExchange.Redis;
 
 namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        public static int JsonDelete(this IDatabase db, RedisKey key, string path = "") =>
-            (int)db.Execute(new Delete(key, path));
+        public static int JsonDelete(this IDatabase db, RedisKey key, string path = "")
+        {
+            var commandResult = db.Execute(GetCommandName(CommandType.Json.DEL), new { key, path });
 
-        public static string JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
-            (string)db.Execute(new Get(key, paths));
+            return (int)commandResult;
+        }
+
+
+        public static string JsonGet(this IDatabase db, RedisKey key, params string[] paths)
+        {
+            var arguments = new string[] { key }.Concat(paths).ToArray();
+
+            var getResult = db.Execute(GetCommandName(CommandType.Json.GET), arguments);
+
+            return getResult.ToString();
+        }
+
 
         public static void JsonMultiGet(this IDatabase db)
         {
 
         }
 
-        public static string JsonSet(this IDatabase db, RedisKey key, string json, SetOption setOption = SetOption.Default) =>
-            (string)db.Execute(new Set(key, json, setOption));
+        public static string JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default)
+        {
+            var setResult = db.Execute(GetCommandName(CommandType.Json.SET), new string[] { key, path, json, });
+
+            return setResult.ToString();
+        }
+
 
         public static void JsonType(this IDatabase db)
         {
@@ -97,6 +115,11 @@ namespace NReJSON
         public static void JsonGetResp(this IDatabase db)
         {
 
+        }
+
+        private static string GetCommandName(CommandType.Json jsonCommandType)
+        {
+            return $"{nameof(CommandType.Json).ToUpperInvariant()}.{jsonCommandType.ToString()}";
         }
     }
 }
