@@ -83,5 +83,19 @@ namespace NReJSON.IntegrationTests
 
             Assert.Equal(value, typeResult.ToString());
         }
+
+        [Theory]
+        [InlineData(".integer", 1, 2)]
+        [InlineData(".number", .9, 2)]
+        public void ItCanIncrementJsonValues(string path, double number, double expectedResult)
+        {
+            var key = $"test_{nameof(ItCanIncrementJsonValues)}";
+
+            _db.JsonSet(key, "{\"integer\":1,\"number\":1.1}");
+
+            var result = _db.JsonIncrementNumber(key, path, number);
+
+            Assert.Equal(expectedResult, (int)result);
+        }
     }
 }

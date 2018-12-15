@@ -63,10 +63,19 @@ namespace NReJSON
         public static RedisResult JsonType(this IDatabase db, RedisKey key, string path = ".") =>
             db.Execute(GetCommandName(CommandType.Json.TYPE), CombineArguments(key, path));
 
-        public static void JsonIncrementNumber(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.NUMINCRBY`
+        /// 
+        /// Increments the number value stored at `path` by `number`.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonnumincrby
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="number"></param>
+        public static RedisResult JsonIncrementNumber(this IDatabase db, RedisKey key, string path, double number) =>
+            db.Execute(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number.ToString()));
 
         public static void JsonMultiplyNumber(this IDatabase db)
         {
@@ -142,6 +151,9 @@ namespace NReJSON
         {
             return $"JSON.{jsonCommandType.ToString()}";
         }
+
+        private static string[] CombineArguments(RedisKey key, params string[] arguments) =>
+            new[] { key.ToString() }.Concat(arguments).ToArray();
 
         private static string[] CombineArguments(RedisKey[] keys, params string[] arguments) =>
             keys.Select(k => k.ToString()).Concat(arguments).ToArray();
