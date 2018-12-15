@@ -1,4 +1,6 @@
-﻿using StackExchange.Redis;
+﻿using System.Collections.Generic;
+using StackExchange.Redis;
+using System;
 using System.Linq;
 
 namespace NReJSON
@@ -11,10 +13,8 @@ namespace NReJSON
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
             db.Execute(GetCommandName(CommandType.Json.GET), new string[] { key }.Concat(paths).ToArray());
 
-        public static void JsonMultiGet(this IDatabase db, RedisKey[] key, string path = ".")
-        {
-
-        }
+        public static RedisResult[] JsonMultiGet(this IDatabase db, RedisKey[] keys, string path = ".") =>
+            (RedisResult[])db.Execute(GetCommandName(CommandType.Json.MGET), CombineArguments(keys, path));
 
         public static RedisResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
             db.Execute(GetCommandName(CommandType.Json.SET), new string[] { key, path, json, });
@@ -103,5 +103,8 @@ namespace NReJSON
         {
             return $"JSON.{jsonCommandType.ToString()}";
         }
+
+        public static string[] CombineArguments(RedisKey[] keys, params string[] arguments) =>
+            keys.Select(k => k.ToString()).Concat(arguments).ToArray();
     }
 }
