@@ -1,4 +1,4 @@
-﻿namespace NReJSON.Commands
+﻿namespace NReJSON
 {
     internal class CommandType
     {

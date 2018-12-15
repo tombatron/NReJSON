@@ -1,35 +1,24 @@
-using System.Threading;
-using System.Threading.Tasks;
 using StackExchange.Redis;
-using NReJSON.Commands;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = "")
-        {
-            var result = await db.ExecuteAsync(new Delete(key, path)).ConfigureAwait(false);
+        public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = "") =>
+            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.DEL), new { key, path }));
 
-            return (int)result;
-        }
-
-        public static async Task<string> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths)
-        {
-            var result = await db.ExecuteAsync(new Get(key, paths)).ConfigureAwait(false);
-
-            return (string)result;
-        }
+        public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths) =>
+            db.ExecuteAsync(GetCommandName(CommandType.Json.GET), new string[] { }.Concat(paths).ToArray());
 
         public static Task JsonMultiGetAsync(this IDatabase db)
         {
             return Task.CompletedTask;
         }
 
-        public static Task JsonSetAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        public static Task JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
+            db.ExecuteAsync(GetCommandName(CommandType.Json.SET), new string[] { key, path, json });
 
         public static Task JsonTypeAsync(this IDatabase db)
         {
