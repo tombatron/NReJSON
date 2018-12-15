@@ -95,7 +95,21 @@ namespace NReJSON.IntegrationTests
 
             var result = _db.JsonIncrementNumber(key, path, number);
 
-            Assert.Equal(expectedResult, (int)result);
+            Assert.Equal(expectedResult, (double)result, 2);
+        }
+
+        [Theory]
+        [InlineData(".integer", 10, 10)]
+        [InlineData(".number", .9, .99)]
+        public void ItCanMultiplyJsonValues(string path, double number, double expectedResult)
+        {
+            var key = $"test_{nameof(ItCanMultiplyJsonValues)}";
+
+            _db.JsonSet(key, "{\"integer\":1,\"number\":1.1}");
+
+            var result = _db.JsonMultiplyNumber(key, path, number);
+
+            Assert.Equal(expectedResult, (double)result, 2);
         }
     }
 }

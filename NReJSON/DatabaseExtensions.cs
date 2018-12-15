@@ -77,10 +77,19 @@ namespace NReJSON
         public static RedisResult JsonIncrementNumber(this IDatabase db, RedisKey key, string path, double number) =>
             db.Execute(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number.ToString()));
 
-        public static void JsonMultiplyNumber(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.NUMMULTBY`
+        /// 
+        /// Multiplies the number value stored at `path` by `number`.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonnummultby
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="number"></param>
+        public static RedisResult JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number) =>
+            db.Execute(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number.ToString()));
 
         public static void JsonAppendString(this IDatabase db)
         {
