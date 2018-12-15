@@ -11,7 +11,7 @@ namespace NReJSON
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
             db.Execute(GetCommandName(CommandType.Json.GET), new string[] { key }.Concat(paths).ToArray());
 
-        public static void JsonMultiGet(this IDatabase db)
+        public static void JsonMultiGet(this IDatabase db, RedisKey[] key, string path = ".")
         {
 
         }
