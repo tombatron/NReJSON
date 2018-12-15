@@ -67,5 +67,21 @@ namespace NReJSON.IntegrationTests
             Assert.Equal("\"world\"", result[0].ToString());
             Assert.Equal("\"tom\"", result[1].ToString());
         }
+
+        [Theory]
+        [InlineData(".string", "string")]
+        [InlineData(".integer", "integer")]
+        [InlineData(".boolean", "boolean")]
+        [InlineData(".number", "number")]
+        public void ItCanGetJsonType(string path, string value)
+        {
+            var key = $"test_{nameof(ItCanGetJsonType)}";
+
+            _db.JsonSet(key, "{\"string\":\"hello world\", \"integer\":5, \"boolean\": true, \"number\":4.7}");
+
+            var typeResult = _db.JsonType(key, path);
+
+            Assert.Equal(value, typeResult.ToString());
+        }
     }
 }
