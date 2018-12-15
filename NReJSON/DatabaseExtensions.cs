@@ -1,41 +1,23 @@
-﻿using System;
+﻿using StackExchange.Redis;
 using System.Linq;
-using StackExchange.Redis;
 
 namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        public static int JsonDelete(this IDatabase db, RedisKey key, string path = "")
-        {
-            var commandResult = db.Execute(GetCommandName(CommandType.Json.DEL), new { key, path });
+        public static int JsonDelete(this IDatabase db, RedisKey key, string path = "") =>
+            (int)db.Execute(GetCommandName(CommandType.Json.DEL), new { key, path });
 
-            return (int)commandResult;
-        }
-
-
-        public static string JsonGet(this IDatabase db, RedisKey key, params string[] paths)
-        {
-            var arguments = new string[] { key }.Concat(paths).ToArray();
-
-            var getResult = db.Execute(GetCommandName(CommandType.Json.GET), arguments);
-
-            return getResult.ToString();
-        }
-
+        public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
+            db.Execute(GetCommandName(CommandType.Json.GET), new string[] { key }.Concat(paths).ToArray());
 
         public static void JsonMultiGet(this IDatabase db)
         {
 
         }
 
-        public static string JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default)
-        {
-            var setResult = db.Execute(GetCommandName(CommandType.Json.SET), new string[] { key, path, json, });
-
-            return setResult.ToString();
-        }
-
+        public static RedisResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
+            db.Execute(GetCommandName(CommandType.Json.SET), new string[] { key, path, json, });
 
         public static void JsonType(this IDatabase db)
         {
@@ -119,7 +101,7 @@ namespace NReJSON
 
         private static string GetCommandName(CommandType.Json jsonCommandType)
         {
-            return $"{nameof(CommandType.Json).ToUpperInvariant()}.{jsonCommandType.ToString()}";
+            return $"JSON.{jsonCommandType.ToString()}";
         }
     }
 }
