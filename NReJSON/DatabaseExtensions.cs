@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using StackExchange.Redis;
-using System;
+﻿using StackExchange.Redis;
 using System.Linq;
 
 namespace NReJSON
