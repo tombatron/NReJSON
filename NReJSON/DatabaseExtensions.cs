@@ -305,13 +305,45 @@ namespace NReJSON
         public static int JsonDebugMemory(this IDatabase db, RedisKey key, string path = ".") =>
             (int)db.Execute(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path));
 
+        /// <summary>
+        /// `JSON.FORGET`
+        /// 
+        /// An alias for JSON.DEL.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonforget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static int JsonForget(this IDatabase db, RedisKey key, string path = ".") =>
             db.JsonDelete(key, path);
 
-        public static void JsonGetResp(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.RESP`
+        /// 
+        /// This command uses the following mapping from JSON to RESP: 
+        /// 
+        ///     - JSON Null is mapped to the RESP Null Bulk String 
+        ///     
+        ///     - JSON `false` and `true` values are mapped to the respective RESP Simple Strings 
+        ///     
+        ///     - JSON Numbers are mapped to RESP Integers or RESP Bulk Strings, depending on type 
+        ///     
+        ///     - JSON Strings are mapped to RESP Bulk Strings 
+        ///     
+        ///     - JSON Arrays are represented as RESP Arrays in which the first element is the simple string `[` followed by the array's elements 
+        ///     
+        ///     - JSON Objects are represented as RESP Arrays in which the first element is the simple string `{`. Each successive entry represents a key-value pair as a two-entries array of bulk strings.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonresp
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path">Defaults to root if not provided. </param>
+        /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
+        public static RedisResult[] JsonGetResp(this IDatabase db, RedisKey key, string path = ".") =>
+            (RedisResult[])db.Execute(GetCommandName(CommandType.Json.RESP), key, path);
 
         private static string GetCommandName(CommandType.Json jsonCommandType) =>
             $"JSON.{jsonCommandType.ToString()}";
