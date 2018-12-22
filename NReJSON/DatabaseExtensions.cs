@@ -248,10 +248,21 @@ namespace NReJSON
         public static int JsonArrayTrim(this IDatabase db, RedisKey key, string path, int start, int stop) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRTRIM), CombineArguments(key, path, start, stop));
 
-        public static void JsonObjectKeys(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.OBJKEYS`
+        /// 
+        /// Return the keys in the object that's referenced by `path`.
+        ///
+        /// `path` defaults to root if not provided.If the object is empty, or either `key` or `path` do not exist, then null is returned.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonobjkeys
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Array, specifically the key names in the object as Bulk Strings.</returns>
+        public static RedisResult[] JsonObjectKeys(this IDatabase db, RedisKey key, string path = ".") =>
+            (RedisResult[])db.Execute(GetCommandName(CommandType.Json.OBJKEYS), CombineArguments(key, path));
 
         public static void JsonObjectLength(this IDatabase db)
         {
