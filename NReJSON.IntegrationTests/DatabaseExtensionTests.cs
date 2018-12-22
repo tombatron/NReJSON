@@ -111,5 +111,17 @@ namespace NReJSON.IntegrationTests
 
             Assert.Equal(expectedResult, (double)result, 2);
         }
+
+        [Fact(Skip = "This doesn't work, not sure what I'm doing wrong yet.")]
+        public void ItCanAppendJsonString()
+        {
+            var key = $"test_{nameof(ItCanAppendJsonString)}";
+
+            _db.JsonSet(key, "{\"hello\":\"world\"}");
+
+            var result = _db.JsonAppendJsonString(key, ".hello", "{\"t\":1}");
+
+            Assert.Equal(4, result);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using StackExchange.Redis;
+using System;
 using System.Linq;
 
 namespace NReJSON
@@ -91,10 +92,24 @@ namespace NReJSON
         public static RedisResult JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number) =>
             db.Execute(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number.ToString()));
 
-        public static void JsonAppendString(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.STRAPPEND`
+        /// 
+        /// Append the json-string value(s) the string at path.
+        ///
+        /// path defaults to root if not provided.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonstrappend
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="jsonString"></param>
+        /// <returns>Length of the new JSON object.</returns>
+        public static int JsonAppendJsonString(this IDatabase db, RedisKey key, string path = ".", string jsonString = "{}") =>
+            //(int)db.Execute(GetCommandName(CommandType.Json.STRAPPEND), CombineArguments(key, path, jsonString));
+            throw new NotImplementedException("This doesn't work, not sure what I'm doing wrong here.");
+            
 
         public static void JsonStringLength(this IDatabase db)
         {
