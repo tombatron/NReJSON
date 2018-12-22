@@ -264,10 +264,33 @@ namespace NReJSON
         public static RedisResult[] JsonObjectKeys(this IDatabase db, RedisKey key, string path = ".") =>
             (RedisResult[])db.Execute(GetCommandName(CommandType.Json.OBJKEYS), CombineArguments(key, path));
 
-        public static void JsonObjectLength(this IDatabase db)
+        /// <summary>
+        /// `JSON.OBJLEN`
+        /// 
+        /// Report the number of keys in the JSON Object at `path` in `key`.
+        ///
+        /// `path` defaults to root if not provided. If the `key` or `path` do not exist, null is returned.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonobjlen
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Integer, specifically the number of keys in the object.</returns>
+        public static int? JsonObjectLength(this IDatabase db, RedisKey key, string path = ".")
         {
+            var result = db.Execute(GetCommandName(CommandType.Json.OBJLEN), CombineArguments(key, path));
 
+            if (result.IsNull)
+            {
+                return null;
+            }
+            else
+            {
+                return (int)result;
+            }
         }
+
 
         public static void JsonDebug(this IDatabase db)
         {
