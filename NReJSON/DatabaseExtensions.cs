@@ -180,10 +180,33 @@ namespace NReJSON
         public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index, params string[] json) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRINSERT), CombineArguments(key, path, index, json));
 
-        public static void JsonArrayLength(this IDatabase db)
+        /// <summary>
+        /// `JSON.ARRLEN`
+        /// 
+        /// Report the length of the JSON Array at `path` in `key`.
+        /// 
+        /// `path` defaults to root if not provided. If the `key` or `path` do not exist, null is returned.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrlen
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Integer, specifically the array's length.</returns>
+        public static int? JsonArrayLength(this IDatabase db, RedisKey key, string path = ".")
         {
+            var result = db.Execute(GetCommandName(CommandType.Json.ARRLEN), CombineArguments(key, path));
 
+            if (result.IsNull)
+            {
+                return null;
+            }
+            else
+            {
+                return (int)result;
+            }
         }
+            
 
         public static void JsonArrayPop(this IDatabase db)
         {
