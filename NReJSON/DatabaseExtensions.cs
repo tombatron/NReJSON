@@ -126,10 +126,20 @@ namespace NReJSON
         public static int JsonStringLength(this IDatabase db, RedisKey key, string path) =>
             (int)db.Execute(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path));
 
-        public static void JsonArrayAppend(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.ARRAPPEND`
+        /// 
+        /// Append the `json` value(s) into the array at `path` after the last element in it.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrappend
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="json"></param>
+        /// <returns>Integer, specifically the array's new size.</returns>
+        public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path, params string[] json) =>
+            (int)db.Execute(GetCommandName(CommandType.Json.ARRAPPEND), CombineArguments(key, path, json));
 
         public static void JsonArrayIndexOf(this IDatabase db)
         {
@@ -189,6 +199,9 @@ namespace NReJSON
 
         private static string[] CombineArguments(RedisKey[] keys, params string[] arguments) =>
             keys.Select(k => k.ToString()).Concat(arguments).ToArray();
+
+        private static string[] CombineArguments(RedisKey key, string path, params string[] arguments) =>
+            new[] { key.ToString(), path }.Concat(arguments).ToArray();
 
         private static string[] CombineArguments(RedisKey key, string argument) =>
             new[] { key.ToString(), argument };

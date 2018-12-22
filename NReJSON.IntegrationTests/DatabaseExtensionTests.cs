@@ -135,5 +135,17 @@ namespace NReJSON.IntegrationTests
 
             Assert.Equal(5, result);
         }
+
+        [Fact]
+        public void ItCanAppendToJsonArray()
+        {
+            var key = $"test_{nameof(ItCanAppendToJsonArray)}";
+
+            _db.JsonSet(key, "{\"array\": []}");
+
+            var result = _db.JsonArrayAppend(key, ".array", "\"hello\"", "\"world\"");
+
+            Assert.Equal(2, result);
+        }
     }
 }
