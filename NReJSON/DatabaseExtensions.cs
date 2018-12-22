@@ -7,37 +7,60 @@ namespace NReJSON
     public static partial class DatabaseExtensions
     {
         /// <summary>
+        /// `JSON.DEL`
         /// 
+        /// Delete a value.
+        ///
+        /// Non-existing keys and paths are ignored. Deleting an object's root is equivalent to deleting the key from Redis.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsondel
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">Defaults to root if not provided.</param>
+        /// <returns>Integer, specifically the number of paths deleted (0 or 1).</returns>
         public static int JsonDelete(this IDatabase db, RedisKey key, string path = ".") =>
-            (int)db.Execute(GetCommandName(CommandType.Json.DEL), new { key, path });
+            (int)db.Execute(GetCommandName(CommandType.Json.DEL), CombineArguments(key, path));
 
         /// <summary>
+        /// `JSON.GET`
         /// 
+        /// Return the value at `path` in JSON serialized form.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key"></param>
+        /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
         /// <param name="paths"></param>
         /// <returns></returns>
-        public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
-            db.Execute(GetCommandName(CommandType.Json.GET), new string[] { key }.Concat(paths).ToArray());
+        public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape = true, params string[] paths) =>
+            db.Execute(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, paths));
 
         /// <summary>
+        /// `JSON.MGET`
         /// 
+        /// Returns the values at `path` from multiple `key`s. Non-existing keys and non-existing paths are reported as null.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonmget
         /// </summary>
         /// <param name="db"></param>
         /// <param name="keys"></param>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static RedisResult[] JsonMultiGet(this IDatabase db, RedisKey[] keys, string path = ".") =>
             (RedisResult[])db.Execute(GetCommandName(CommandType.Json.MGET), CombineArguments(keys, path));
 
         /// <summary>
+        /// `JSON.SET`
         /// 
+        /// Sets the JSON value at path in key
+        ///
+        /// For new Redis keys the path must be the root. 
+        /// 
+        /// For existing keys, when the entire path exists, the value that it contains is replaced with the json value.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonset
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key"></param>
@@ -46,7 +69,7 @@ namespace NReJSON
         /// <param name="setOption"></param>
         /// <returns></returns>
         public static RedisResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
-            db.Execute(GetCommandName(CommandType.Json.SET), new string[] { key, path, json, });
+            db.Execute(GetCommandName(CommandType.Json.SET), CombineArguments(key, path, json, GetSetOptionString(setOption)));
 
         /// <summary>
         /// `JSON.TYPE`
@@ -359,5 +382,20 @@ namespace NReJSON
 
         private static string[] CombineArguments(RedisKey key, string argument) =>
             new[] { key.ToString(), argument };
+
+        private static string GetSetOptionString(SetOption setOption)
+        {
+            switch(setOption)
+            {
+                case SetOption.Default:
+                    return string.Empty;
+                case SetOption.SetIfNotExists:
+                    return "NX";
+                case SetOption.SetOnlyIfExists:
+                    return "XX";
+                default:
+                    return string.Empty;
+            }
+        }
     }
 }
