@@ -1,5 +1,6 @@
 ﻿using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NReJSON
@@ -36,7 +37,7 @@ namespace NReJSON
         /// <param name="paths"></param>
         /// <returns></returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
-            db.JsonGet(key, true, paths);
+            db.JsonGet(key, true, paths == null || paths.Length == 0 ? new[] { "." } : paths);
 
         /// <summary>
         /// `JSON.GET`
@@ -387,23 +388,37 @@ namespace NReJSON
         private static string GetCommandName(CommandType.Json jsonCommandType) =>
             $"JSON.{jsonCommandType.ToString()}";
 
-        //private static string[] CombineArguments(RedisKey key, params string[] arguments) =>
-        //    new[] { key.ToString() }.Concat(arguments).ToArray();
+        private static string[] CombineArguments(params object[] args)
+        {
+            IEnumerable<string> _combineArguments(object[] _args)
+            {
+                if (args == null)
+                {
+                    yield break;
+                }
 
-        //private static string[] CombineArguments(RedisKey[] keys, params string[] arguments) =>
-        //    keys.Select(k => k.ToString()).Concat(arguments).ToArray();
+                foreach (var arg in args)
+                {
+                    if (arg.GetType().IsArray)
+                    {
+                        foreach (var aa in (object[])arg)
+                        {
+                            yield return aa.ToString();
+                        }
+                    }
+                    else
+                    {
+                        yield return arg.ToString();
+                    }
+                }
+            }
 
-        //private static string[] CombineArguments(RedisKey key, string path, params object[] arguments) =>
-        //    new[] { key.ToString(), path }.Concat(arguments.Select(a => a.ToString())).ToArray();
-
-        //private static string[] CombineArguments(RedisKey key, string argument) =>
-        //    new[] { key.ToString(), argument };
-        private static string[] CombineArguments(params object[] args) =>
-            args.Select(a => a.ToString()).ToArray();
+            return _combineArguments(args).ToArray();
+        }
 
         private static string GetSetOptionString(SetOption setOption)
         {
-            switch(setOption)
+            switch (setOption)
             {
                 case SetOption.Default:
                     return string.Empty;

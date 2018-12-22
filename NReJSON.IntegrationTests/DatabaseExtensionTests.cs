@@ -1,4 +1,5 @@
-﻿using StackExchange.Redis;
+﻿using System;
+using StackExchange.Redis;
 using Xunit;
 
 namespace NReJSON.IntegrationTests
@@ -26,9 +27,11 @@ namespace NReJSON.IntegrationTests
         [Fact]
         public void ItCanGetJsonAtASinglePath()
         {
-            _db.JsonSet("test_get_object", "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+            var key = Guid.NewGuid().ToString("N");
 
-            var result = _db.JsonGet("test_get_object", ".hello");
+            _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+            var result = _db.JsonGet(key, ".hello");
 
             Assert.Equal("\"world\"", result.ToString());
         }
