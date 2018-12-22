@@ -147,5 +147,17 @@ namespace NReJSON.IntegrationTests
 
             Assert.Equal(2, result);
         }
+
+        [Fact]
+        public void ItCanFindScalarValueInJsonArray()
+        {
+            var key = $"test_{nameof(ItCanFindScalarValueInJsonArray)}";
+
+            _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+
+            var result = _db.JsonArrayIndexOf(key, ".array", "\"world\"", 0, 2);
+
+            Assert.Equal(1, result);
+        }
     }
 }

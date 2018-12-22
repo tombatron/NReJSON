@@ -141,10 +141,26 @@ namespace NReJSON
         public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path, params string[] json) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRAPPEND), CombineArguments(key, path, json));
 
-        public static void JsonArrayIndexOf(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.ARRINDEX`
+        /// 
+        /// Search for the first occurrence of a scalar JSON value in an array.
+        ///
+        /// The optional inclusive `start`(default 0) and exclusive `stop`(default 0, meaning that the last element is included) specify a slice of the array to search.
+        ///
+        /// Note: out of range errors are treated by rounding the index to the array's start and end. An inverse index range (e.g. from 1 to 0) will return unfound.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrindex
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="jsonScalar"></param>
+        /// <param name="start"></param>
+        /// <param name="stop"></param>
+        /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
+        public static int JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, string jsonScalar, int start = 0, int stop = 0) =>
+            (int)db.Execute(GetCommandName(CommandType.Json.ARRINDEX), CombineArguments(key, path, jsonScalar, start, stop));
 
         public static void JsonArrayInsert(this IDatabase db)
         {
@@ -200,8 +216,8 @@ namespace NReJSON
         private static string[] CombineArguments(RedisKey[] keys, params string[] arguments) =>
             keys.Select(k => k.ToString()).Concat(arguments).ToArray();
 
-        private static string[] CombineArguments(RedisKey key, string path, params string[] arguments) =>
-            new[] { key.ToString(), path }.Concat(arguments).ToArray();
+        private static string[] CombineArguments(RedisKey key, string path, params object[] arguments) =>
+            new[] { key.ToString(), path }.Concat(arguments.Select(a => a.ToString())).ToArray();
 
         private static string[] CombineArguments(RedisKey key, string argument) =>
             new[] { key.ToString(), argument };
