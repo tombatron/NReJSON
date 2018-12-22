@@ -206,12 +206,23 @@ namespace NReJSON
                 return (int)result;
             }
         }
-            
 
-        public static void JsonArrayPop(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.ARRPOP`
+        /// 
+        /// Remove and return element from the index in the array.
+        ///
+        /// Out of range indices are rounded to their respective array ends.Popping an empty array yields null.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrpop
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path">Defaults to root (".") if not provided.</param>
+        /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
+        /// <returns>Bulk String, specifically the popped JSON value.</returns>
+        public static RedisResult JsonArrayPop(this IDatabase db, RedisKey key, string path = ".", int index = -1) =>
+            db.Execute(GetCommandName(CommandType.Json.ARRPOP), CombineArguments(key, path, index));
 
         public static void JsonArrayTrim(this IDatabase db)
         {
