@@ -162,10 +162,23 @@ namespace NReJSON
         public static int JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, string jsonScalar, int start = 0, int stop = 0) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRINDEX), CombineArguments(key, path, jsonScalar, start, stop));
 
-        public static void JsonArrayInsert(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.ARRINSERT`
+        /// 
+        /// Insert the `json` value(s) into the array at `path` before the `index` (shifts to the right).
+        ///
+        /// The index must be in the array's range. Inserting at `index` 0 prepends to the array. Negative index values are interpreted as starting from the end.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrinsert
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="index"></param>
+        /// <param name="json"></param>
+        /// <returns>Integer, specifically the array's new size.</returns>
+        public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index, params string[] json) =>
+            (int)db.Execute(GetCommandName(CommandType.Json.ARRINSERT), CombineArguments(key, path, index, json));
 
         public static void JsonArrayLength(this IDatabase db)
         {
