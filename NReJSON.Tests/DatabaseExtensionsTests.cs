@@ -48,6 +48,16 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.GET", "fake_key", "NOESCAPE", "." }, db.PreviousCommand);
             }
+
+            [Fact]
+            public void CanSpecifyEscaping()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonGet("fake_key", false);
+
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "." }, db.PreviousCommand);
+            }
         }
     }
 }

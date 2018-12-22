@@ -51,8 +51,22 @@ namespace NReJSON
         /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
         /// <param name="paths"></param>
         /// <returns></returns>
-        public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape, params string[] paths) =>
-            db.Execute(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, paths));
+        public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape, params string[] paths)
+        {
+            string[] processedPaths;
+
+            if (paths == null || paths.Length == 0)
+            {
+                processedPaths = new[] { "." };
+            }
+            else
+            {
+                processedPaths = paths;
+            }
+
+            return db.Execute(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, processedPaths));
+        }
+
 
         /// <summary>
         /// `JSON.MGET`
@@ -413,7 +427,7 @@ namespace NReJSON
                 }
             }
 
-            return _combineArguments(args).ToArray();
+            return _combineArguments(args).Where(a => a.Length > 0).ToArray();
         }
 
         private static string GetSetOptionString(SetOption setOption)
