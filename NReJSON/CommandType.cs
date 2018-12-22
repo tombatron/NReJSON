@@ -14,6 +14,7 @@
             STRAPPEND,
             STRLEN,
             ARRAPPEND,
+            ARRINDEX,
             ARRINSERT,
             ARRLEN,
             ARRPOP,
