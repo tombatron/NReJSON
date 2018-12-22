@@ -181,10 +181,8 @@ namespace NReJSON
 
         }
 
-        private static string GetCommandName(CommandType.Json jsonCommandType)
-        {
-            return $"JSON.{jsonCommandType.ToString()}";
-        }
+        private static string GetCommandName(CommandType.Json jsonCommandType) =>
+            $"JSON.{jsonCommandType.ToString()}";
 
         private static string[] CombineArguments(RedisKey key, params string[] arguments) =>
             new[] { key.ToString() }.Concat(arguments).ToArray();
