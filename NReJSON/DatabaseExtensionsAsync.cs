@@ -6,8 +6,21 @@ namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = "") =>
-            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.DEL), new { key, path }));
+        /// <summary>
+        /// `JSON.DEL`
+        /// 
+        /// Delete a value.
+        ///
+        /// Non-existing keys and paths are ignored. Deleting an object's root is equivalent to deleting the key from Redis.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsondel
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path">Defaults to root if not provided.</param>
+        /// <returns>Integer, specifically the number of paths deleted (0 or 1).</returns>
+        public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = ".") =>
+            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.DEL), CombineArguments(key, path)));
 
         public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.GET), new string[] { }.Concat(paths).ToArray());

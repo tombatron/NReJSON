@@ -27,6 +27,22 @@ namespace NReJSON
         /// 
         /// Return the value at `path` in JSON serialized form.
         /// 
+        /// `NOESCAPE` is `true` by default.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="paths"></param>
+        /// <returns></returns>
+        public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
+            db.JsonGet(key, true, paths);
+
+        /// <summary>
+        /// `JSON.GET`
+        /// 
+        /// Return the value at `path` in JSON serialized form.
+        /// 
         /// https://oss.redislabs.com/rejson/commands/#jsonget
         /// </summary>
         /// <param name="db"></param>
@@ -34,7 +50,7 @@ namespace NReJSON
         /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
         /// <param name="paths"></param>
         /// <returns></returns>
-        public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape = true, params string[] paths) =>
+        public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape, params string[] paths) =>
             db.Execute(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, paths));
 
         /// <summary>
@@ -371,17 +387,19 @@ namespace NReJSON
         private static string GetCommandName(CommandType.Json jsonCommandType) =>
             $"JSON.{jsonCommandType.ToString()}";
 
-        private static string[] CombineArguments(RedisKey key, params string[] arguments) =>
-            new[] { key.ToString() }.Concat(arguments).ToArray();
+        //private static string[] CombineArguments(RedisKey key, params string[] arguments) =>
+        //    new[] { key.ToString() }.Concat(arguments).ToArray();
 
-        private static string[] CombineArguments(RedisKey[] keys, params string[] arguments) =>
-            keys.Select(k => k.ToString()).Concat(arguments).ToArray();
+        //private static string[] CombineArguments(RedisKey[] keys, params string[] arguments) =>
+        //    keys.Select(k => k.ToString()).Concat(arguments).ToArray();
 
-        private static string[] CombineArguments(RedisKey key, string path, params object[] arguments) =>
-            new[] { key.ToString(), path }.Concat(arguments.Select(a => a.ToString())).ToArray();
+        //private static string[] CombineArguments(RedisKey key, string path, params object[] arguments) =>
+        //    new[] { key.ToString(), path }.Concat(arguments.Select(a => a.ToString())).ToArray();
 
-        private static string[] CombineArguments(RedisKey key, string argument) =>
-            new[] { key.ToString(), argument };
+        //private static string[] CombineArguments(RedisKey key, string argument) =>
+        //    new[] { key.ToString(), argument };
+        private static string[] CombineArguments(params object[] args) =>
+            args.Select(a => a.ToString()).ToArray();
 
         private static string GetSetOptionString(SetOption setOption)
         {
