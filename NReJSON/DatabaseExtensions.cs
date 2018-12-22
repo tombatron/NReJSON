@@ -413,7 +413,14 @@ namespace NReJSON
 
                 foreach (var arg in args)
                 {
-                    if (arg.GetType().IsArray)
+                    if (arg.GetType() == typeof(RedisKey[]))
+                    {
+                        foreach (var aa in (RedisKey[])arg)
+                        {
+                            yield return aa.ToString();
+                        }
+                    }
+                    else if (arg.GetType().IsArray)
                     {
                         foreach (var aa in (object[])arg)
                         {
