@@ -13,7 +13,7 @@ namespace NReJSON
         /// <param name="key"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static int JsonDelete(this IDatabase db, RedisKey key, string path = "") =>
+        public static int JsonDelete(this IDatabase db, RedisKey key, string path = ".") =>
             (int)db.Execute(GetCommandName(CommandType.Json.DEL), new { key, path });
 
         /// <summary>
@@ -305,10 +305,8 @@ namespace NReJSON
         public static int JsonDebugMemory(this IDatabase db, RedisKey key, string path = ".") =>
             (int)db.Execute(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path));
 
-        public static void JsonForget(this IDatabase db)
-        {
-
-        }
+        public static int JsonForget(this IDatabase db, RedisKey key, string path = ".") =>
+            db.JsonDelete(key, path);
 
         public static void JsonGetResp(this IDatabase db)
         {
