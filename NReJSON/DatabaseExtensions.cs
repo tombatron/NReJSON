@@ -291,11 +291,19 @@ namespace NReJSON
             }
         }
 
-
-        public static void JsonDebug(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.DEBUG MEMORY`
+        /// 
+        /// Report the memory usage in bytes of a value. `path` defaults to root if not provided.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsondebug
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Integer, specifically the size in bytes of the value</returns>
+        public static int JsonDebugMemory(this IDatabase db, RedisKey key, string path = ".") =>
+            (int)db.Execute(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path));
 
         public static void JsonForget(this IDatabase db)
         {
