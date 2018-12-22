@@ -13,7 +13,7 @@
             NUMMULTBY,
             STRAPPEND,
             STRLEN,
-            ARRAPEND,
+            ARRAPPEND,
             ARRINSERT,
             ARRLEN,
             ARRPOP,
