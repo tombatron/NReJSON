@@ -109,12 +109,22 @@ namespace NReJSON
         public static int JsonAppendJsonString(this IDatabase db, RedisKey key, string path = ".", string jsonString = "{}") =>
             //(int)db.Execute(GetCommandName(CommandType.Json.STRAPPEND), CombineArguments(key, path, jsonString));
             throw new NotImplementedException("This doesn't work, not sure what I'm doing wrong here.");
-            
 
-        public static void JsonStringLength(this IDatabase db)
-        {
-
-        }
+        /// <summary>
+        /// `JSON.STRLEN`
+        /// 
+        /// Report the length of the JSON String at `path` in `key`.
+        ///
+        /// `path` defaults to root if not provided. If the `key` or `path` do not exist, null is returned.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonstrlen
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Integer, specifically the string's length.</returns>
+        public static int JsonStringLength(this IDatabase db, RedisKey key, string path) =>
+            (int)db.Execute(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path));
 
         public static void JsonArrayAppend(this IDatabase db)
         {

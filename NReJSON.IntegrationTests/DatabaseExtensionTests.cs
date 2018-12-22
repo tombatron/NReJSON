@@ -123,5 +123,17 @@ namespace NReJSON.IntegrationTests
 
             Assert.Equal(4, result);
         }
+
+        [Fact]
+        public void ItCanGetJsonStringLength()
+        {
+            var key = $"test_{nameof(ItCanGetJsonStringLength)}";
+
+            _db.JsonSet(key, "{\"hello\":\"world\"}");
+
+            var result = _db.JsonStringLength(key, ".hello");
+
+            Assert.Equal(5, result);
+        }
     }
 }
