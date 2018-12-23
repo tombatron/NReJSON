@@ -85,7 +85,45 @@ namespace NReJSON.Tests
 
         public class JsonSet
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonSet("fake_key", "{\"hello\":\"world\"}", ".fake");
+
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".fake", "{\"hello\":\"world\"}" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonSet("fake_key", "{\"hello\":\"world\"}");
+
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}"}, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void SetIfNotExistsIsProperlyEmitted()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonSet("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetIfNotExists);
+
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "NX" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void SetOnlyIfExistsIsProperlyEmitted()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonSet("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetOnlyIfExists);
+
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX" }, db.PreviousCommand);
+            }
         }
 
         public class JsonType

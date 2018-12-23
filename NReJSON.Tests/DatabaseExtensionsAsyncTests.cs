@@ -86,7 +86,45 @@ namespace NReJSON.Tests
 
         public class JsonSetAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", ".fake");
+
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".fake", "{\"hello\":\"world\"}" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}");
+
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task SetIfNotExistsIsProperlyEmitted()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetIfNotExists);
+
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "NX" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task SetOnlyIfExistsIsProperlyEmitted()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetOnlyIfExists);
+
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX" }, db.PreviousCommand);
+            }
         }
 
         public class JsonTypeAsync
