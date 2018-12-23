@@ -60,5 +60,95 @@ namespace NReJSON.Tests
                 Assert.Equal(new[] { "JSON.GET", "fake_key", "." }, db.PreviousCommand);
             }
         }
+
+        public class JsonMultiGetAsync
+        {
+
+        }
+
+        public class JsonSetAsync
+        {
+
+        }
+
+        public class JsonTypeAsync
+        {
+
+        }
+
+        public class JsonIncrementNumberAsync
+        {
+
+        }
+
+        public class JsonMultiplyNumberAsync
+        {
+
+        }
+
+        public class JsonAppendJsonStringAsync
+        {
+
+        }
+
+        public class JsonStringLengthAsync
+        {
+
+        }
+
+        public class JsonArrayAppendAsync
+        {
+
+        }
+
+        public class JsonArrayIndexOfAsync
+        {
+
+        }
+
+        public class JsonArrayInsertAsync
+        {
+
+        }
+
+        public class JsonArrayLengthAsync
+        {
+
+        }
+
+        public class JsonArrayPopAsync
+        {
+
+        }
+
+        public class JsonArrayTrimAsync
+        {
+
+        }
+
+        public class JsonObjectKeysAsync
+        {
+
+        }
+
+        public class JsonObjectLengthAsync
+        {
+
+        }
+
+        public class JsonDebugMemoryAsync
+        {
+
+        }
+
+        public class JsonForgetAsync
+        {
+
+        }
+
+        public class JsonGetRespAsync
+        {
+
+        }
     }
 }
