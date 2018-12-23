@@ -128,7 +128,25 @@ namespace NReJSON.Tests
 
         public class JsonType
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonType("fake_key", ".fakePath");
+
+                Assert.Equal(new[] { "JSON.TYPE", "fake_key", ".fakePath" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonType("fake_key");
+
+                Assert.Equal(new[] { "JSON.TYPE", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonIncrementNumber

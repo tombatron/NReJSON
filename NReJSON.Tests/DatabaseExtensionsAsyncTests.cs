@@ -129,7 +129,25 @@ namespace NReJSON.Tests
 
         public class JsonTypeAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonTypeAsync("fake_key", ".fakePath");
+
+                Assert.Equal(new[] { "JSON.TYPE", "fake_key", ".fakePath" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonTypeAsync("fake_key");
+
+                Assert.Equal(new[] { "JSON.TYPE", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonIncrementNumberAsync
