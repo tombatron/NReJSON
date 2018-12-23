@@ -1,5 +1,4 @@
 using StackExchange.Redis;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace NReJSON
@@ -22,8 +21,36 @@ namespace NReJSON
         public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = ".") =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.DEL), CombineArguments(key, path)));
 
+        /// <summary>
+        /// `JSON.GET`
+        /// 
+        /// Return the value at `path` in JSON serialized form.
+        /// 
+        /// `NOESCAPE` is `true` by default.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="paths"></param>
+        /// <returns></returns>
         public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths) =>
-            db.ExecuteAsync(GetCommandName(CommandType.Json.GET), new string[] { }.Concat(paths).ToArray());
+            db.JsonGetAsync(key, true, paths);
+
+        /// <summary>
+        /// `JSON.GET`
+        /// 
+        /// Return the value at `path` in JSON serialized form.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
+        /// <param name="paths"></param>
+        /// <returns></returns>
+        public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, bool noEscape, params string[] paths) =>
+            db.ExecuteAsync(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, PathsOrDefault(paths, new[] { "."})));
 
         public static Task JsonMultiGetAsync(this IDatabase db)
         {
