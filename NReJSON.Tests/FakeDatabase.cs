@@ -8,7 +8,12 @@ namespace NReJSON.Tests
 {
     public class FakeDatabase : IDatabase
     {
+        private bool _expectArrayResult;
+
         public string[] PreviousCommand { get; private set; }
+
+        public FakeDatabase(bool expectArrayResult = false) =>
+            _expectArrayResult = expectArrayResult;
 
         public RedisResult Execute(string command, params object[] args)
         {
@@ -21,7 +26,14 @@ namespace NReJSON.Tests
                 PreviousCommand[i + 1] = args[i].ToString();
             }
 
-            return RedisResult.Create(0);
+            if (_expectArrayResult)
+            {
+                return RedisResult.Create(new[] { RedisResult.Create(0) });
+            }
+            else
+            {
+                return RedisResult.Create(0);
+            }
         }
 
         public Task<RedisResult> ExecuteAsync(string command, params object[] args)

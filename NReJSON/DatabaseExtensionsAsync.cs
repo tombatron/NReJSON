@@ -1,4 +1,5 @@
 using StackExchange.Redis;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NReJSON
@@ -50,12 +51,36 @@ namespace NReJSON
         /// <param name="paths"></param>
         /// <returns></returns>
         public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, bool noEscape, params string[] paths) =>
-            db.ExecuteAsync(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, PathsOrDefault(paths, new[] { "."})));
+            db.ExecuteAsync(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, PathsOrDefault(paths, new[] { "." })));
 
-        public static Task JsonMultiGetAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.MGET`
+        /// 
+        /// Returns the values at `path` from multiple `key`s. Non-existing keys and non-existing paths are reported as null.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonmget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="keys"></param>
+        /// <param name="path"></param>
+        /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
+        public static Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, string[] keys, string path = ".") =>
+            db.JsonMultiGetAsync(keys.Select(k => (RedisKey)k).ToArray(), path);
+
+        /// <summary>
+        /// `JSON.MGET`
+        /// 
+        /// Returns the values at `path` from multiple `key`s. Non-existing keys and non-existing paths are reported as null.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonmget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="keys"></param>
+        /// <param name="path"></param>
+        /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
+        public static async Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, RedisKey[] keys, string path = ".") =>
+            (RedisResult[])(await db.ExecuteAsync(GetCommandName(CommandType.Json.MGET), CombineArguments(keys, path)));
+
 
         public static Task JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.SET), new string[] { key, path, json });

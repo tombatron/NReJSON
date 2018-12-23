@@ -62,7 +62,25 @@ namespace NReJSON.Tests
 
         public class JsonMultiGet
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(true);
 
+                db.JsonMultiGet(new[] { "fake_key::1", "fake_key::2" }, ".super.fake.path");
+
+                Assert.Equal(new[] { "JSON.MGET", "fake_key::1", "fake_key::2", ".super.fake.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase(true);
+
+                db.JsonMultiGet(new[] { "fake_key::1", "fake_key::2" });
+
+                Assert.Equal(new[] { "JSON.MGET", "fake_key::1", "fake_key::2", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonSet

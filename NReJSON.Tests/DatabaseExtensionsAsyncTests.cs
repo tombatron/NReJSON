@@ -63,7 +63,25 @@ namespace NReJSON.Tests
 
         public class JsonMultiGetAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(true);
 
+                await db.JsonMultiGetAsync(new[] { "fake_key::1", "fake_key::2" }, ".super.fake.path");
+
+                Assert.Equal(new[] { "JSON.MGET", "fake_key::1", "fake_key::2", ".super.fake.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase(true);
+
+                await db.JsonMultiGetAsync(new[] { "fake_key::1", "fake_key::2" });
+
+                Assert.Equal(new[] { "JSON.MGET", "fake_key::1", "fake_key::2", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonSetAsync
