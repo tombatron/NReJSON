@@ -81,9 +81,25 @@ namespace NReJSON
         public static async Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, RedisKey[] keys, string path = ".") =>
             (RedisResult[])(await db.ExecuteAsync(GetCommandName(CommandType.Json.MGET), CombineArguments(keys, path)));
 
-
+        /// <summary>
+        /// `JSON.SET`
+        /// 
+        /// Sets the JSON value at path in key
+        ///
+        /// For new Redis keys the path must be the root. 
+        /// 
+        /// For existing keys, when the entire path exists, the value that it contains is replaced with the json value.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonset
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="json"></param>
+        /// <param name="path"></param>
+        /// <param name="setOption"></param>
+        /// <returns></returns>
         public static Task JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
-            db.ExecuteAsync(GetCommandName(CommandType.Json.SET), new string[] { key, path, json });
+            db.ExecuteAsync(GetCommandName(CommandType.Json.SET), CombineArguments(key, path, json, GetSetOptionString(setOption)));
 
         public static Task JsonTypeAsync(this IDatabase db)
         {
