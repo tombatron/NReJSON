@@ -101,10 +101,21 @@ namespace NReJSON
         public static Task JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.SET), CombineArguments(key, path, json, GetSetOptionString(setOption)));
 
-        public static Task JsonTypeAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.TYPE`
+        /// 
+        /// Report the type of JSON value at `path`.
+        ///
+        /// `path` defaults to root if not provided.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsontype
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static Task JsonTypeAsync(this IDatabase db, RedisKey key, string path = ".") =>
+            db.ExecuteAsync(GetCommandName(CommandType.Json.TYPE), CombineArguments(key, path));
 
         public static Task JsonIncrementNumberAsync(this IDatabase db)
         {
