@@ -178,7 +178,7 @@ namespace NReJSON.Tests
 
         public class JsonAppendJsonStringAsync
         {
-
+            // TODO: Complete this once I figure out how this command is supposed to work.
         }
 
         public class JsonStringLengthAsync

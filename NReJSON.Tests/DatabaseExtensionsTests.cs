@@ -177,7 +177,7 @@ namespace NReJSON.Tests
 
         public class JsonAppendJsonString
         {
-
+            // TODO: Complete this once I figure out how this command is supposed to work.
         }
 
         public class JsonStringLength
