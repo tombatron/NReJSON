@@ -1,5 +1,5 @@
-using System;
 using StackExchange.Redis;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -165,10 +165,21 @@ namespace NReJSON
         public static Task<int> JsonAppendStringAsync(this IDatabase db, RedisKey key, string path = ".", string jsonString = "{}") =>
             throw new NotImplementedException("This doesn't work, not sure what I'm doing wrong here.");
 
-        public static Task JsonStringLengthAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.STRLEN`
+        /// 
+        /// Report the length of the JSON String at `path` in `key`.
+        ///
+        /// `path` defaults to root if not provided. If the `key` or `path` do not exist, null is returned.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonstrlen
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Integer, specifically the string's length.</returns>
+        public static async Task<int> JsonStringLengthAsync(this IDatabase db, RedisKey key, string path) =>
+            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path)));
 
         public static Task JsonArrayAppendAsync(this IDatabase db)
         {
