@@ -131,10 +131,19 @@ namespace NReJSON
         public static Task<RedisResult> JsonIncrementNumberAsync(this IDatabase db, RedisKey key, string path, double number) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number));
 
-        public static Task JsonMultiplyNumberAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.NUMMULTBY`
+        /// 
+        /// Multiplies the number value stored at `path` by `number`.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonnummultby
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="number"></param>
+        public static Task<RedisResult> JsonMultiplyNumberAsync(this IDatabase db, RedisKey key, string path, double number) =>
+            db.ExecuteAsync(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number));
 
         public static Task JsonAppendStringAsync(this IDatabase db)
         {
