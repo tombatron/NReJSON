@@ -147,6 +147,8 @@ namespace NReJSON
             db.Execute(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number));
 
         /// <summary>
+        /// [Not implemented yet]
+        /// 
         /// `JSON.STRAPPEND`
         /// 
         /// Append the json-string value(s) the string at path.

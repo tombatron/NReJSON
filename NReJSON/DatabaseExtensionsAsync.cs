@@ -1,3 +1,4 @@
+using System;
 using StackExchange.Redis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -145,10 +146,24 @@ namespace NReJSON
         public static Task<RedisResult> JsonMultiplyNumberAsync(this IDatabase db, RedisKey key, string path, double number) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number));
 
-        public static Task JsonAppendStringAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// [Not implemented yet]
+        /// 
+        /// `JSON.STRAPPEND`
+        /// 
+        /// Append the json-string value(s) the string at path.
+        ///
+        /// path defaults to root if not provided.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonstrappend
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="jsonString"></param>
+        /// <returns>Length of the new JSON object.</returns>
+        public static Task JsonAppendStringAsync(this IDatabase db, RedisKey key, string path = ".", string jsonString = "{}") =>
+            throw new NotImplementedException("This doesn't work, not sure what I'm doing wrong here.");
 
         public static Task JsonStringLengthAsync(this IDatabase db)
         {
