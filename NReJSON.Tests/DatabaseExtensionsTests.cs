@@ -196,7 +196,15 @@ namespace NReJSON.Tests
 
         public class JsonArrayAppend
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonArrayAppend("fake_key", ".fake.path", "\"1\"", "\"2\"");
+
+                Assert.Equal(new[] { "JSON.ARRAPPEND", "fake_key", ".fake.path", "\"1\"", "\"2\""}, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayIndexOf

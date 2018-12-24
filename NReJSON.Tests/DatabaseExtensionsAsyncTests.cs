@@ -196,7 +196,15 @@ namespace NReJSON.Tests
 
         public class JsonArrayAppendAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonArrayAppendAsync("fake_key", ".fake.path", "\"1\"", "\"2\"");
+
+                Assert.Equal(new[] { "JSON.ARRAPPEND", "fake_key", ".fake.path", "\"1\"", "\"2\"" }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayIndexOfAsync
