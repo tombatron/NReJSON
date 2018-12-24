@@ -164,7 +164,15 @@ namespace NReJSON.Tests
 
         public class JsonMultiplyNumber
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonMultiplyNumber("fake_key", ".fake.path", 5);
+
+                Assert.Equal(new[] { "JSON.NUMMULTBY", "fake_key", ".fake.path", "5" }, db.PreviousCommand);
+            }
         }
 
         public class JsonAppendJsonString

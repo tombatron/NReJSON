@@ -165,7 +165,15 @@ namespace NReJSON.Tests
 
         public class JsonMultiplyNumberAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonMultiplyNumberAsync("fake_key", ".fake.path", 5);
+
+                Assert.Equal(new[] { "JSON.NUMMULTBY", "fake_key", ".fake.path", "5" }, db.PreviousCommand);
+            }
         }
 
         public class JsonAppendJsonStringAsync
