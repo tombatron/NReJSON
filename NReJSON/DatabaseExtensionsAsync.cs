@@ -98,7 +98,7 @@ namespace NReJSON
         /// <param name="path"></param>
         /// <param name="setOption"></param>
         /// <returns></returns>
-        public static Task JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
+        public static Task<RedisResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.SET), CombineArguments(key, path, json, GetSetOptionString(setOption)));
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace NReJSON
         /// <param name="key"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static Task JsonTypeAsync(this IDatabase db, RedisKey key, string path = ".") =>
+        public static Task<RedisResult> JsonTypeAsync(this IDatabase db, RedisKey key, string path = ".") =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.TYPE), CombineArguments(key, path));
 
         /// <summary>
