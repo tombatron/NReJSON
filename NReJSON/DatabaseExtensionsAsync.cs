@@ -162,7 +162,7 @@ namespace NReJSON
         /// <param name="path"></param>
         /// <param name="jsonString"></param>
         /// <returns>Length of the new JSON object.</returns>
-        public static Task JsonAppendStringAsync(this IDatabase db, RedisKey key, string path = ".", string jsonString = "{}") =>
+        public static Task<int> JsonAppendStringAsync(this IDatabase db, RedisKey key, string path = ".", string jsonString = "{}") =>
             throw new NotImplementedException("This doesn't work, not sure what I'm doing wrong here.");
 
         public static Task JsonStringLengthAsync(this IDatabase db)
