@@ -130,7 +130,7 @@ namespace NReJSON
         /// <param name="path"></param>
         /// <param name="number"></param>
         public static RedisResult JsonIncrementNumber(this IDatabase db, RedisKey key, string path, double number) =>
-            db.Execute(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number.ToString()));
+            db.Execute(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number));
 
         /// <summary>
         /// `JSON.NUMMULTBY`

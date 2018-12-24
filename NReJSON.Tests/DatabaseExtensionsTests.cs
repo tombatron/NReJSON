@@ -102,7 +102,7 @@ namespace NReJSON.Tests
 
                 db.JsonSet("fake_key", "{\"hello\":\"world\"}");
 
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}"}, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -151,7 +151,15 @@ namespace NReJSON.Tests
 
         public class JsonIncrementNumber
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonIncrementNumber("fake_key", ".fake.path", 2);
+
+                Assert.Equal(new[] { "JSON.NUMINCRBY", "fake_key", ".fake.path", "2" }, db.PreviousCommand);
+            }
         }
 
         public class JsonMultiplyNumber

@@ -117,10 +117,19 @@ namespace NReJSON
         public static Task JsonTypeAsync(this IDatabase db, RedisKey key, string path = ".") =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.TYPE), CombineArguments(key, path));
 
-        public static Task JsonIncrementNumberAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.NUMINCRBY`
+        /// 
+        /// Increments the number value stored at `path` by `number`.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonnumincrby
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="number"></param>
+        public static Task<RedisResult> JsonIncrementNumberAsync(this IDatabase db, RedisKey key, string path, double number) =>
+            db.ExecuteAsync(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number));
 
         public static Task JsonMultiplyNumberAsync(this IDatabase db)
         {
