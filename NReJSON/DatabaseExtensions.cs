@@ -144,7 +144,7 @@ namespace NReJSON
         /// <param name="path"></param>
         /// <param name="number"></param>
         public static RedisResult JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number) =>
-            db.Execute(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number.ToString()));
+            db.Execute(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number));
 
         /// <summary>
         /// `JSON.STRAPPEND`
