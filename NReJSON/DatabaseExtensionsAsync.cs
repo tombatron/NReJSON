@@ -181,10 +181,20 @@ namespace NReJSON
         public static async Task<int> JsonStringLengthAsync(this IDatabase db, RedisKey key, string path) =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path)));
 
-        public static Task JsonArrayAppendAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.ARRAPPEND`
+        /// 
+        /// Append the `json` value(s) into the array at `path` after the last element in it.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrappend
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="json"></param>
+        /// <returns>Integer, specifically the array's new size.</returns>
+        public static async Task<int> JsonArrayAppendAsync(this IDatabase db, RedisKey key, string path, params string[] json) =>
+            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRAPPEND), CombineArguments(key, path, json)));
 
         public static Task JsonArrayIndexOfAsync(this IDatabase db)
         {

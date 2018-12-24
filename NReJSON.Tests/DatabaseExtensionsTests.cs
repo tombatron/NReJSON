@@ -182,6 +182,15 @@ namespace NReJSON.Tests
 
         public class JsonStringLength
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonStringLength("fake_key", ".fake.path");
+
+                Assert.Equal(new[] { "JSON.STRLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
+            }
 
         }
 

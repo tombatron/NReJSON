@@ -183,7 +183,15 @@ namespace NReJSON.Tests
 
         public class JsonStringLengthAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonStringLengthAsync("fake_key", ".fake.path");
+
+                Assert.Equal(new[] { "JSON.STRLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayAppendAsync
