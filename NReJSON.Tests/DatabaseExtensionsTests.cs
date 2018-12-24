@@ -203,13 +203,31 @@ namespace NReJSON.Tests
 
                 db.JsonArrayAppend("fake_key", ".fake.path", "\"1\"", "\"2\"");
 
-                Assert.Equal(new[] { "JSON.ARRAPPEND", "fake_key", ".fake.path", "\"1\"", "\"2\""}, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRAPPEND", "fake_key", ".fake.path", "\"1\"", "\"2\"" }, db.PreviousCommand);
             }
         }
 
         public class JsonArrayIndexOf
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonArrayIndexOf("fake_key", ".fake.path", "\"hello world\"", 10, 20);
+
+                Assert.Equal(new[] { "JSON.ARRINDEX", "fake_key", ".fake.path", "\"hello world\"", "10", "20" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasZeroAsDefaultForStartAndStop()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonArrayIndexOf("fake_key", ".fake.path", "\"hello world\"");
+
+                Assert.Equal(new[] { "JSON.ARRINDEX", "fake_key", ".fake.path", "\"hello world\"", "0", "0" }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayInsert
