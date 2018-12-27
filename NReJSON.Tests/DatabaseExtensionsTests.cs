@@ -245,7 +245,25 @@ namespace NReJSON.Tests
 
         public class JsonArrayLength
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonArrayLength("fake_key", ".fake.array.path");
+
+                Assert.Equal(new[] { "JSON.ARRLEN", "fake_key", ".fake.array.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonArrayLength("fake_key");
+
+                Assert.Equal(new[] { "JSON.ARRLEN", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayPop
