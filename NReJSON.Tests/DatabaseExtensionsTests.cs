@@ -232,7 +232,15 @@ namespace NReJSON.Tests
 
         public class JsonArrayInsert
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonArrayInsert("fake_key", ".fake.path", 15, "\"hello\"", "\"world\"");
+
+                Assert.Equal(new[] { "JSON.ARRINSERT", "fake_key", ".fake.path", "15", "\"hello\"", "\"world\"" }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayLength
