@@ -301,7 +301,15 @@ namespace NReJSON.Tests
 
         public class JsonArrayTrim
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonArrayTrim("fake_key", ".fake.path", 1, 10);
+
+                Assert.Equal(new[] { "JSON.ARRTRIM", "fake_key", ".fake.path", "1", "10" }, db.PreviousCommand);
+            }
         }
 
         public class JsonObjectKeys
