@@ -360,7 +360,25 @@ namespace NReJSON.Tests
 
         public class JsonDebugMemory
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonDebugMemory("fake_key", ".fake.path");
+
+                Assert.Equal(new[] { "JSON.DEBUG", "MEMORY", "fake_key", ".fake.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonDebugMemory("fake_key");
+
+                Assert.Equal(new[] { "JSON.DEBUG", "MEMORY", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonForget
