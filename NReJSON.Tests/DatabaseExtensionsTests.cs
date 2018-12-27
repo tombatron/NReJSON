@@ -383,7 +383,25 @@ namespace NReJSON.Tests
 
         public class JsonGetResp
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(true);
 
+                db.JsonGetResp("fake_key", ".hello.fake");
+
+                Assert.Equal(new[] { "JSON.RESP", "fake_key", ".hello.fake" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase(true);
+
+                db.JsonGetResp("fake_key");
+
+                Assert.Equal(new[] { "JSON.RESP", "fake_key", "." }, db.PreviousCommand);
+            }
         }
     }
 }
