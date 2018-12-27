@@ -337,7 +337,25 @@ namespace NReJSON.Tests
 
         public class JsonObjectLength
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonObjectLength("fake_key", ".fake.path");
+
+                Assert.Equal(new[] { "JSON.OBJLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonObjectLength("fake_key");
+
+                Assert.Equal(new[] { "JSON.OBJLEN", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonDebugMemory
