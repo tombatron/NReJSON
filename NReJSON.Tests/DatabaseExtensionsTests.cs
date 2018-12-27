@@ -268,7 +268,35 @@ namespace NReJSON.Tests
 
         public class JsonArrayPop
         {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                db.JsonArrayPop("fake_key", ".what.ever", 10);
+
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".what.ever", "10" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonArrayPop("fake_key", index: 10);
+
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".", "10" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void HasNegativeOneAsDefaultIndex()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonArrayPop("fake_key", ".what.ever");
+
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".what.ever", "-1" }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayTrim
