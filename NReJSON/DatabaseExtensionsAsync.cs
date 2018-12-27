@@ -236,11 +236,6 @@ namespace NReJSON
             return Task.CompletedTask;
         }
 
-        public static Task JsonForgetAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
-
         public static Task JsonGetRespAsync(this IDatabase db)
         {
             return Task.CompletedTask;

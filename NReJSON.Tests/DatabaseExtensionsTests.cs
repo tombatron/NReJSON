@@ -381,11 +381,6 @@ namespace NReJSON.Tests
             }
         }
 
-        public class JsonForget
-        {
-
-        }
-
         public class JsonGetResp
         {
 

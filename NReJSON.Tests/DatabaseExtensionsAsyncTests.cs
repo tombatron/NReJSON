@@ -247,11 +247,6 @@ namespace NReJSON.Tests
 
         }
 
-        public class JsonForgetAsync
-        {
-
-        }
-
         public class JsonGetRespAsync
         {
 

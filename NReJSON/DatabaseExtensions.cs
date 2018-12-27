@@ -362,20 +362,6 @@ namespace NReJSON
             (int)db.Execute(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path));
 
         /// <summary>
-        /// `JSON.FORGET`
-        /// 
-        /// An alias for JSON.DEL.
-        /// 
-        /// https://oss.redislabs.com/rejson/commands/#jsonforget
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static int JsonForget(this IDatabase db, RedisKey key, string path = ".") =>
-            db.JsonDelete(key, path);
-
-        /// <summary>
         /// `JSON.RESP`
         /// 
         /// This command uses the following mapping from JSON to RESP: 
