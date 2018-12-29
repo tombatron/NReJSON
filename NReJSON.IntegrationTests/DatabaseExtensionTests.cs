@@ -289,9 +289,19 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-        public class JsonGetResp
+        public class JsonGetResp : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
 
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = ((RedisResult[])_db.JsonGetResp(key)[1])[1];
+
+                Assert.Equal("world", result.ToString());
+            }
         }
     }
 }
