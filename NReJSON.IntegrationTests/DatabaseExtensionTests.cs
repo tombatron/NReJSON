@@ -6,6 +6,101 @@ namespace NReJSON.IntegrationTests
 {
     public class DatabaseExtensionTests : BaseIntegrationTest
     {
+        public class JsonSet
+        {
+
+        }
+
+        public class JsonGet
+        {
+
+        }
+
+        public class JsonDelete
+        {
+
+        }
+
+        public class JsonMultiGet
+        {
+
+        }
+
+        public class JsonType
+        {
+
+        }
+
+        public class JsonIncrementNumber
+        {
+
+        }
+
+        public class JsonMultiplyNumber
+        {
+
+        }
+
+        public class JsonAppendJsonString
+        {
+
+        }
+
+        public class JsonStringLength
+        {
+
+        }
+
+        public class JsonArrayAppend
+        {
+
+        }
+
+        public class JsonArrayIndexOf
+        {
+
+        }
+
+        public class JsonArrayInsert
+        {
+
+        }
+
+        public class JsonArrayLength
+        {
+
+        }
+
+        public class JsonArrayPop
+        {
+
+        }
+
+        public class JsonArrayTrim
+        {
+
+        }
+
+        public class JsonObjectKeys
+        {
+
+        }
+
+        public class JsonObjectLength
+        {
+
+        }
+
+        public class JsonDebugMemory
+        {
+
+        }
+
+        public class JsonGetResp
+        {
+
+        }
+
         [Fact]
         public void ItCanSetJson()
         {
