@@ -34,9 +34,21 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-        public class JsonDelete
+        public class JsonDelete : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonDelete(key, ".goodnight");
+                var jsonResult = _db.JsonGet(key);
+
+                Assert.Equal(1, result);
+                Assert.DoesNotContain("goodnight", jsonResult.ToString());
+            }
         }
 
         public class JsonMultiGet : BaseIntegrationTest
