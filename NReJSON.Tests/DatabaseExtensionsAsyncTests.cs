@@ -209,47 +209,199 @@ namespace NReJSON.Tests
 
         public class JsonArrayIndexOfAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonArrayIndexOfAsync("fake_key", ".fake.path", "\"hello world\"", 10, 20);
+
+                Assert.Equal(new[] { "JSON.ARRINDEX", "fake_key", ".fake.path", "\"hello world\"", "10", "20" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasZeroAsDefaultForStartAndStop()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonArrayIndexOfAsync("fake_key", ".fake.path", "\"hello world\"");
+
+                Assert.Equal(new[] { "JSON.ARRINDEX", "fake_key", ".fake.path", "\"hello world\"", "0", "0" }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayInsertAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonArrayInsertAsync("fake_key", ".fake.path", 15, "\"hello\"", "\"world\"");
+
+                Assert.Equal(new[] { "JSON.ARRINSERT", "fake_key", ".fake.path", "15", "\"hello\"", "\"world\"" }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayLengthAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonArrayLengthAsync("fake_key", ".fake.array.path");
+
+                Assert.Equal(new[] { "JSON.ARRLEN", "fake_key", ".fake.array.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonArrayLengthAsync("fake_key");
+
+                Assert.Equal(new[] { "JSON.ARRLEN", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayPopAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonArrayPopAsync("fake_key", ".what.ever", 10);
+
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".what.ever", "10" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonArrayPopAsync("fake_key", index: 10);
+
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".", "10" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasNegativeOneAsDefaultIndex()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonArrayPopAsync("fake_key", ".what.ever");
+
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".what.ever", "-1" }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayTrimAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonArrayTrimAsync("fake_key", ".fake.path", 1, 10);
+
+                Assert.Equal(new[] { "JSON.ARRTRIM", "fake_key", ".fake.path", "1", "10" }, db.PreviousCommand);
+            }
         }
 
         public class JsonObjectKeysAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(true);
 
+                await db.JsonObjectKeysAsync("fake_key", ".fake.path");
+
+                Assert.Equal(new[] { "JSON.OBJKEYS", "fake_key", ".fake.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase(true);
+
+                await db.JsonObjectKeysAsync("fake_key");
+
+                Assert.Equal(new[] { "JSON.OBJKEYS", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonObjectLengthAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonObjectLengthAsync("fake_key", ".fake.path");
+
+                Assert.Equal(new[] { "JSON.OBJLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonObjectLengthAsync("fake_key");
+
+                Assert.Equal(new[] { "JSON.OBJLEN", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonDebugMemoryAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
 
+                await db.JsonDebugMemoryAsync("fake_key", ".fake.path");
+
+                Assert.Equal(new[] { "JSON.DEBUG", "MEMORY", "fake_key", ".fake.path" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonDebugMemoryAsync("fake_key");
+
+                Assert.Equal(new[] { "JSON.DEBUG", "MEMORY", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonGetRespAsync
         {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(true);
 
+                await db.JsonGetRespAsync("fake_key", ".hello.fake");
+
+                Assert.Equal(new[] { "JSON.RESP", "fake_key", ".hello.fake" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase(true);
+
+                await db.JsonGetRespAsync("fake_key");
+
+                Assert.Equal(new[] { "JSON.RESP", "fake_key", "." }, db.PreviousCommand);
+            }
         }
     }
 }
