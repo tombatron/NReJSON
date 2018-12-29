@@ -346,10 +346,19 @@ namespace NReJSON
             }
         }
 
-        public static Task JsonDebugAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.DEBUG MEMORY`
+        /// 
+        /// Report the memory usage in bytes of a value. `path` defaults to root if not provided.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsondebug
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Integer, specifically the size in bytes of the value</returns>
+        public static async Task<int> JsonDebugAsync(this IDatabase db, RedisKey key, string path = ".") =>
+            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path)));
 
         public static Task JsonGetRespAsync(this IDatabase db)
         {
