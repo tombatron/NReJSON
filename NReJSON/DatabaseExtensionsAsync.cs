@@ -319,9 +319,31 @@ namespace NReJSON
         public static async Task<RedisResult[]> JsonObjectKeysAsync(this IDatabase db, RedisKey key, string path = ".") =>
             (RedisResult[])(await db.ExecuteAsync(GetCommandName(CommandType.Json.OBJKEYS), CombineArguments(key, path)));
 
-        public static Task JsonObjectLengthAsync(this IDatabase db)
+        /// <summary>
+        /// `JSON.OBJLEN`
+        /// 
+        /// Report the number of keys in the JSON Object at `path` in `key`.
+        ///
+        /// `path` defaults to root if not provided. If the `key` or `path` do not exist, null is returned.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonobjlen
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Integer, specifically the number of keys in the object.</returns>
+        public static async Task<int?> JsonObjectLengthAsync(this IDatabase db)
         {
-            return Task.CompletedTask;
+            var result = await db.ExecuteAsync(GetCommandName(CommandType.Json.OBJLEN), CombineArguments(key, path));
+
+            if (result.IsNull)
+            {
+                return null;
+            }
+            else
+            {
+                return (int)result;
+            }
         }
 
         public static Task JsonDebugAsync(this IDatabase db)
