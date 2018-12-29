@@ -235,9 +235,31 @@ namespace NReJSON
         public static async Task<int> JsonArrayInsertAsync(this IDatabase db, RedisKey key, string path, int index, params string[] json) =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRINSERT), CombineArguments(key, path, index, json)));
 
-        public static Task JsonArrayLengthAsync(this IDatabase db)
+        /// <summary>
+        /// `JSON.ARRLEN`
+        /// 
+        /// Report the length of the JSON Array at `path` in `key`.
+        /// 
+        /// `path` defaults to root if not provided. If the `key` or `path` do not exist, null is returned.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrlen
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns>Integer, specifically the array's length.</returns>
+        public static async Task<int?> JsonArrayLengthAsync(this IDatabase db, RedisKey key, string path = ".")
         {
-            return Task.CompletedTask;
+            var result = await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRLEN), CombineArguments(key, path));
+
+            if (result.IsNull)
+            {
+                return null;
+            }
+            else
+            {
+                return (int)result;
+            }
         }
 
         public static Task JsonArrayPopAsync(this IDatabase db)
