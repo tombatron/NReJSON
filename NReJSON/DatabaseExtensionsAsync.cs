@@ -360,9 +360,30 @@ namespace NReJSON
         public static async Task<int> JsonDebugAsync(this IDatabase db, RedisKey key, string path = ".") =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path)));
 
-        public static Task JsonGetRespAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.RESP`
+        /// 
+        /// This command uses the following mapping from JSON to RESP: 
+        /// 
+        ///     - JSON Null is mapped to the RESP Null Bulk String 
+        ///     
+        ///     - JSON `false` and `true` values are mapped to the respective RESP Simple Strings 
+        ///     
+        ///     - JSON Numbers are mapped to RESP Integers or RESP Bulk Strings, depending on type 
+        ///     
+        ///     - JSON Strings are mapped to RESP Bulk Strings 
+        ///     
+        ///     - JSON Arrays are represented as RESP Arrays in which the first element is the simple string `[` followed by the array's elements 
+        ///     
+        ///     - JSON Objects are represented as RESP Arrays in which the first element is the simple string `{`. Each successive entry represents a key-value pair as a two-entries array of bulk strings.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonresp
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path">Defaults to root if not provided. </param>
+        /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
+        public static async Task<RedisResult[]> JsonGetRespAsync(this IDatabase db, RedisKey key, string path = ".") =>
+            (RedisResult[])(await db.ExecuteAsync(GetCommandName(CommandType.Json.RESP), key, path));
     }
 }
