@@ -332,7 +332,7 @@ namespace NReJSON
         /// <param name="key"></param>
         /// <param name="path"></param>
         /// <returns>Integer, specifically the number of keys in the object.</returns>
-        public static async Task<int?> JsonObjectLengthAsync(this IDatabase db)
+        public static async Task<int?> JsonObjectLengthAsync(this IDatabase db, RedisKey key, string path = ".")
         {
             var result = await db.ExecuteAsync(GetCommandName(CommandType.Json.OBJLEN), CombineArguments(key, path));
 
