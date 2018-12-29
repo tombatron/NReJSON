@@ -4,16 +4,34 @@ using Xunit;
 
 namespace NReJSON.IntegrationTests
 {
-    public class DatabaseExtensionTests : BaseIntegrationTest
+    public class DatabaseExtensionTests
     {
-        public class JsonSet
+        public class JsonSet : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                var result = _db.JsonSet(key, "{}");
+
+                Assert.NotNull(result);
+            }
         }
 
-        public class JsonGet
+        public class JsonGet : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonGet("test_get_object");
+
+                Assert.False(result.IsNull);
+            }
         }
 
         public class JsonDelete
@@ -21,44 +39,136 @@ namespace NReJSON.IntegrationTests
 
         }
 
-        public class JsonMultiGet
+        public class JsonMultiGet : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key1 = Guid.NewGuid().ToString("N");
+                var key2 = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+                _db.JsonSet(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
+
+                var result = _db.JsonMultiGet(new RedisKey[] { key1, key2 });
+
+                Assert.Equal(2, result.Length);
+                Assert.Contains("world", result[0].ToString());
+                Assert.Contains("tom", result[1].ToString());
+            }
         }
 
-        public class JsonType
+        public class JsonType : BaseIntegrationTest
         {
+            [Theory]
+            [InlineData(".string", "string")]
+            [InlineData(".integer", "integer")]
+            [InlineData(".boolean", "boolean")]
+            [InlineData(".number", "number")]
+            public void CanExecute(string path, string value)
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key, "{\"string\":\"hello world\", \"integer\":5, \"boolean\": true, \"number\":4.7}");
+
+                var typeResult = _db.JsonType(key, path);
+
+                Assert.Equal(value, typeResult.ToString());
+            }
         }
 
-        public class JsonIncrementNumber
+        public class JsonIncrementNumber : BaseIntegrationTest
         {
+            [Theory]
+            [InlineData(".integer", 1, 2)]
+            [InlineData(".number", .9, 2)]
+            public void CanExecute(string path, double number, double expectedResult)
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key, "{\"integer\":1,\"number\":1.1}");
+
+                var result = _db.JsonIncrementNumber(key, path, number);
+
+                Assert.Equal(expectedResult, (double)result, 2);
+            }
         }
 
-        public class JsonMultiplyNumber
+        public class JsonMultiplyNumber : BaseIntegrationTest
         {
+            [Theory]
+            [InlineData(".integer", 10, 10)]
+            [InlineData(".number", .9, .99)]
+            public void CanExecute(string path, double number, double expectedResult)
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key, "{\"integer\":1,\"number\":1.1}");
+
+                var result = _db.JsonMultiplyNumber(key, path, number);
+
+                Assert.Equal(expectedResult, (double)result, 2);
+            }
         }
 
-        public class JsonAppendJsonString
+        public class JsonAppendJsonString : BaseIntegrationTest
         {
+            [Fact(Skip = "This doesn't work, not sure what I'm doing wrong yet.")]
+            public void ItCanAppendJsonString()
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key, "{\"hello\":\"world\"}");
+
+                var result = _db.JsonAppendJsonString(key, ".hello", "{\"t\":1}");
+
+                Assert.Equal(4, result);
+            }
         }
 
-        public class JsonStringLength
+        public class JsonStringLength : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key, "{\"hello\":\"world\"}");
+
+                var result = _db.JsonStringLength(key, ".hello");
+
+                Assert.Equal(5, result);
+            }
         }
 
-        public class JsonArrayAppend
+        public class JsonArrayAppend : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString("N");
 
+                _db.JsonSet(key, "{\"array\": []}");
+
+                var result = _db.JsonArrayAppend(key, ".array", "\"hello\"", "\"world\"");
+
+                Assert.Equal(2, result);
+            }
         }
 
-        public class JsonArrayIndexOf
+        public class JsonArrayIndexOf : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
 
+                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+
+                var result = _db.JsonArrayIndexOf(key, ".array", "\"world\"", 0, 2);
+
+                Assert.Equal(1, result);
+            }
         }
 
         public class JsonArrayInsert
@@ -99,163 +209,6 @@ namespace NReJSON.IntegrationTests
         public class JsonGetResp
         {
 
-        }
-
-        [Fact]
-        public void ItCanSetJson()
-        {
-            var result = _db.JsonSet("test_key_set", "{}");
-
-            Assert.NotNull(result);
-        }
-
-        [Fact]
-        public void ItCanGetAJsonObject()
-        {
-            _db.JsonSet("test_get_object", "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
-
-            var result = _db.JsonGet("test_get_object");
-
-            Assert.False(result.IsNull);
-        }
-
-        [Fact]
-        public void ItCanGetJsonAtASinglePath()
-        {
-            var key = Guid.NewGuid().ToString("N");
-
-            _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
-
-            var result = _db.JsonGet(key, ".hello");
-
-            Assert.Equal("\"world\"", result.ToString());
-        }
-
-        [Fact]
-        public void ItCanGetJsonAtMultiplePaths()
-        {
-            _db.JsonSet("test_get_object", "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
-
-            var result = _db.JsonGet("test_get_object", ".hello", ".goodnight.value");
-
-            Assert.Equal("{\".hello\":\"world\",\".goodnight.value\":\"moon\"}", result.ToString());
-        }
-
-        [Fact]
-        public void ItCanGetMultipleJsonObjectAtDefaultPath()
-        {
-            _db.JsonSet("test_multiget_object:1", "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
-            _db.JsonSet("test_multiget_object:2", "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
-
-            var result = _db.JsonMultiGet(new RedisKey[] { "test_multiget_object:1", "test_multiget_object:2" });
-
-            Assert.Equal(2, result.Length);
-            Assert.Contains("world", result[0].ToString());
-            Assert.Contains("tom", result[1].ToString());
-        }
-
-        [Fact]
-        public void ItCanGetMultipleJsonObjectAtSpecificPath()
-        {
-            _db.JsonSet("test_multiget_object:1", "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
-            _db.JsonSet("test_multiget_object:2", "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
-
-            var result = _db.JsonMultiGet(new RedisKey[] { "test_multiget_object:1", "test_multiget_object:2" }, ".hello");
-
-            Assert.Equal("\"world\"", result[0].ToString());
-            Assert.Equal("\"tom\"", result[1].ToString());
-        }
-
-        [Theory]
-        [InlineData(".string", "string")]
-        [InlineData(".integer", "integer")]
-        [InlineData(".boolean", "boolean")]
-        [InlineData(".number", "number")]
-        public void ItCanGetJsonType(string path, string value)
-        {
-            var key = $"test_{nameof(ItCanGetJsonType)}";
-
-            _db.JsonSet(key, "{\"string\":\"hello world\", \"integer\":5, \"boolean\": true, \"number\":4.7}");
-
-            var typeResult = _db.JsonType(key, path);
-
-            Assert.Equal(value, typeResult.ToString());
-        }
-
-        [Theory]
-        [InlineData(".integer", 1, 2)]
-        [InlineData(".number", .9, 2)]
-        public void ItCanIncrementJsonValues(string path, double number, double expectedResult)
-        {
-            var key = $"test_{nameof(ItCanIncrementJsonValues)}";
-
-            _db.JsonSet(key, "{\"integer\":1,\"number\":1.1}");
-
-            var result = _db.JsonIncrementNumber(key, path, number);
-
-            Assert.Equal(expectedResult, (double)result, 2);
-        }
-
-        [Theory]
-        [InlineData(".integer", 10, 10)]
-        [InlineData(".number", .9, .99)]
-        public void ItCanMultiplyJsonValues(string path, double number, double expectedResult)
-        {
-            var key = $"test_{nameof(ItCanMultiplyJsonValues)}";
-
-            _db.JsonSet(key, "{\"integer\":1,\"number\":1.1}");
-
-            var result = _db.JsonMultiplyNumber(key, path, number);
-
-            Assert.Equal(expectedResult, (double)result, 2);
-        }
-
-        [Fact(Skip = "This doesn't work, not sure what I'm doing wrong yet.")]
-        public void ItCanAppendJsonString()
-        {
-            var key = $"test_{nameof(ItCanAppendJsonString)}";
-
-            _db.JsonSet(key, "{\"hello\":\"world\"}");
-
-            var result = _db.JsonAppendJsonString(key, ".hello", "{\"t\":1}");
-
-            Assert.Equal(4, result);
-        }
-
-        [Fact]
-        public void ItCanGetJsonStringLength()
-        {
-            var key = $"test_{nameof(ItCanGetJsonStringLength)}";
-
-            _db.JsonSet(key, "{\"hello\":\"world\"}");
-
-            var result = _db.JsonStringLength(key, ".hello");
-
-            Assert.Equal(5, result);
-        }
-
-        [Fact]
-        public void ItCanAppendToJsonArray()
-        {
-            var key = $"test_{nameof(ItCanAppendToJsonArray)}";
-
-            _db.JsonSet(key, "{\"array\": []}");
-
-            var result = _db.JsonArrayAppend(key, ".array", "\"hello\"", "\"world\"");
-
-            Assert.Equal(2, result);
-        }
-
-        [Fact]
-        public void ItCanFindScalarValueInJsonArray()
-        {
-            var key = $"test_{nameof(ItCanFindScalarValueInJsonArray)}";
-
-            _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
-
-            var result = _db.JsonArrayIndexOf(key, ".array", "\"world\"", 0, 2);
-
-            Assert.Equal(1, result);
         }
     }
 }
