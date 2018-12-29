@@ -228,9 +228,19 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-        public class JsonArrayTrim
+        public class JsonArrayTrim : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
 
+                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+
+                var result = _db.JsonArrayTrim(key, ".array", 0, 1);
+
+                Assert.Equal(2, result);
+            }
         }
 
         public class JsonObjectKeys

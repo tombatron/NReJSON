@@ -300,7 +300,7 @@ namespace NReJSON
         /// <param name="path"></param>
         /// <param name="start"></param>
         /// <param name="stop"></param>
-        /// <returns></returns>
+        /// <returns>New length of affected array.</returns>
         public static int JsonArrayTrim(this IDatabase db, RedisKey key, string path, int start, int stop) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRTRIM), CombineArguments(key, path, start, stop));
 
