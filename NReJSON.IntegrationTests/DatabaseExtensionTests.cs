@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using StackExchange.Redis;
 using Xunit;
 
@@ -243,9 +244,19 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-        public class JsonObjectKeys
+        public class JsonObjectKeys : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
 
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonObjectKeys(key);
+
+                Assert.Equal(new[] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
+            }
         }
 
         public class JsonObjectLength
