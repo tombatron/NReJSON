@@ -279,10 +279,29 @@ namespace NReJSON
         public static Task<RedisResult> JsonArrayPopAsync(this IDatabase db, RedisKey key, string path = ".", int index = -1) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.ARRPOP), CombineArguments(key, path, index));
 
-        public static Task JsonArrayTrimAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.ARRTRIM`
+        /// 
+        /// Trim an array so that it contains only the specified inclusive range of elements.
+        /// 
+        /// This command is extremely forgiving and using it with out of range indexes will not produce an error. 
+        /// 
+        /// If start is larger than the array's size or start > stop, the result will be an empty array. 
+        /// 
+        /// If start is &lt; 0 then it will be treated as 0. 
+        /// 
+        /// If stop is larger than the end of the array, it will be treated like the last element in it.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrtrim
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="start"></param>
+        /// <param name="stop"></param>
+        /// <returns></returns>
+        public static async Task<int> JsonArrayTrimAsync(this IDatabase db, RedisKey key, string path, int start, int stop) =>
+            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRTRIM), CombineArguments(key, path, start, stop)));
 
         public static Task JsonObjectKeysAsync(this IDatabase db)
         {
