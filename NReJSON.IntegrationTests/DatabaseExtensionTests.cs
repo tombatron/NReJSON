@@ -274,9 +274,19 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-        public class JsonDebugMemory
+        public class JsonDebugMemory : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
 
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonDebugMemory(key, ".goodnight");
+
+                Assert.Equal(89, result);
+            }
         }
 
         public class JsonGetResp
