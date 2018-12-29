@@ -357,7 +357,7 @@ namespace NReJSON
         /// <param name="key"></param>
         /// <param name="path"></param>
         /// <returns>Integer, specifically the size in bytes of the value</returns>
-        public static async Task<int> JsonDebugAsync(this IDatabase db, RedisKey key, string path = ".") =>
+        public static async Task<int> JsonDebugMemoryAsync(this IDatabase db, RedisKey key, string path = ".") =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path)));
 
         /// <summary>
