@@ -213,9 +213,19 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-        public class JsonArrayPop
+        public class JsonArrayPop : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
 
+                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+
+                var result = _db.JsonArrayPop(key, ".array", 1);
+
+                Assert.Equal("\"world\"", result.ToString());
+            }
         }
 
         public class JsonArrayTrim
