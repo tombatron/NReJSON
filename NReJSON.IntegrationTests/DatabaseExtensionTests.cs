@@ -198,9 +198,19 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-        public class JsonArrayLength
+        public class JsonArrayLength : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
 
+                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+
+                var result = _db.JsonArrayLength(key, ".array");
+
+                Assert.Equal(3, result);
+            }
         }
 
         public class JsonArrayPop
