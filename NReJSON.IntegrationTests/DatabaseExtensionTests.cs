@@ -259,9 +259,19 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-        public class JsonObjectLength
+        public class JsonObjectLength : BaseIntegrationTest
         {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
 
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonObjectLength(key, ".goodnight");
+
+                Assert.Equal(1, result);
+            }
         }
 
         public class JsonDebugMemory
