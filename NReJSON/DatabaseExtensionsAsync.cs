@@ -196,10 +196,26 @@ namespace NReJSON
         public static async Task<int> JsonArrayAppendAsync(this IDatabase db, RedisKey key, string path, params string[] json) =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRAPPEND), CombineArguments(key, path, json)));
 
-        public static Task JsonArrayIndexOfAsync(this IDatabase db)
-        {
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// `JSON.ARRINDEX`
+        /// 
+        /// Search for the first occurrence of a scalar JSON value in an array.
+        ///
+        /// The optional inclusive `start`(default 0) and exclusive `stop`(default 0, meaning that the last element is included) specify a slice of the array to search.
+        ///
+        /// Note: out of range errors are treated by rounding the index to the array's start and end. An inverse index range (e.g. from 1 to 0) will return unfound.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrindex
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <param name="jsonScalar"></param>
+        /// <param name="start"></param>
+        /// <param name="stop"></param>
+        /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
+        public static async Task<int> JsonArrayIndexOfAsync(this IDatabase db, RedisKey key, string path, string jsonScalar, int start = 0, int stop = 0) =>
+            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRINDEX), CombineArguments(key, path, jsonScalar, start, stop)));
 
         public static Task JsonArrayInsertAsync(this IDatabase db)
         {
