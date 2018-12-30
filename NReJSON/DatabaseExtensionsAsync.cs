@@ -200,7 +200,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrappend
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to append to.</param>
         /// <param name="path"></param>
         /// <param name="json"></param>
         /// <returns>Integer, specifically the array's new size.</returns>
@@ -219,7 +219,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrindex
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to check for a scalar value in.</param>
         /// <param name="path"></param>
         /// <param name="jsonScalar"></param>
         /// <param name="start"></param>
@@ -238,7 +238,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrinsert
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to insert an object into.</param>
         /// <param name="path"></param>
         /// <param name="index"></param>
         /// <param name="json"></param>
@@ -256,7 +256,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrlen
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want the length of.</param>
         /// <param name="path"></param>
         /// <returns>Integer, specifically the array's length.</returns>
         public static async Task<int?> JsonArrayLengthAsync(this IDatabase db, RedisKey key, string path = ".")
@@ -283,7 +283,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrpop
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to pop an object off of.</param>
         /// <param name="path">Defaults to root (".") if not provided.</param>
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <returns>Bulk String, specifically the popped JSON value.</returns>
@@ -306,7 +306,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrtrim
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to trim.</param>
         /// <param name="path"></param>
         /// <param name="start"></param>
         /// <param name="stop"></param>
@@ -324,7 +324,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonobjkeys
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object which you want to enumerate keys for.</param>
         /// <param name="path"></param>
         /// <returns>Array, specifically the key names in the object as Bulk Strings.</returns>
         public static async Task<RedisResult[]> JsonObjectKeysAsync(this IDatabase db, RedisKey key, string path = ".") =>
@@ -340,7 +340,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonobjlen
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object which you want the length of.</param>
         /// <param name="path"></param>
         /// <returns>Integer, specifically the number of keys in the object.</returns>
         public static async Task<int?> JsonObjectLengthAsync(this IDatabase db, RedisKey key, string path = ".")
@@ -365,7 +365,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsondebug
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that you want to determine the memory usage of.</param>
         /// <param name="path"></param>
         /// <returns>Integer, specifically the size in bytes of the value</returns>
         public static async Task<int> JsonDebugMemoryAsync(this IDatabase db, RedisKey key, string path = ".") =>
@@ -391,7 +391,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonresp
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that you want an RESP result for.</param>
         /// <param name="path">Defaults to root if not provided. </param>
         /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
         public static async Task<RedisResult[]> JsonGetRespAsync(this IDatabase db, RedisKey key, string path = ".") =>
