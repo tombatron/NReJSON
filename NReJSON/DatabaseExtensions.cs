@@ -17,7 +17,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsondel
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="path">Defaults to root if not provided.</param>
         /// <returns>Integer, specifically the number of paths deleted (0 or 1).</returns>
         public static int JsonDelete(this IDatabase db, RedisKey key, string path = ".") =>
@@ -33,8 +33,8 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonget
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="paths"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
+        /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
             db.JsonGet(key, true, paths);
@@ -47,9 +47,9 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonget
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
-        /// <param name="paths"></param>
+        /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape, params string[] paths) =>
             db.Execute(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, PathsOrDefault(paths, new[] { "." })));
@@ -62,8 +62,8 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonmget
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="keys"></param>
-        /// <param name="path"></param>
+        /// <param name="keys">Keys where JSON objects are stored.</param>
+        /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static RedisResult[] JsonMultiGet(this IDatabase db, string[] keys, string path = ".") =>
             db.JsonMultiGet(keys.Select(k => (RedisKey)k).ToArray(), path);
@@ -76,8 +76,8 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonmget
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="keys"></param>
-        /// <param name="path"></param>
+        /// <param name="keys">Keys where JSON objects are stored.</param>
+        /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static RedisResult[] JsonMultiGet(this IDatabase db, RedisKey[] keys, string path = ".") =>
             (RedisResult[])db.Execute(GetCommandName(CommandType.Json.MGET), CombineArguments(keys, path));
@@ -94,10 +94,10 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonset
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="json"></param>
-        /// <param name="path"></param>
-        /// <param name="setOption"></param>
+        /// <param name="key">Key where JSON object is to be stored.</param>
+        /// <param name="json">The JSON object which you want to persist.</param>
+        /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
+        /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
         /// <returns></returns>
         public static RedisResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
             db.Execute(GetCommandName(CommandType.Json.SET), CombineArguments(key, path, json, GetSetOptionString(setOption)));
@@ -112,8 +112,8 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsontype
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
+        /// <param name="key">The key of the JSON object you need the type of.</param>
+        /// <param name="path">The path of the JSON object you want the type of. This defaults to root.</param>
         /// <returns></returns>
         public static RedisResult JsonType(this IDatabase db, RedisKey key, string path = ".") =>
             db.Execute(GetCommandName(CommandType.Json.TYPE), CombineArguments(key, path));
@@ -126,9 +126,9 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonnumincrby
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
-        /// <param name="number"></param>
+        /// <param name="key">The key of the JSON object which contains the number value you want to increment.</param>
+        /// <param name="path">The path of the JSON value you want to increment.</param>
+        /// <param name="number">The value you want to increment by.</param>
         public static RedisResult JsonIncrementNumber(this IDatabase db, RedisKey key, string path, double number) =>
             db.Execute(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number));
 
@@ -140,9 +140,9 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonnummultby
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
-        /// <param name="number"></param>
+        /// <param name="key">They key of the JSON object which contains the number value you want to multiply.</param>
+        /// <param name="path">The path of the JSON value you want to multiply.</param>
+        /// <param name="number">The value you want to multiply by.</param>
         public static RedisResult JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number) =>
             db.Execute(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number));
 
@@ -171,13 +171,13 @@ namespace NReJSON
         /// 
         /// Report the length of the JSON String at `path` in `key`.
         ///
-        /// `path` defaults to root if not provided. If the `key` does not exist, null is returned.
+        /// `path` defaults to root if not provided. If the `key` or `path` do not exist, null is returned.
         /// 
         /// https://oss.redislabs.com/rejson/commands/#jsonstrlen
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
+        /// <param name="key">The key of the JSON object you need string length information about.</param>
+        /// <param name="path">The path of the JSON string you want the length of. This defaults to root.</param>
         /// <returns>Integer, specifically the string's length.</returns>
         public static int? JsonStringLength(this IDatabase db, RedisKey key, string path = ".")
         {
@@ -201,9 +201,9 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrappend
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
-        /// <param name="json"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to append to.</param>
+        /// <param name="path">The path to the JSON array you want to append to.</param>
+        /// <param name="json">The JSON values that you want to append.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path, params string[] json) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRAPPEND), CombineArguments(key, path, json));
@@ -220,11 +220,11 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrindex
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
-        /// <param name="jsonScalar"></param>
-        /// <param name="start"></param>
-        /// <param name="stop"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to check for a scalar value in.</param>
+        /// <param name="path">The path to the JSON array that you want to check.</param>
+        /// <param name="jsonScalar">The JSON object that you are looking for.</param>
+        /// <param name="start">Where to start searching, defaults to 0 (the beginning of the array).</param>
+        /// <param name="stop">Where to stop searching, defaults to 0 (the end of the array).</param>
         /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
         public static int JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, string jsonScalar, int start = 0, int stop = 0) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRINDEX), CombineArguments(key, path, jsonScalar, start, stop));
@@ -239,10 +239,10 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrinsert
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
-        /// <param name="index"></param>
-        /// <param name="json"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to insert an object into.</param>
+        /// <param name="path">The path of the JSON array that you want to insert into.</param>
+        /// <param name="index">The index at which you want to insert, 0 prepends and negative values are interpreted as starting from the end.</param>
+        /// <param name="json">The object that you want to insert.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index, params string[] json) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRINSERT), CombineArguments(key, path, index, json));
@@ -257,8 +257,8 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrlen
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want the length of.</param>
+        /// <param name="path">The path to the JSON array that you want the length of.</param>
         /// <returns>Integer, specifically the array's length.</returns>
         public static int? JsonArrayLength(this IDatabase db, RedisKey key, string path = ".")
         {
@@ -284,7 +284,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrpop
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to pop an object off of.</param>
         /// <param name="path">Defaults to root (".") if not provided.</param>
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <returns>Bulk String, specifically the popped JSON value.</returns>
@@ -307,11 +307,11 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonarrtrim
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
-        /// <param name="start"></param>
-        /// <param name="stop"></param>
-        /// <returns>New length of affected array.</returns>
+        /// <param name="key">The key of the JSON object that contains the array you want to trim.</param>
+        /// <param name="path">The path of the JSON array that you want to trim.</param>
+        /// <param name="start">The inclusive start index.</param>
+        /// <param name="stop">The inclusive stop index.</param>
+        /// <returns></returns>
         public static int JsonArrayTrim(this IDatabase db, RedisKey key, string path, int start, int stop) =>
             (int)db.Execute(GetCommandName(CommandType.Json.ARRTRIM), CombineArguments(key, path, start, stop));
 
@@ -325,8 +325,8 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonobjkeys
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
+        /// <param name="key">The key of the JSON object which you want to enumerate keys for.</param>
+        /// <param name="path">The path to the JSON object you want the keys for, this defaults to root.</param>
         /// <returns>Array, specifically the key names in the object as Bulk Strings.</returns>
         public static RedisResult[] JsonObjectKeys(this IDatabase db, RedisKey key, string path = ".") =>
             (RedisResult[])db.Execute(GetCommandName(CommandType.Json.OBJKEYS), CombineArguments(key, path));
@@ -341,8 +341,8 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonobjlen
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
+        /// <param name="key">The key of the JSON object which you want the length of.</param>
+        /// <param name="path">The path to the JSON object which you want the length of, defaults to root.</param>
         /// <returns>Integer, specifically the number of keys in the object.</returns>
         public static int? JsonObjectLength(this IDatabase db, RedisKey key, string path = ".")
         {
@@ -366,8 +366,8 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsondebug
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
+        /// <param name="key">The key of the JSON object that you want to determine the memory usage of.</param>
+        /// <param name="path">The path to JSON object you want to check, this defaults to root.</param>
         /// <returns>Integer, specifically the size in bytes of the value</returns>
         public static int JsonDebugMemory(this IDatabase db, RedisKey key, string path = ".") =>
             (int)db.Execute(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path));
@@ -392,7 +392,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonresp
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object that you want an RESP result for.</param>
         /// <param name="path">Defaults to root if not provided. </param>
         /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
         public static RedisResult[] JsonGetResp(this IDatabase db, RedisKey key, string path = ".") =>
