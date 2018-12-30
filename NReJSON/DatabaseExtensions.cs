@@ -20,7 +20,7 @@ namespace NReJSON
         /// <param name="path">Defaults to root if not provided.</param>
         /// <returns>Integer, specifically the number of paths deleted (0 or 1).</returns>
         public static int JsonDelete(this IDatabase db, RedisKey key, string path = ".") =>
-            (int)db.Execute(GetCommandName(CommandType.Json.DEL), CombineArguments(key, path));
+            (int)db.Execute(JsonCommands.DEL, CombineArguments(key, path));
 
         /// <summary>
         /// `JSON.GET`
@@ -51,7 +51,7 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape, params string[] paths) =>
-            db.Execute(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, PathsOrDefault(paths, new[] { "." })));
+            db.Execute(JsonCommands.GET, CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, PathsOrDefault(paths, new[] { "." })));
 
         /// <summary>
         /// `JSON.MGET`
@@ -79,7 +79,7 @@ namespace NReJSON
         /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static RedisResult[] JsonMultiGet(this IDatabase db, RedisKey[] keys, string path = ".") =>
-            (RedisResult[])db.Execute(GetCommandName(CommandType.Json.MGET), CombineArguments(keys, path));
+            (RedisResult[])db.Execute(JsonCommands.MGET, CombineArguments(keys, path));
 
         /// <summary>
         /// `JSON.SET`
@@ -99,7 +99,7 @@ namespace NReJSON
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
         /// <returns></returns>
         public static RedisResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
-            db.Execute(GetCommandName(CommandType.Json.SET), CombineArguments(key, path, json, GetSetOptionString(setOption)));
+            db.Execute(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption)));
 
         /// <summary>
         /// `JSON.TYPE`
@@ -115,7 +115,7 @@ namespace NReJSON
         /// <param name="path">The path of the JSON object you want the type of. This defaults to root.</param>
         /// <returns></returns>
         public static RedisResult JsonType(this IDatabase db, RedisKey key, string path = ".") =>
-            db.Execute(GetCommandName(CommandType.Json.TYPE), CombineArguments(key, path));
+            db.Execute(JsonCommands.TYPE, CombineArguments(key, path));
 
         /// <summary>
         /// `JSON.NUMINCRBY`
@@ -129,7 +129,7 @@ namespace NReJSON
         /// <param name="path">The path of the JSON value you want to increment.</param>
         /// <param name="number">The value you want to increment by.</param>
         public static RedisResult JsonIncrementNumber(this IDatabase db, RedisKey key, string path, double number) =>
-            db.Execute(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number));
+            db.Execute(JsonCommands.NUMINCRBY, CombineArguments(key, path, number));
 
         /// <summary>
         /// `JSON.NUMMULTBY`
@@ -143,7 +143,7 @@ namespace NReJSON
         /// <param name="path">The path of the JSON value you want to multiply.</param>
         /// <param name="number">The value you want to multiply by.</param>
         public static RedisResult JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number) =>
-            db.Execute(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number));
+            db.Execute(JsonCommands.NUMMULTBY, CombineArguments(key, path, number));
 
         /// <summary>
         /// [Not implemented yet]
@@ -180,7 +180,7 @@ namespace NReJSON
         /// <returns>Integer, specifically the string's length.</returns>
         public static int? JsonStringLength(this IDatabase db, RedisKey key, string path = ".")
         {
-            var result = db.Execute(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path));
+            var result = db.Execute(JsonCommands.STRLEN, CombineArguments(key, path));
 
             if (result.IsNull)
             {
@@ -205,7 +205,7 @@ namespace NReJSON
         /// <param name="json">The JSON values that you want to append.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path, params string[] json) =>
-            (int)db.Execute(GetCommandName(CommandType.Json.ARRAPPEND), CombineArguments(key, path, json));
+            (int)db.Execute(JsonCommands.ARRAPPEND, CombineArguments(key, path, json));
 
         /// <summary>
         /// `JSON.ARRINDEX`
@@ -226,7 +226,7 @@ namespace NReJSON
         /// <param name="stop">Where to stop searching, defaults to 0 (the end of the array).</param>
         /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
         public static int JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, string jsonScalar, int start = 0, int stop = 0) =>
-            (int)db.Execute(GetCommandName(CommandType.Json.ARRINDEX), CombineArguments(key, path, jsonScalar, start, stop));
+            (int)db.Execute(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop));
 
         /// <summary>
         /// `JSON.ARRINSERT`
@@ -244,7 +244,7 @@ namespace NReJSON
         /// <param name="json">The object that you want to insert.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index, params string[] json) =>
-            (int)db.Execute(GetCommandName(CommandType.Json.ARRINSERT), CombineArguments(key, path, index, json));
+            (int)db.Execute(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json));
 
         /// <summary>
         /// `JSON.ARRLEN`
@@ -261,7 +261,7 @@ namespace NReJSON
         /// <returns>Integer, specifically the array's length.</returns>
         public static int? JsonArrayLength(this IDatabase db, RedisKey key, string path = ".")
         {
-            var result = db.Execute(GetCommandName(CommandType.Json.ARRLEN), CombineArguments(key, path));
+            var result = db.Execute(JsonCommands.ARRLEN, CombineArguments(key, path));
 
             if (result.IsNull)
             {
@@ -288,7 +288,7 @@ namespace NReJSON
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <returns>Bulk String, specifically the popped JSON value.</returns>
         public static RedisResult JsonArrayPop(this IDatabase db, RedisKey key, string path = ".", int index = -1) =>
-            db.Execute(GetCommandName(CommandType.Json.ARRPOP), CombineArguments(key, path, index));
+            db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index));
 
         /// <summary>
         /// `JSON.ARRTRIM`
@@ -312,7 +312,7 @@ namespace NReJSON
         /// <param name="stop">The inclusive stop index.</param>
         /// <returns></returns>
         public static int JsonArrayTrim(this IDatabase db, RedisKey key, string path, int start, int stop) =>
-            (int)db.Execute(GetCommandName(CommandType.Json.ARRTRIM), CombineArguments(key, path, start, stop));
+            (int)db.Execute(JsonCommands.ARRTRIM, CombineArguments(key, path, start, stop));
 
         /// <summary>
         /// `JSON.OBJKEYS`
@@ -328,7 +328,7 @@ namespace NReJSON
         /// <param name="path">The path to the JSON object you want the keys for, this defaults to root.</param>
         /// <returns>Array, specifically the key names in the object as Bulk Strings.</returns>
         public static RedisResult[] JsonObjectKeys(this IDatabase db, RedisKey key, string path = ".") =>
-            (RedisResult[])db.Execute(GetCommandName(CommandType.Json.OBJKEYS), CombineArguments(key, path));
+            (RedisResult[])db.Execute(JsonCommands.OBJKEYS, CombineArguments(key, path));
 
         /// <summary>
         /// `JSON.OBJLEN`
@@ -345,7 +345,7 @@ namespace NReJSON
         /// <returns>Integer, specifically the number of keys in the object.</returns>
         public static int? JsonObjectLength(this IDatabase db, RedisKey key, string path = ".")
         {
-            var result = db.Execute(GetCommandName(CommandType.Json.OBJLEN), CombineArguments(key, path));
+            var result = db.Execute(JsonCommands.OBJLEN, CombineArguments(key, path));
 
             if (result.IsNull)
             {
@@ -369,7 +369,7 @@ namespace NReJSON
         /// <param name="path">The path to JSON object you want to check, this defaults to root.</param>
         /// <returns>Integer, specifically the size in bytes of the value</returns>
         public static int JsonDebugMemory(this IDatabase db, RedisKey key, string path = ".") =>
-            (int)db.Execute(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path));
+            (int)db.Execute(JsonCommands.DEBUG, CombineArguments("MEMORY", key.ToString(), path));
 
         /// <summary>
         /// `JSON.RESP`
@@ -395,6 +395,6 @@ namespace NReJSON
         /// <param name="path">Defaults to root if not provided. </param>
         /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
         public static RedisResult[] JsonGetResp(this IDatabase db, RedisKey key, string path = ".") =>
-            (RedisResult[])db.Execute(GetCommandName(CommandType.Json.RESP), key, path);
+            (RedisResult[])db.Execute(JsonCommands.RESP, key, path);
     }
 }

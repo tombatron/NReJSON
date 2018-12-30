@@ -6,9 +6,6 @@ namespace NReJSON
 {
     public static partial class DatabaseExtensions
     {
-        private static string GetCommandName(CommandType.Json jsonCommandType) =>
-            $"JSON.{jsonCommandType.ToString()}";
-
         private static string[] CombineArguments(params object[] args)
         {
             IEnumerable<string> _combineArguments(object[] _args)
