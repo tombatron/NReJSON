@@ -179,8 +179,19 @@ namespace NReJSON
         /// <param name="key"></param>
         /// <param name="path"></param>
         /// <returns>Integer, specifically the string's length.</returns>
-        public static int JsonStringLength(this IDatabase db, RedisKey key, string path) =>
-            (int)db.Execute(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path));
+        public static int? JsonStringLength(this IDatabase db, RedisKey key, string path = ".")
+        {
+            var result = db.Execute(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path));
+
+            if (result.IsNull)
+            {
+                return null;
+            }
+            else
+            {
+                return (int)result;
+            }
+        }
 
         /// <summary>
         /// `JSON.ARRAPPEND`

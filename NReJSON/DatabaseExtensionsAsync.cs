@@ -178,8 +178,19 @@ namespace NReJSON
         /// <param name="key">The key of the JSON object you need string length information about.</param>
         /// <param name="path"></param>
         /// <returns>Integer, specifically the string's length.</returns>
-        public static async Task<int> JsonStringLengthAsync(this IDatabase db, RedisKey key, string path) =>
-            (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path)));
+        public static async Task<int?> JsonStringLengthAsync(this IDatabase db, RedisKey key, string path = ".")
+        {
+            var result = await db.ExecuteAsync(GetCommandName(CommandType.Json.STRLEN), CombineArguments(key, path));
+
+            if (result.IsNull)
+            {
+                return null;
+            }
+            else
+            {
+                return (int)result;
+            }
+        }
 
         /// <summary>
         /// `JSON.ARRAPPEND`
