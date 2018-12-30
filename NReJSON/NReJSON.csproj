@@ -9,6 +9,7 @@
     <FileVersion>0.0.1.0</FileVersion>
     <Version>0.0.1</Version>
     <Description>A series of extension methods for use with StackExchange.Redis 2.x and the ReJSON Redis module.</Description>
+    <PackageLicenseUrl>https://mit-license.org/; https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>
