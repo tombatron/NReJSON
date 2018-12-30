@@ -17,7 +17,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsondel
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="path">Defaults to root if not provided.</param>
         /// <returns>Integer, specifically the number of paths deleted (0 or 1).</returns>
         public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = ".") =>
@@ -33,7 +33,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonget
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="paths"></param>
         /// <returns></returns>
         public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths) =>
@@ -47,7 +47,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonget
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
         /// <param name="paths"></param>
         /// <returns></returns>
@@ -62,7 +62,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonmget
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="keys"></param>
+        /// <param name="keys">Keys where JSON objects are stored.</param>
         /// <param name="path"></param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, string[] keys, string path = ".") =>
@@ -76,7 +76,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonmget
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="keys"></param>
+        /// <param name="keys">Keys where JSON objects are stored.</param>
         /// <param name="path"></param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static async Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, RedisKey[] keys, string path = ".") =>
@@ -94,7 +94,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonset
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">Key where JSON object is to be stored.</param>
         /// <param name="json"></param>
         /// <param name="path"></param>
         /// <param name="setOption"></param>
@@ -112,7 +112,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsontype
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object you need the type of.</param>
         /// <param name="path"></param>
         /// <returns></returns>
         public static Task<RedisResult> JsonTypeAsync(this IDatabase db, RedisKey key, string path = ".") =>
@@ -126,7 +126,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonnumincrby
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object which contains the number value you want to increment.</param>
         /// <param name="path"></param>
         /// <param name="number"></param>
         public static Task<RedisResult> JsonIncrementNumberAsync(this IDatabase db, RedisKey key, string path, double number) =>
@@ -140,7 +140,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonnummultby
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">They key of the JSON object which contains the number value you want to multiply.</param>
         /// <param name="path"></param>
         /// <param name="number"></param>
         public static Task<RedisResult> JsonMultiplyNumberAsync(this IDatabase db, RedisKey key, string path, double number) =>
@@ -158,7 +158,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonstrappend
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object you want to append to.</param>
         /// <param name="path"></param>
         /// <param name="jsonString"></param>
         /// <returns>Length of the new JSON object.</returns>
@@ -175,7 +175,7 @@ namespace NReJSON
         /// https://oss.redislabs.com/rejson/commands/#jsonstrlen
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The key of the JSON object you need string length information about.</param>
         /// <param name="path"></param>
         /// <returns>Integer, specifically the string's length.</returns>
         public static async Task<int> JsonStringLengthAsync(this IDatabase db, RedisKey key, string path) =>
