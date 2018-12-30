@@ -34,7 +34,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is stored.</param>
-        /// <param name="paths"></param>
+        /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
         public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths) =>
             db.JsonGetAsync(key, true, paths);
@@ -49,7 +49,7 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
-        /// <param name="paths"></param>
+        /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
         public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, bool noEscape, params string[] paths) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.GET), CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, PathsOrDefault(paths, new[] { "." })));
@@ -63,7 +63,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="keys">Keys where JSON objects are stored.</param>
-        /// <param name="path"></param>
+        /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, string[] keys, string path = ".") =>
             db.JsonMultiGetAsync(keys.Select(k => (RedisKey)k).ToArray(), path);
@@ -77,7 +77,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="keys">Keys where JSON objects are stored.</param>
-        /// <param name="path"></param>
+        /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static async Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, RedisKey[] keys, string path = ".") =>
             (RedisResult[])(await db.ExecuteAsync(GetCommandName(CommandType.Json.MGET), CombineArguments(keys, path)));
@@ -95,9 +95,9 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is to be stored.</param>
-        /// <param name="json"></param>
-        /// <param name="path"></param>
-        /// <param name="setOption"></param>
+        /// <param name="json">The JSON object which you want to persist.</param>
+        /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
+        /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
         /// <returns></returns>
         public static Task<RedisResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.SET), CombineArguments(key, path, json, GetSetOptionString(setOption)));
@@ -113,7 +113,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object you need the type of.</param>
-        /// <param name="path"></param>
+        /// <param name="path">The path of the JSON object you want the type of. This defaults to root.</param>
         /// <returns></returns>
         public static Task<RedisResult> JsonTypeAsync(this IDatabase db, RedisKey key, string path = ".") =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.TYPE), CombineArguments(key, path));
@@ -127,8 +127,8 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object which contains the number value you want to increment.</param>
-        /// <param name="path"></param>
-        /// <param name="number"></param>
+        /// <param name="path">The path of the JSON value you want to increment.</param>
+        /// <param name="number">The value you want to increment by.</param>
         public static Task<RedisResult> JsonIncrementNumberAsync(this IDatabase db, RedisKey key, string path, double number) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.NUMINCRBY), CombineArguments(key, path, number));
 
@@ -141,8 +141,8 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">They key of the JSON object which contains the number value you want to multiply.</param>
-        /// <param name="path"></param>
-        /// <param name="number"></param>
+        /// <param name="path">The path of the JSON value you want to multiply.</param>
+        /// <param name="number">The value you want to multiply by.</param>
         public static Task<RedisResult> JsonMultiplyNumberAsync(this IDatabase db, RedisKey key, string path, double number) =>
             db.ExecuteAsync(GetCommandName(CommandType.Json.NUMMULTBY), CombineArguments(key, path, number));
 
@@ -176,7 +176,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object you need string length information about.</param>
-        /// <param name="path"></param>
+        /// <param name="path">The path of the JSON string you want the length of. This defaults to root.</param>
         /// <returns>Integer, specifically the string's length.</returns>
         public static async Task<int?> JsonStringLengthAsync(this IDatabase db, RedisKey key, string path = ".")
         {
@@ -201,8 +201,8 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object that contains the array you want to append to.</param>
-        /// <param name="path"></param>
-        /// <param name="json"></param>
+        /// <param name="path">The path to the JSON array you want to append to.</param>
+        /// <param name="json">The JSON values that you want to append.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static async Task<int> JsonArrayAppendAsync(this IDatabase db, RedisKey key, string path, params string[] json) =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRAPPEND), CombineArguments(key, path, json)));
@@ -220,10 +220,10 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object that contains the array you want to check for a scalar value in.</param>
-        /// <param name="path"></param>
-        /// <param name="jsonScalar"></param>
-        /// <param name="start"></param>
-        /// <param name="stop"></param>
+        /// <param name="path">The path to the JSON array that you want to check.</param>
+        /// <param name="jsonScalar">The JSON object that you are looking for.</param>
+        /// <param name="start">Where to start searching, defaults to 0 (the beginning of the array).</param>
+        /// <param name="stop">Where to stop searching, defaults to 0 (the end of the array).</param>
         /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
         public static async Task<int> JsonArrayIndexOfAsync(this IDatabase db, RedisKey key, string path, string jsonScalar, int start = 0, int stop = 0) =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRINDEX), CombineArguments(key, path, jsonScalar, start, stop)));
@@ -239,9 +239,9 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object that contains the array you want to insert an object into.</param>
-        /// <param name="path"></param>
-        /// <param name="index"></param>
-        /// <param name="json"></param>
+        /// <param name="path">The path of the JSON array that you want to insert into.</param>
+        /// <param name="index">The index at which you want to insert, 0 prepends and negative values are interpreted as starting from the end.</param>
+        /// <param name="json">The object that you want to insert.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static async Task<int> JsonArrayInsertAsync(this IDatabase db, RedisKey key, string path, int index, params string[] json) =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRINSERT), CombineArguments(key, path, index, json)));
@@ -257,7 +257,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object that contains the array you want the length of.</param>
-        /// <param name="path"></param>
+        /// <param name="path">The path to the JSON array that you want the length of.</param>
         /// <returns>Integer, specifically the array's length.</returns>
         public static async Task<int?> JsonArrayLengthAsync(this IDatabase db, RedisKey key, string path = ".")
         {
@@ -307,9 +307,9 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object that contains the array you want to trim.</param>
-        /// <param name="path"></param>
-        /// <param name="start"></param>
-        /// <param name="stop"></param>
+        /// <param name="path">The path of the JSON array that you want to trim.</param>
+        /// <param name="start">The inclusive start index.</param>
+        /// <param name="stop">The inclusive stop index.</param>
         /// <returns></returns>
         public static async Task<int> JsonArrayTrimAsync(this IDatabase db, RedisKey key, string path, int start, int stop) =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.ARRTRIM), CombineArguments(key, path, start, stop)));
@@ -325,7 +325,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object which you want to enumerate keys for.</param>
-        /// <param name="path"></param>
+        /// <param name="path">The path to the JSON object you want the keys for, this defaults to root.</param>
         /// <returns>Array, specifically the key names in the object as Bulk Strings.</returns>
         public static async Task<RedisResult[]> JsonObjectKeysAsync(this IDatabase db, RedisKey key, string path = ".") =>
             (RedisResult[])(await db.ExecuteAsync(GetCommandName(CommandType.Json.OBJKEYS), CombineArguments(key, path)));
@@ -341,7 +341,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object which you want the length of.</param>
-        /// <param name="path"></param>
+        /// <param name="path">The path to the JSON object which you want the length of, defaults to root.</param>
         /// <returns>Integer, specifically the number of keys in the object.</returns>
         public static async Task<int?> JsonObjectLengthAsync(this IDatabase db, RedisKey key, string path = ".")
         {
@@ -366,7 +366,7 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object that you want to determine the memory usage of.</param>
-        /// <param name="path"></param>
+        /// <param name="path">The path to JSON object you want to check, this defaults to root.</param>
         /// <returns>Integer, specifically the size in bytes of the value</returns>
         public static async Task<int> JsonDebugMemoryAsync(this IDatabase db, RedisKey key, string path = ".") =>
             (int)(await db.ExecuteAsync(GetCommandName(CommandType.Json.DEBUG), CombineArguments("MEMORY", key.ToString(), path)));
