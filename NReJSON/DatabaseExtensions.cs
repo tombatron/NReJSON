@@ -171,7 +171,7 @@ namespace NReJSON
         /// 
         /// Report the length of the JSON String at `path` in `key`.
         ///
-        /// `path` defaults to root if not provided. If the `key` or `path` do not exist, null is returned.
+        /// `path` defaults to root if not provided. If the `key` does not exist, null is returned.
         /// 
         /// https://oss.redislabs.com/rejson/commands/#jsonstrlen
         /// </summary>

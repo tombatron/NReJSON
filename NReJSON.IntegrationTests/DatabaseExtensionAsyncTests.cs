@@ -153,6 +153,18 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal(5, result);
             }
+
+            [Fact]
+            public async Task WillReturnNullIfPathDoesntExist()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key, "{\"hello\":\"world\"}");
+
+                var result = await _db.JsonStringLengthAsync("doesnt_exist", ".hello.doesnt.exist");
+
+                Assert.Null(result);
+            }
         }
 
         public class JsonArrayAppendAsync : BaseIntegrationTest

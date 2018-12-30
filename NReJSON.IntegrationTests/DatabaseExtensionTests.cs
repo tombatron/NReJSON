@@ -152,6 +152,18 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal(5, result);
             }
+
+            [Fact]
+            public void WillReturnNullIfPathDoesntExist()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\":\"world\"}");
+
+                var result = _db.JsonStringLength("doesnt_exist", ".hello.doesnt.exist");
+
+                Assert.Null(result);
+            }
         }
 
         public class JsonArrayAppend : BaseIntegrationTest

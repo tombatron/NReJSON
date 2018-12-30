@@ -192,6 +192,16 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.STRLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
             }
+
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonStringLengthAsync("fake_key");
+
+                Assert.Equal(new[] { "JSON.STRLEN", "fake_key", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonArrayAppendAsync
