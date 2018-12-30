@@ -2,14 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Tom Hanks</Authors>
+    <Company />
+    <AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <FileVersion>0.0.1.0</FileVersion>
+    <Version>0.0.1</Version>
+    <Description>A series of extension methods for use with StackExchange.Redis 2.x and the ReJSON Redis module.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="StackExchange.Redis" Version="2.0.519" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Commands\BaseCommand.cs" />
-    <Compile Remove="AssemblyInfoHack.cs" />
   </ItemGroup>
 </Project>
