@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NReJSON", "NReJSON\NReJSON.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NReJSON.Tests", "NReJSON.Tests\NReJSON.Tests.csproj", "{33DE391E-34B1-4D17-8D11-4E4352B87518}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NReJSON.IntegrationTests", "NReJSON.IntegrationTests\NReJSON.IntegrationTests.csproj", "{5AE938E5-2383-4D1F-82F7-26F99D9AD2CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NReJSON.IntegrationTests", "NReJSON.IntegrationTests\NReJSON.IntegrationTests.csproj", "{5AE938E5-2383-4D1F-82F7-26F99D9AD2CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C00BF79D-B4E2-4C44-A2C4-8B4D70E4E9EA}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
