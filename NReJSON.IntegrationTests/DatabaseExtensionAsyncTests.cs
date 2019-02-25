@@ -1,4 +1,6 @@
-﻿using StackExchange.Redis;
+﻿using Newtonsoft.Json;
+using NReJSON.IntegrationTests.TestTypes;
+using StackExchange.Redis;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,9 +32,33 @@ namespace NReJSON.IntegrationTests
 
                 await _db.JsonSetAsync(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = await _db.JsonGetAsync("test_get_object");
+                var result = await _db.JsonGetAsync(key);
 
                 Assert.False(result.IsNull);
+            }
+
+            [Fact]
+            public async Task CanReturnDeserialisedObjectFromJsonAsync()
+            {
+                var customerToSave = new Customer
+                {
+                    Id = 12345,
+                    Name = "XYZ Inc.",
+                    RegisteredOn = DateTime.UtcNow,
+                    CorporateAddress = new Address
+                    {
+                        City = "London",
+                        Postcode = "NW1"
+                    }
+                };
+
+                await _db.JsonSetAsync(
+                    customerToSave.Id.ToString(),
+                    JsonConvert.SerializeObject(customerToSave));
+
+                var savedCustomer = await _db.JsonGetAsync<Customer>(
+                    customerToSave.Id.ToString());
+                Assert.True(savedCustomer.Equals(customerToSave));
             }
         }
 

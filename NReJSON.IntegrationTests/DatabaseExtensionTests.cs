@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Newtonsoft.Json;
+using NReJSON.IntegrationTests.TestTypes;
 using StackExchange.Redis;
 using Xunit;
 
@@ -29,9 +31,33 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = _db.JsonGet("test_get_object");
+                var result = _db.JsonGet(key);
 
                 Assert.False(result.IsNull);
+            }
+
+            [Fact]
+            public void CanReturnDeserialisedObjectFromJson()
+            {
+                var customerToSave = new Customer
+                {
+                    Id = 1234,
+                    Name = "XYZ Inc.",
+                    RegisteredOn = DateTime.UtcNow,
+                    CorporateAddress = new Address
+                    {
+                        City = "London",
+                        Postcode = "NW1"
+                    }
+                };
+
+                _db.JsonSet(
+                    customerToSave.Id.ToString(), 
+                    JsonConvert.SerializeObject(customerToSave));
+
+                var savedCustomer = _db.JsonGet<Customer>(
+                    customerToSave.Id.ToString());
+                Assert.True(savedCustomer.Equals(customerToSave));
             }
         }
 

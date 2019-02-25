@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Linq;
@@ -396,5 +397,16 @@ namespace NReJSON
         /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
         public static async Task<RedisResult[]> JsonGetRespAsync(this IDatabase db, RedisKey key, string path = ".") =>
             (RedisResult[])(await db.ExecuteAsync(JsonCommands.RESP, key, path));
+
+        /// <summary>
+        /// Returns the strongly typed object for the stored JSON type.
+        /// This method returns all the properties of the JSON document
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="db"></param>
+        /// <param name="key">The key of the JSON object that you want an JSON.GET result for.</param>
+        /// <returns><see cref="Task{TEntity}"/></returns>
+        public static async Task<TEntity> JsonGetAsync<TEntity>(this IDatabase db, RedisKey key) where TEntity : class =>
+            JsonConvert.DeserializeObject<TEntity>((await db.JsonGetAsync(key)).ToString());
     }
 }

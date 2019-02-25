@@ -8,12 +8,20 @@ namespace NReJSON.Tests
 {
     public class FakeDatabase : IDatabase
     {
+        private readonly RedisValue _expectedValue;
         private bool _expectArrayResult;
 
         public string[] PreviousCommand { get; private set; }
 
-        public FakeDatabase(bool expectArrayResult = false) =>
+        public FakeDatabase(RedisValue expectedValue) : this()
+        {
+            _expectedValue = expectedValue;
+        }
+
+        public FakeDatabase(bool expectArrayResult = false)
+        {
             _expectArrayResult = expectArrayResult;
+        }
 
         public RedisResult Execute(string command, params object[] args)
         {
@@ -32,7 +40,8 @@ namespace NReJSON.Tests
             }
             else
             {
-                return RedisResult.Create(0);
+                return RedisResult.Create(
+                    _expectedValue.HasValue ? _expectedValue : 0);
             }
         }
 

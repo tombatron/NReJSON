@@ -1,4 +1,7 @@
-﻿using Xunit;
+﻿using Newtonsoft.Json;
+using NReJSON.Tests.TestTypes;
+using System;
+using Xunit;
 
 namespace NReJSON.Tests
 {
@@ -57,6 +60,33 @@ namespace NReJSON.Tests
                 db.JsonGet("fake_key", false);
 
                 Assert.Equal(new[] { "JSON.GET", "fake_key", "." }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void CanReturnDeserialisedObjectFromJson()
+            {
+                var customerToSave = new Customer
+                {
+                    Id = 1234,
+                    Name = "XYZ Inc.",
+                    RegisteredOn = DateTime.UtcNow,
+                    CorporateAddress = new Address
+                    {
+                        City = "London",
+                        Postcode = "NW1"
+                    }
+                };
+
+                var expectedJson = JsonConvert.SerializeObject(customerToSave);
+                var db = new FakeDatabase(expectedJson);
+
+                db.JsonSet(
+                    customerToSave.Id.ToString(),
+                    expectedJson);
+
+                var savedCustomer = db.JsonGet<Customer>(
+                    customerToSave.Id.ToString());
+                Assert.True(savedCustomer.Equals(customerToSave));
             }
         }
 
