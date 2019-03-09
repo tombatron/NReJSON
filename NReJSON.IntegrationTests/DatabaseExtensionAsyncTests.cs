@@ -30,7 +30,7 @@ namespace NReJSON.IntegrationTests
 
                 await _db.JsonSetAsync(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = await _db.JsonGetAsync("test_get_object");
+                var result = await _db.JsonGetAsync(key);
 
                 Assert.False(result.IsNull);
             }

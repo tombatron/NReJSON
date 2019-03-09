@@ -29,7 +29,7 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = _db.JsonGet("test_get_object");
+                var result = _db.JsonGet(key);
 
                 Assert.False(result.IsNull);
             }
