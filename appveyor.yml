@@ -6,5 +6,5 @@ build:
   project: NReJSON.sln
   publish_nuget: false
   verbosity: minimal
-test_script:
+script:
 - docker run -d -p 6379:6379 redislabs/rejson:latest
