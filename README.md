@@ -1,5 +1,7 @@
 # NReJSON
 
+[![Build status](https://ci.appveyor.com/api/projects/status/fwah8euqttecil89?svg=true)](https://ci.appveyor.com/project/tombatron/nrejson)
+
 ## Overview
 
 NReJSON is a series of extension methods for the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) library that will enable you to interact with the [Redis](https://redis.io/) module [ReJSON](https://github.com/RedisLabsModules/rejson). This is made possible by the `Execute` and `ExecuteAsync` methods already present in the SE.Redis library. 
