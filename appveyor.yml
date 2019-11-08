@@ -7,4 +7,4 @@ build:
   publish_nuget: false
   verbosity: minimal
 test_script:
-- docker run -p 6379:6379 redislabs/rejson:latest
+- docker run -d -p 6379:6379 redislabs/rejson:latest
