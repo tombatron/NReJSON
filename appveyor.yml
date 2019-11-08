@@ -1,10 +1,13 @@
 version: 1.0.{build}
 image: Ubuntu1804
+
 services:
 - docker
+
+init:
+- docker run -d -p 6379:6379 redislabs/rejson:latest
+
 build:
   project: NReJSON.sln
   publish_nuget: false
   verbosity: minimal
-script:
-- docker run -d -p 6379:6379 redislabs/rejson:latest
