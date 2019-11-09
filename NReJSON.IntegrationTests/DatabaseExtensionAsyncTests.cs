@@ -1,7 +1,7 @@
-﻿using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using StackExchange.Redis;
 using Xunit;
 
 namespace NReJSON.IntegrationTests
@@ -33,6 +33,42 @@ namespace NReJSON.IntegrationTests
                 var result = await _db.JsonGetAsync(key);
 
                 Assert.False(result.IsNull);
+            }
+
+            [Fact]
+            public async Task CanExecuteAsyncWithIdent()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = await _db.JsonGetAsync(key, indent: "&");
+
+                Assert.Contains("&", (string)result);
+            }
+
+            [Fact]
+            public async Task CanExecuteAsyncWithNewline()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = await _db.JsonGetAsync(key, newline: "=");
+
+                Assert.Contains("=", (string)result);
+            }
+
+            [Fact]
+            public async Task CanExecuteAsyncWithSpace()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = await _db.JsonGetAsync(key, space: "+");
+
+                Assert.Contains("+", (string)result);
             }
         }
 
@@ -268,7 +304,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonObjectKeysAsync(key);
 
-                Assert.Equal(new[] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
+                Assert.Equal(new [] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
             }
         }
 

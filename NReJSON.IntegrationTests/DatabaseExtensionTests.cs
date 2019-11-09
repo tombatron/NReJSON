@@ -33,6 +33,42 @@ namespace NReJSON.IntegrationTests
 
                 Assert.False(result.IsNull);
             }
+
+            [Fact]
+            public void CanExecuteWithIdent()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonGet(key, indent: "&");
+
+                Assert.Contains("&", (string)result);
+            }
+
+            [Fact]
+            public void CanExecuteWithNewline()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonGet(key, newline: "=");
+
+                Assert.Contains("=", (string)result);
+            }
+
+            [Fact]
+            public void CanExecuteWithSpace()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonGet(key, space: "+");
+
+                Assert.Contains("+", (string)result);
+            }
         }
 
         public class JsonDelete : BaseIntegrationTest

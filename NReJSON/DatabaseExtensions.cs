@@ -1,6 +1,7 @@
-﻿using StackExchange.Redis;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using StackExchange.Redis;
 
 namespace NReJSON
 {
@@ -36,7 +37,7 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
-            db.JsonGet(key, true, paths);
+            db.JsonGet(key, noEscape : true, paths : paths);
 
         /// <summary>
         /// `JSON.GET`
@@ -48,10 +49,45 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
+        /// <param name="indent">Sets the indentation string for nested levels</param>
+        /// <param name="newline">Sets the string that's printed at the end of each line</param>
+        /// <param name="space">Sets the string that's put between a key and a value</param>
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
-        public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape, params string[] paths) =>
-            db.Execute(JsonCommands.GET, CombineArguments(key, noEscape ? "NOESCAPE" : string.Empty, PathsOrDefault(paths, new[] { "." })));
+        public static RedisResult JsonGet(this IDatabase db, RedisKey key, bool noEscape = false, string indent = default, string newline = default, string space = default, params string[] paths)
+        {
+            var args = new List<object> { key };
+
+            if (noEscape)
+            {
+                args.Add("NOESCAPE");
+            }
+
+            if (indent != default)
+            {
+                args.Add("INDENT");
+                args.Add(indent);
+            }
+
+            if (newline != default)
+            {
+                args.Add("NEWLINE");
+                args.Add(newline);
+            }
+
+            if (space != default)
+            {
+                args.Add("SPACE");
+                args.Add(space);
+            }
+
+            foreach (var path in PathsOrDefault(paths, new [] { "." }))
+            {
+                args.Add(path);
+            }
+
+            return db.Execute(JsonCommands.GET, args);
+        }
 
         /// <summary>
         /// `JSON.MGET`
