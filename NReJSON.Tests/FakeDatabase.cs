@@ -1,6 +1,7 @@
 ﻿using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ namespace NReJSON.Tests
 
             if (_expectArrayResult)
             {
-                return RedisResult.Create(new[] { RedisResult.Create(0) });
+                return RedisResult.Create(new [] { RedisResult.Create(0) });
             }
             else
             {
@@ -41,21 +42,19 @@ namespace NReJSON.Tests
             return Task.FromResult(Execute(command, args));
         }
 
+        public RedisResult Execute(string command, ICollection<object> args, CommandFlags flags = CommandFlags.None) =>
+            Execute(command, args.ToArray());
+
+        public Task<RedisResult> ExecuteAsync(string command, ICollection<object> args, CommandFlags flags = CommandFlags.None) =>
+            Task.FromResult(Execute(command, args.ToArray()));
+
         #region Not Implemented
 
-        public RedisResult Execute(string command, ICollection<object> args, CommandFlags flags = CommandFlags.None)
-        {
+        public int Database =>
             throw new NotImplementedException();
-        }
 
-        public Task<RedisResult> ExecuteAsync(string command, ICollection<object> args, CommandFlags flags = CommandFlags.None)
-        {
+        public IConnectionMultiplexer Multiplexer =>
             throw new NotImplementedException();
-        }
-
-        public int Database => throw new NotImplementedException();
-
-        public IConnectionMultiplexer Multiplexer => throw new NotImplementedException();
 
         public IBatch CreateBatch(object asyncState = null)
         {

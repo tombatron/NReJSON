@@ -58,6 +58,46 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.GET", "fake_key", "." }, db.PreviousCommand);
             }
+
+            [Fact]
+            public void CanSpecifyIndent()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonGet("fake_key", indent: "\t\t");
+
+                Assert.Equal(new [] { "JSON.GET", "fake_key", "INDENT", "\t\t", "." }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void CanSpecifySpace()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonGet("fake_key", space: "  ");
+
+                Assert.Equal(new [] { "JSON.GET", "fake_key", "SPACE", "  ", "." }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void CanSpecifyNewLine()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonGet("fake_key", newline: "\r\n");
+
+                Assert.Equal(new [] { "JSON.GET", "fake_key", "NEWLINE", "\r\n", "." }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void CanSpecifyIndentSpaceAndNewLine()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonGet("fake_key", indent: "\t", newline: "\r\n", space: "  ");
+
+                Assert.Equal(new [] { "JSON.GET", "fake_key", "INDENT", "\t", "NEWLINE", "\r\n", "SPACE", "  ", "." }, db.PreviousCommand);
+            }
         }
 
         public class JsonMultiGet
