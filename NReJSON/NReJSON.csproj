@@ -9,7 +9,6 @@
     <FileVersion>0.0.1.0</FileVersion>
     <Version>0.0.1</Version>
     <Description>A series of extension methods for use with StackExchange.Redis 2.x and the ReJSON Redis module.</Description>
-    <PackageLicenseUrl>https://mit-license.org/; https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/tombatron/NReJSON</RepositoryUrl>
     <PackageProjectUrl>https://github.com/tombatron/NReJSON</PackageProjectUrl>
@@ -23,8 +22,12 @@
     <PackageReference Include="StackExchange.Redis" Version="2.0.519" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <None Update="license\license.txt">
+    <None Update="license\license.txt" Pack="true" PackagePath="$(PackageLicenseFile)">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
