@@ -4,9 +4,9 @@
 
 ## Overview
 
-NReJSON is a series of extension methods for the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) library that will enable you to interact with the [Redis](https://redis.io/) module [ReJSON](https://github.com/RedisLabsModules/rejson). This is made possible by the `Execute` and `ExecuteAsync` methods already present in the SE.Redis library. 
+NReJSON is a series of extension methods for the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) library that will enable you to interact with the [Redis](https://redis.io/) module [RedisJSON](https://github.com/RedisJSON/RedisJSON). This is made possible by the `Execute` and `ExecuteAsync` methods already present in the SE.Redis library. 
 
-The following blog post by Marc Gravell was the inspiration behind this: [StackExchange.Redis and Redis 4.0 Modules](https://blog.marcgravell.com/2017/04/stackexchangeredis-and-redis-40-modules.html). He even has an example of how to call a command from the ReJSON module! 
+The following blog post by Marc Gravell was the inspiration behind this: [StackExchange.Redis and Redis 4.0 Modules](https://blog.marcgravell.com/2017/04/stackexchangeredis-and-redis-40-modules.html). He even has an example of how to call a command from the RedisJSON module! 
 
 ## Installation
 
@@ -14,13 +14,13 @@ The following blog post by Marc Gravell was the inspiration behind this: [StackE
 
 ## Usage
 
-I'm assuming that you already have the [ReJSON](https://github.com/RedisLabsModules/rejson) module installed on your Redis server. 
+I'm assuming that you already have the [RedisJSON](https://github.com/RedisJSON/RedisJSON) module installed on your Redis server. 
 
 You can verify that the module is installed by executing the following command:
 
 `MODULE LIST`
 
-If ReJSON is installed you should see output similar to the following:
+If RedisJSON is installed you should see output similar to the following:
 
 ```
 1) 1) "name"
@@ -33,7 +33,7 @@ If ReJSON is installed you should see output similar to the following:
 
 ### Examples
 
-In this repository there are a suite of integration tests that should be sufficent to serve as examples on how to use all supported ReJSON commands.
+In this repository there are a suite of integration tests that should be sufficent to serve as examples on how to use all supported RedisJSON commands.
 
 [Integration Tests](https://github.com/tombatron/NReJSON/blob/master/NReJSON.IntegrationTests/DatabaseExtensionAsyncTests.cs)
 
