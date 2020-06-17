@@ -352,5 +352,53 @@ namespace NReJSON.IntegrationTests
                 Assert.Equal("world", result.ToString());
             }
         }
+
+        public class JsonIndexAddAsync : BaseIntegrationTest
+        {
+            [Fact]
+            public async Task CanExecute()
+            {
+                var index = Guid.NewGuid().ToString();
+
+                var result = await _db.JsonIndexAddAsync(index, "test_field", "$.a");
+
+                Assert.Equal("OK", result.ToString());
+            }
+        }
+
+        public class JsonIndexDeleteAsync : BaseIntegrationTest
+        {
+            [Fact]
+            public async Task CanExecute()
+            {
+                var index = Guid.NewGuid().ToString();
+
+                await _db.JsonIndexAddAsync(index, "some_field", "$.a");
+
+                var result = await _db.JsonIndexDeleteAsync(index);
+
+                Assert.Equal("OK", result.ToString());
+            }
+        }
+
+        public class JsonIndexGetAsync : BaseIntegrationTest
+        {
+            [Fact]
+            public async Task CanExecute()
+            {
+                var index = Guid.NewGuid().ToString().Substring(0, 4);
+                var key = Guid.NewGuid().ToString();   
+
+                await _db.JsonSetAsync($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index); 
+                await _db.JsonSetAsync($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
+
+                await _db.JsonIndexAddAsync(index, "last", "$.last");
+
+                var result = (await _db.JsonIndexGetAsync(index, "Jo*")).ToString();
+
+                Assert.Contains("Joe", result);
+                Assert.Contains("Joan", result);
+            }
+        }        
     }
 }

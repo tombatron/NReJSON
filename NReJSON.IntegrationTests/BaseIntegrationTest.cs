@@ -11,7 +11,7 @@ namespace NReJSON.IntegrationTests
         protected BaseIntegrationTest()
         {
             _muxer = ConnectionMultiplexer.Connect("127.0.0.1");
-            _db = _muxer.GetDatabase(1);
+            _db = _muxer.GetDatabase(0);
         }
 
         public void Dispose()
