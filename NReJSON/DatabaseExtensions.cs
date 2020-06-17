@@ -434,7 +434,6 @@ namespace NReJSON
         public static RedisResult[] JsonGetResp(this IDatabase db, RedisKey key, string path = ".") =>
             (RedisResult[])db.Execute(JsonCommands.RESP, key, path);
 
-
         /// <summary>
         /// `JSON.INDEX ADD`
         /// 
