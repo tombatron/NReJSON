@@ -10,7 +10,7 @@ The following blog post by Marc Gravell was the inspiration behind this: [StackE
 
 ## Installation
 
-`PM> Install-Package NReJSON -Version 1.0.0`
+`PM> Install-Package NReJSON -Version 2.0.0`
 
 ## Usage
 

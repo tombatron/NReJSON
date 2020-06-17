@@ -34,7 +34,7 @@
             <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
             <returns></returns>
         </member>
-        <member name="M:NReJSON.DatabaseExtensions.JsonGet(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.Boolean,System.String[])">
+        <member name="M:NReJSON.DatabaseExtensions.JsonGet(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.Boolean,System.String,System.String,System.String,System.String[])">
             <summary>
             `JSON.GET`
             
@@ -45,6 +45,9 @@
             <param name="db"></param>
             <param name="key">Key where JSON object is stored.</param>
             <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
+            <param name="indent">Sets the indentation string for nested levels</param>
+            <param name="newline">Sets the string that's printed at the end of each line</param>
+            <param name="space">Sets the string that's put between a key and a value</param>
             <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
             <returns></returns>
         </member>
@@ -74,7 +77,7 @@
             <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
             <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         </member>
-        <member name="M:NReJSON.DatabaseExtensions.JsonSet(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.String,System.String,NReJSON.SetOption)">
+        <member name="M:NReJSON.DatabaseExtensions.JsonSet(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.String,System.String,NReJSON.SetOption,System.String)">
              <summary>
              `JSON.SET`
              
@@ -91,6 +94,7 @@
              <param name="json">The JSON object which you want to persist.</param>
              <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
              <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
+             <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
              <returns></returns>
         </member>
         <member name="M:NReJSON.DatabaseExtensions.JsonType(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.String)">
@@ -340,6 +344,46 @@
             <param name="path">Defaults to root if not provided. </param>
             <returns>Array, specifically the JSON's RESP form as detailed.</returns>
         </member>
+        <member name="M:NReJSON.DatabaseExtensions.JsonIndexAdd(StackExchange.Redis.IDatabase,System.String,System.String,System.String)">
+            <summary>
+            `JSON.INDEX ADD`
+            
+            Adds a JSON index.
+            
+            RedisJson documentation link forthcoming.
+            </summary>
+            <param name="db"></param>
+            <param name="index">Name of the index.</param>
+            <param name="field">Name of the field being indexed.</param>
+            <param name="path">Path of the field being indexed.</param>
+            <returns></returns>
+        </member>
+        <member name="M:NReJSON.DatabaseExtensions.JsonIndexDelete(StackExchange.Redis.IDatabase,System.String)">
+            <summary>
+            `JSON.INDEX DEL`
+            
+            Deletes a JSON index.
+            
+            RedisJson documentation link forthcoming.
+            </summary>
+            <param name="db"></param>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NReJSON.DatabaseExtensions.JsonIndexGet(StackExchange.Redis.IDatabase,System.String,System.String,System.String)">
+            <summary>
+            `JSON.QGET`
+            
+            Query a JSON index for an existing object.
+            
+            RedisJson documentation link forthcoming.
+            </summary>
+            <param name="db"></param>
+            <param name="index">Name of the index.</param>
+            <param name="query">Pattern being applied to the index.</param>
+            <param name="path">[Optional] Path to the expected value.</param>
+            <returns></returns>
+        </member>
         <member name="M:NReJSON.DatabaseExtensions.JsonDeleteAsync(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.String)">
              <summary>
              `JSON.DEL`
@@ -370,7 +414,7 @@
             <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
             <returns></returns>
         </member>
-        <member name="M:NReJSON.DatabaseExtensions.JsonGetAsync(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.Boolean,System.String[])">
+        <member name="M:NReJSON.DatabaseExtensions.JsonGetAsync(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.Boolean,System.String,System.String,System.String,System.String[])">
             <summary>
             `JSON.GET`
             
@@ -381,6 +425,9 @@
             <param name="db"></param>
             <param name="key">Key where JSON object is stored.</param>
             <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
+            <param name="indent">Sets the indentation string for nested levels</param>
+            <param name="newline">Sets the string that's printed at the end of each line</param>
+            <param name="space">Sets the string that's put between a key and a value</param>
             <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
             <returns></returns>
         </member>
@@ -410,7 +457,7 @@
             <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
             <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         </member>
-        <member name="M:NReJSON.DatabaseExtensions.JsonSetAsync(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.String,System.String,NReJSON.SetOption)">
+        <member name="M:NReJSON.DatabaseExtensions.JsonSetAsync(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.String,System.String,NReJSON.SetOption,System.String)">
              <summary>
              `JSON.SET`
              
@@ -427,6 +474,7 @@
              <param name="json">The JSON object which you want to persist.</param>
              <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
              <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
+             <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
              <returns></returns>
         </member>
         <member name="M:NReJSON.DatabaseExtensions.JsonTypeAsync(StackExchange.Redis.IDatabase,StackExchange.Redis.RedisKey,System.String)">
@@ -675,6 +723,46 @@
             <param name="key">The key of the JSON object that you want an RESP result for.</param>
             <param name="path">Defaults to root if not provided. </param>
             <returns>Array, specifically the JSON's RESP form as detailed.</returns>
+        </member>
+        <member name="M:NReJSON.DatabaseExtensions.JsonIndexAddAsync(StackExchange.Redis.IDatabase,System.String,System.String,System.String)">
+            <summary>
+            `JSON.INDEX ADD`
+            
+            Adds a JSON index.
+            
+            RedisJson documentation link forthcoming.
+            </summary>
+            <param name="db"></param>
+            <param name="index">Name of the index.</param>
+            <param name="field">Name of the field being indexed.</param>
+            <param name="path">Path of the field being indexed.</param>
+            <returns></returns>
+        </member>
+        <member name="M:NReJSON.DatabaseExtensions.JsonIndexDeleteAsync(StackExchange.Redis.IDatabase,System.String)">
+            <summary>
+            `JSON.INDEX DEL`
+            
+            Deletes a JSON index.
+            
+            RedisJson documentation link forthcoming.
+            </summary>
+            <param name="db"></param>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NReJSON.DatabaseExtensions.JsonIndexGetAsync(StackExchange.Redis.IDatabase,System.String,System.String,System.String)">
+            <summary>
+            `JSON.QGET`
+            
+            Query a JSON index for an existing object.
+            
+            RedisJson documentation link forthcoming.
+            </summary>
+            <param name="db"></param>
+            <param name="index">Name of the index.</param>
+            <param name="query">Pattern being applied to the index.</param>
+            <param name="path">[Optional] Path to the expected value.</param>
+            <returns></returns>
         </member>
     </members>
 </doc>
