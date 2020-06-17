@@ -333,7 +333,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonDebugMemory(key, ".goodnight");
 
-                Assert.Equal(89, result);
+                Assert.True(result > 50);
             }
         }
 
@@ -346,7 +346,7 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = ((RedisResult[])_db.JsonGetResp(key)[1])[1];
+                var result = _db.JsonGetResp(key)[2];
 
                 Assert.Equal("world", result.ToString());
             }

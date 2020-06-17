@@ -334,7 +334,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonDebugMemoryAsync(key, ".goodnight");
 
-                Assert.Equal(89, result);
+                Assert.True(result > 50);
             }
         }
 
@@ -347,7 +347,7 @@ namespace NReJSON.IntegrationTests
 
                 await _db.JsonSetAsync(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = ((RedisResult[])(await _db.JsonGetRespAsync(key))[1])[1];
+                var result = (await _db.JsonGetRespAsync(key))[2];
 
                 Assert.Equal("world", result.ToString());
             }
