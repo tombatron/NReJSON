@@ -5,7 +5,7 @@ services:
 - docker
 
 init:
-- docker run -d -p 6379:6379 redislabs/rejson:latest
+- docker run -d -p 6379:6379 redislabs/rejson:edge
 
 build:
   project: NReJSON.sln
