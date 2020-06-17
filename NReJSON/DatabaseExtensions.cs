@@ -136,7 +136,7 @@ namespace NReJSON
         /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <returns></returns>
         public static RedisResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default, string index = "") =>
-            db.Execute(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), string.IsNullOrEmpty(index) ? "" : $"INDEX {index}"));
+            db.Execute(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)));
 
         /// <summary>
         /// `JSON.TYPE`

@@ -58,5 +58,17 @@ namespace NReJSON
                     return string.Empty;
             }
         }
+
+        private static string[] ResolveIndexSpecification(string index)
+        {
+            if (string.IsNullOrEmpty(index))
+            {
+                return new[] { string.Empty };
+            }
+            else
+            {
+                return new[] { "INDEX", index };
+            }
+        }
     }
 }
