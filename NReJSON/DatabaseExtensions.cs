@@ -433,5 +433,49 @@ namespace NReJSON
         /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
         public static RedisResult[] JsonGetResp(this IDatabase db, RedisKey key, string path = ".") =>
             (RedisResult[])db.Execute(JsonCommands.RESP, key, path);
+
+
+        /// <summary>
+        /// `JSON.INDEX ADD`
+        /// 
+        /// Adds a JSON index.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index">Name of the index.</param>
+        /// <param name="field">Name of the field being indexed.</param>
+        /// <param name="path">Path of the field being indexed.</param>
+        /// <returns></returns>
+        public static RedisResult JsonIndexAdd(this IDatabase db, string index, string field, string path) =>
+            db.Execute(JsonCommands.INDEX, CombineArguments("ADD", index, field, path));
+
+        /// <summary>
+        /// `JSON.INDEX DEL`
+        /// 
+        /// Deletes a JSON index.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static RedisResult JsonIndexDelete(this IDatabase db, string index) =>
+            db.Execute(JsonCommands.INDEX, CombineArguments("DEL", index));
+
+        /// <summary>
+        /// `JSON.QGET`
+        /// 
+        /// Query a JSON index for an existing object.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index">Name of the index.</param>
+        /// <param name="query">Pattern being applied to the index.</param>
+        /// <param name="path">[Optional] Path to the expected value.</param>
+        /// <returns></returns>
+        public static RedisResult JsonIndexGet(this IDatabase db, string index, string query, string path = "") =>
+            db.Execute(JsonCommands.QGET, CombineArguments(index, query, path));
     }
 }
