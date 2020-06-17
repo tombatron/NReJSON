@@ -134,9 +134,10 @@ namespace NReJSON
         /// <param name="json">The JSON object which you want to persist.</param>
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
+        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <returns></returns>
-        public static Task<RedisResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
-            db.ExecuteAsync(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption)));
+        public static Task<RedisResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default, string index = "") =>
+            db.ExecuteAsync(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)));
 
         /// <summary>
         /// `JSON.TYPE`
