@@ -66,7 +66,7 @@ namespace NReJSON.Tests
 
                 db.JsonGet("fake_key", indent: "\t\t");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "INDENT", "\t\t", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "INDENT", "\t\t", "." }, db.PreviousCommand);
             }
 
             [Fact]
@@ -76,7 +76,7 @@ namespace NReJSON.Tests
 
                 db.JsonGet("fake_key", space: "  ");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "SPACE", "  ", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "SPACE", "  ", "." }, db.PreviousCommand);
             }
 
             [Fact]
@@ -86,7 +86,7 @@ namespace NReJSON.Tests
 
                 db.JsonGet("fake_key", newline: "\r\n");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "NEWLINE", "\r\n", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "NEWLINE", "\r\n", "." }, db.PreviousCommand);
             }
 
             [Fact]
@@ -96,7 +96,7 @@ namespace NReJSON.Tests
 
                 db.JsonGet("fake_key", indent: "\t", newline: "\r\n", space: "  ");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "INDENT", "\t", "NEWLINE", "\r\n", "SPACE", "  ", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "INDENT", "\t", "NEWLINE", "\r\n", "SPACE", "  ", "." }, db.PreviousCommand);
             }
         }
 
@@ -480,6 +480,55 @@ namespace NReJSON.Tests
                 db.JsonGetResp("fake_key");
 
                 Assert.Equal(new[] { "JSON.RESP", "fake_key", "." }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonIndexAdd
+        {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(true);
+
+                db.JsonIndexAdd("index", "field", "$.path");
+
+                Assert.Equal(new[] { "JSON.INDEX", "ADD", "index", "field", "$.path" }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonIndexDelete
+        {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(true);
+
+                db.JsonIndexDelete("index");
+
+                Assert.Equal(new[] { "JSON.INDEX", "DEL", "index" }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonIndexGet
+        {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(true);
+
+                db.JsonIndexGet("index", "hello*");
+
+                Assert.Equal(new[] { "JSON.QGET", "index", "hello*" }, db.PreviousCommand);
+            }
+
+            [Fact]
+            public void EmitsCorrectParametersWithPathSpecified()
+            {
+                var db = new FakeDatabase(true);
+
+                db.JsonIndexGet("index", "hello*", "$.whatever");
+
+                Assert.Equal(new[] { "JSON.QGET", "index", "hello*", "$.whatever" }, db.PreviousCommand);
             }
         }
     }
