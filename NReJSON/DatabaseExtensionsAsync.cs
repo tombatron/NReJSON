@@ -22,7 +22,7 @@ namespace NReJSON
         /// <param name="path">Defaults to root if not provided.</param>
         /// <returns>Integer, specifically the number of paths deleted (0 or 1).</returns>
         public static async Task<int> JsonDeleteAsync(this IDatabase db, RedisKey key, string path = ".") =>
-            (int)(await db.ExecuteAsync(JsonCommands.DEL, CombineArguments(key, path)));
+            (int)(await db.ExecuteAsync(JsonCommands.DEL, CombineArguments(key, path)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.GET`
@@ -116,7 +116,7 @@ namespace NReJSON
         /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static async Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, RedisKey[] keys, string path = ".") =>
-            (RedisResult[])(await db.ExecuteAsync(JsonCommands.MGET, CombineArguments(keys, path)));
+            (RedisResult[])(await db.ExecuteAsync(JsonCommands.MGET, CombineArguments(keys, path)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.SET`
@@ -134,9 +134,10 @@ namespace NReJSON
         /// <param name="json">The JSON object which you want to persist.</param>
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
+        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <returns></returns>
-        public static Task<RedisResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default) =>
-            db.ExecuteAsync(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption)));
+        public static Task<RedisResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default, string index = "") =>
+            db.ExecuteAsync(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)));
 
         /// <summary>
         /// `JSON.TYPE`
@@ -241,7 +242,7 @@ namespace NReJSON
         /// <param name="json">The JSON values that you want to append.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static async Task<int> JsonArrayAppendAsync(this IDatabase db, RedisKey key, string path, params string[] json) =>
-            (int)(await db.ExecuteAsync(JsonCommands.ARRAPPEND, CombineArguments(key, path, json)));
+            (int)(await db.ExecuteAsync(JsonCommands.ARRAPPEND, CombineArguments(key, path, json)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.ARRINDEX`
@@ -262,7 +263,7 @@ namespace NReJSON
         /// <param name="stop">Where to stop searching, defaults to 0 (the end of the array).</param>
         /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
         public static async Task<int> JsonArrayIndexOfAsync(this IDatabase db, RedisKey key, string path, string jsonScalar, int start = 0, int stop = 0) =>
-            (int)(await db.ExecuteAsync(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop)));
+            (int)(await db.ExecuteAsync(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.ARRINSERT`
@@ -280,7 +281,7 @@ namespace NReJSON
         /// <param name="json">The object that you want to insert.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static async Task<int> JsonArrayInsertAsync(this IDatabase db, RedisKey key, string path, int index, params string[] json) =>
-            (int)(await db.ExecuteAsync(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json)));
+            (int)(await db.ExecuteAsync(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.ARRLEN`
@@ -297,7 +298,7 @@ namespace NReJSON
         /// <returns>Integer, specifically the array's length.</returns>
         public static async Task<int?> JsonArrayLengthAsync(this IDatabase db, RedisKey key, string path = ".")
         {
-            var result = await db.ExecuteAsync(JsonCommands.ARRLEN, CombineArguments(key, path));
+            var result = await db.ExecuteAsync(JsonCommands.ARRLEN, CombineArguments(key, path)).ConfigureAwait(false);
 
             if (result.IsNull)
             {
@@ -348,7 +349,7 @@ namespace NReJSON
         /// <param name="stop">The inclusive stop index.</param>
         /// <returns></returns>
         public static async Task<int> JsonArrayTrimAsync(this IDatabase db, RedisKey key, string path, int start, int stop) =>
-            (int)(await db.ExecuteAsync(JsonCommands.ARRTRIM, CombineArguments(key, path, start, stop)));
+            (int)(await db.ExecuteAsync(JsonCommands.ARRTRIM, CombineArguments(key, path, start, stop)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.OBJKEYS`
@@ -364,7 +365,7 @@ namespace NReJSON
         /// <param name="path">The path to the JSON object you want the keys for, this defaults to root.</param>
         /// <returns>Array, specifically the key names in the object as Bulk Strings.</returns>
         public static async Task<RedisResult[]> JsonObjectKeysAsync(this IDatabase db, RedisKey key, string path = ".") =>
-            (RedisResult[])(await db.ExecuteAsync(JsonCommands.OBJKEYS, CombineArguments(key, path)));
+            (RedisResult[])(await db.ExecuteAsync(JsonCommands.OBJKEYS, CombineArguments(key, path)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.OBJLEN`
@@ -381,7 +382,7 @@ namespace NReJSON
         /// <returns>Integer, specifically the number of keys in the object.</returns>
         public static async Task<int?> JsonObjectLengthAsync(this IDatabase db, RedisKey key, string path = ".")
         {
-            var result = await db.ExecuteAsync(JsonCommands.OBJLEN, CombineArguments(key, path));
+            var result = await db.ExecuteAsync(JsonCommands.OBJLEN, CombineArguments(key, path)).ConfigureAwait(false);
 
             if (result.IsNull)
             {
@@ -405,7 +406,7 @@ namespace NReJSON
         /// <param name="path">The path to JSON object you want to check, this defaults to root.</param>
         /// <returns>Integer, specifically the size in bytes of the value</returns>
         public static async Task<int> JsonDebugMemoryAsync(this IDatabase db, RedisKey key, string path = ".") =>
-            (int)(await db.ExecuteAsync(JsonCommands.DEBUG, CombineArguments("MEMORY", key.ToString(), path)));
+            (int)(await db.ExecuteAsync(JsonCommands.DEBUG, CombineArguments("MEMORY", key.ToString(), path)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.RESP`
@@ -431,6 +432,49 @@ namespace NReJSON
         /// <param name="path">Defaults to root if not provided. </param>
         /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
         public static async Task<RedisResult[]> JsonGetRespAsync(this IDatabase db, RedisKey key, string path = ".") =>
-            (RedisResult[])(await db.ExecuteAsync(JsonCommands.RESP, key, path));
+            (RedisResult[])(await db.ExecuteAsync(JsonCommands.RESP, key, path).ConfigureAwait(false));
+
+        /// <summary>
+        /// `JSON.INDEX ADD`
+        /// 
+        /// Adds a JSON index.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index">Name of the index.</param>
+        /// <param name="field">Name of the field being indexed.</param>
+        /// <param name="path">Path of the field being indexed.</param>
+        /// <returns></returns>
+        public static Task<RedisResult> JsonIndexAddAsync(this IDatabase db, string index, string field, string path) =>
+            db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("ADD", index, field, path));
+
+        /// <summary>
+        /// `JSON.INDEX DEL`
+        /// 
+        /// Deletes a JSON index.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static Task<RedisResult> JsonIndexDeleteAsync(this IDatabase db, string index) =>
+            db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("DEL", index));
+
+        /// <summary>
+        /// `JSON.QGET`
+        /// 
+        /// Query a JSON index for an existing object.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index">Name of the index.</param>
+        /// <param name="query">Pattern being applied to the index.</param>
+        /// <param name="path">[Optional] Path to the expected value.</param>
+        /// <returns></returns>
+        public static Task<RedisResult> JsonIndexGetAsync(this IDatabase db, string index, string query, string path = "") =>
+            db.ExecuteAsync(JsonCommands.QGET, CombineArguments(index, query, path));            
     }
 }

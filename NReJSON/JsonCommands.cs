@@ -22,5 +22,7 @@
         public const string FORGET = "JSON.FORGET";
         public const string RESP = "JSON.RESP";
         public const string OBJLEN = "JSON.OBJLEN";
+        public const string INDEX = "JSON.INDEX";
+        public const string QGET = "JSON.QGET";
     }
 }

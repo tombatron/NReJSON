@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Linq;
 using StackExchange.Redis;
 using Xunit;
@@ -333,7 +334,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonDebugMemory(key, ".goodnight");
 
-                Assert.Equal(89, result);
+                Assert.True(result > 50);
             }
         }
 
@@ -346,9 +347,57 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = ((RedisResult[])_db.JsonGetResp(key)[1])[1];
+                var result = _db.JsonGetResp(key)[2];
 
                 Assert.Equal("world", result.ToString());
+            }
+        }
+
+        public class JsonIndexAdd : BaseIntegrationTest
+        {
+            [Fact]
+            public void CanExecute()
+            {
+                var index = Guid.NewGuid().ToString();
+
+                var result = _db.JsonIndexAdd(index, "test_field", "$.a");
+
+                Assert.Equal("OK", result.ToString());
+            }
+        }
+
+        public class JsonIndexDelete : BaseIntegrationTest
+        {
+            [Fact]
+            public void CanExecute()
+            {
+                var index = Guid.NewGuid().ToString();
+
+                _db.JsonIndexAdd(index, "some_field", "$.a");
+
+                var result = _db.JsonIndexDelete(index);
+
+                Assert.Equal("OK", result.ToString());
+            }
+        }
+
+        public class JsonIndexGet : BaseIntegrationTest
+        {
+            [Fact]
+            public void CanExecute()
+            {
+                var index = Guid.NewGuid().ToString().Substring(0, 4);
+                var key = Guid.NewGuid().ToString();   
+
+                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index); 
+                _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
+
+                _db.JsonIndexAdd(index, "last", "$.last");
+
+                var result = _db.JsonIndexGet(index, "Jo*").ToString();
+
+                Assert.Contains("Joe", result);
+                Assert.Contains("Joan", result);
             }
         }
     }
