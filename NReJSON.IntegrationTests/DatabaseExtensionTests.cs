@@ -120,6 +120,23 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("world", result[0].ToString());
                 Assert.Contains("tom", result[1].ToString());
             }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var key1 = Guid.NewGuid().ToString("N");
+                var key2 = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+                _db.JsonSet(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
+
+                var result = _db.JsonMultiGet<ExampleHelloWorld>(new RedisKey[] { key1, "say what?", key2 }).ToList();
+
+                Assert.Equal(3, result.Count);
+                Assert.Null(result[1]);
+                Assert.Contains("world", result[0].Hello);
+                Assert.Contains("tom", result[2].Hello);
+            }
         }
 
         public class JsonType : BaseIntegrationTest

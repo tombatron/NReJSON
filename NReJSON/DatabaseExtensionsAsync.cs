@@ -177,7 +177,7 @@ namespace NReJSON
             {
                 foreach (var sr in srs)
                 {
-                    if (sr is null)
+                    if (sr.IsNull)
                     {
                         yield return default(TResult);
                     }

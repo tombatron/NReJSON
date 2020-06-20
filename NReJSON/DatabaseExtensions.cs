@@ -176,7 +176,7 @@ namespace NReJSON
 
             foreach (var serializedResult in serializedResults)
             {
-                if (serializedResult is null)
+                if (serializedResult.IsNull)
                 {
                     yield return default(TResult);
                 }

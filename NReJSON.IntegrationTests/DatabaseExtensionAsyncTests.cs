@@ -121,6 +121,23 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("world", result[0].ToString());
                 Assert.Contains("tom", result[1].ToString());
             }
+
+            [Fact]
+            public async Task CanExecuteWithSerializer()
+            {
+                var key1 = Guid.NewGuid().ToString("N");
+                var key2 = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+                await _db.JsonSetAsync(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
+
+                var result = (await _db.JsonMultiGetAsync<ExampleHelloWorld>(new RedisKey[] { key1, "say what?", key2 })).ToList();
+
+                Assert.Equal(3, result.Count);
+                Assert.Null(result[1]);
+                Assert.Contains("world", result[0].Hello);
+                Assert.Contains("tom", result[2].Hello);
+            }            
         }
 
         public class JsonTypeAsync : BaseIntegrationTest
