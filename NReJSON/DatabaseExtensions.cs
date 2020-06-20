@@ -424,6 +424,28 @@ namespace NReJSON
             db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index));
 
         /// <summary>
+        /// `JSON.ARRPOP`
+        /// 
+        /// Remove and return element from the index in the array.
+        ///
+        /// Out of range indices are rounded to their respective array ends.Popping an empty array yields null.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrpop
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to pop an object off of.</param>
+        /// <param name="path">Defaults to root (".") if not provided.</param>
+        /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns></returns>
+        public static TResult JsonArrayPop<TResult>(this IDatabase db, RedisKey key, string path = ".", int index = -1)
+        {
+            var result = db.JsonArrayPop(key, path, index);
+
+            return SerializerProxy.Deserialize<TResult>(result);
+        }
+
+        /// <summary>
         /// `JSON.ARRTRIM`
         /// 
         /// Trim an array so that it contains only the specified inclusive range of elements.

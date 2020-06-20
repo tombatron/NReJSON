@@ -328,6 +328,18 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal("\"world\"", result.ToString());
             }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+
+                var result = _db.JsonArrayPop<string>(key, ".array", 1);
+
+                Assert.Equal("world", result);
+            }            
         }
 
         public class JsonArrayTrim : BaseIntegrationTest
