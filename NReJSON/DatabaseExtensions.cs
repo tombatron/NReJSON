@@ -581,8 +581,13 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static RedisResult JsonIndexDelete(this IDatabase db, string index) =>
-            db.Execute(JsonCommands.INDEX, CombineArguments("DEL", index));
+        public static OperationResult JsonIndexDelete(this IDatabase db, string index)
+        {
+            var result = db.Execute(JsonCommands.INDEX, CombineArguments("DEL", index)).ToString();
+
+            return new OperationResult(result == "OK", result);
+        }
+            
 
         /// <summary>
         /// `JSON.QGET`

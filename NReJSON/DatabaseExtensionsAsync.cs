@@ -574,7 +574,6 @@ namespace NReJSON
 
             return new OperationResult(result == "OK", result);
         }
-            
 
         /// <summary>
         /// `JSON.INDEX DEL`
@@ -586,8 +585,13 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static Task<RedisResult> JsonIndexDeleteAsync(this IDatabase db, string index) =>
-            db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("DEL", index));
+        public static async Task<OperationResult> JsonIndexDeleteAsync(this IDatabase db, string index)
+        {
+            var result = (await db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("DEL", index))).ToString();
+
+            return new OperationResult(result == "OK", result);
+        }
+            
 
         /// <summary>
         /// `JSON.QGET`
