@@ -5,6 +5,10 @@ using StackExchange.Redis;
 
 namespace NReJSON
 {
+    /// <summary>
+    /// This class defines the extension methods for StackExchange.Redis that allow
+    /// for the interaction with the RedisJson Redis module.
+    /// </summary>
     public static partial class DatabaseExtensions
     {
         /// <summary>
