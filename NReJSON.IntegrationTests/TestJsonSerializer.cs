@@ -1,7 +1,7 @@
 using StackExchange.Redis;
 using System.Text.Json;
 
-namespace NReJSON.Tests
+namespace NReJSON.IntegrationTests
 {
     public sealed class TestJsonSerializer : ISerializerProxy
     {
