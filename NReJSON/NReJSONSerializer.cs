@@ -56,6 +56,7 @@ namespace NReJSON
                         if (_serializerProxy is null)
                         {
                             _serializerProxy = value;
+                            _serializerSet = true;
                         }
                     }
                 }
