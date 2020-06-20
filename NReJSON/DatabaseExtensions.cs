@@ -159,6 +159,35 @@ namespace NReJSON
             (RedisResult[])db.Execute(JsonCommands.MGET, CombineArguments(keys, path));
 
         /// <summary>
+        /// `JSON.MGET`
+        /// 
+        /// Returns an IEnumerable of the specified result type. Non-existing keys and non-existent paths are returnd as type default.
+        ///  
+        /// https://oss.redislabs.com/rejson/commands/#jsonmget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="keys">Keys where JSON objects are stored.</param>
+        /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns>IEnumerable of TResult, non-existent paths/keys are returned as default(TResult).</returns>
+        public static IEnumerable<TResult> JsonMultiGet<TResult>(this IDatabase db, RedisKey[] keys, string path = ".")
+        {
+            var serializedResults = db.JsonMultiGet(keys, path);
+
+            foreach (var serializedResult in serializedResults)
+            {
+                if (serializedResult is null)
+                {
+                    yield return default(TResult);
+                }
+                else
+                {
+                    yield return SerializerProxy.Deserialize<TResult>(serializedResult);
+                }
+            }
+        }
+
+        /// <summary>
         /// `JSON.SET`
         /// 
         /// Sets the JSON value at path in key

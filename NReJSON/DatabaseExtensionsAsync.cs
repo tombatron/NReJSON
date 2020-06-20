@@ -100,7 +100,7 @@ namespace NReJSON
                 args.Add(space);
             }
 
-            foreach (var path in PathsOrDefault(paths, new [] { "." }))
+            foreach (var path in PathsOrDefault(paths, new[] { "." }))
             {
                 args.Add(path);
             }
@@ -126,7 +126,7 @@ namespace NReJSON
         /// <returns></returns>
         public static async Task<TResult> JsonGetAsync<TResult>(this IDatabase db, RedisKey key, bool noEscape = false, string indent = default, string newline = default, string space = default, params string[] paths)
         {
-            var serializedResult  = await db.JsonGetAsync(key, noEscape, indent, newline, space, paths);
+            var serializedResult = await db.JsonGetAsync(key, noEscape, indent, newline, space, paths);
 
             return SerializerProxy.Deserialize<TResult>(serializedResult);
         }
@@ -158,6 +158,38 @@ namespace NReJSON
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
         public static async Task<RedisResult[]> JsonMultiGetAsync(this IDatabase db, RedisKey[] keys, string path = ".") =>
             (RedisResult[])(await db.ExecuteAsync(JsonCommands.MGET, CombineArguments(keys, path)).ConfigureAwait(false));
+
+        /// <summary>
+        /// `JSON.MGET`
+        /// 
+        /// Returns an IEnumerable of the specified result type. Non-existing keys and non-existent paths are returnd as type default.
+        ///  
+        /// https://oss.redislabs.com/rejson/commands/#jsonmget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="keys">Keys where JSON objects are stored.</param>
+        /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns>IEnumerable of TResult, non-existent paths/keys are returned as default(TResult).</returns>
+        public static async Task<IEnumerable<TResult>> JsonMultiGetAsync<TResult>(this IDatabase db, RedisKey[] keys, string path = ".")
+        {
+            IEnumerable<TResult> CreateResult(RedisResult[] srs)
+            {
+                foreach (var sr in srs)
+                {
+                    if (sr is null)
+                    {
+                        yield return default(TResult);
+                    }
+                    else
+                    {
+                        yield return SerializerProxy.Deserialize<TResult>(sr);
+                    }
+                }
+            }
+
+            return CreateResult(await db.JsonMultiGetAsync(keys, path));
+        }
 
         /// <summary>
         /// `JSON.SET`
@@ -516,6 +548,6 @@ namespace NReJSON
         /// <param name="path">[Optional] Path to the expected value.</param>
         /// <returns></returns>
         public static Task<RedisResult> JsonIndexGetAsync(this IDatabase db, string index, string query, string path = "") =>
-            db.ExecuteAsync(JsonCommands.QGET, CombineArguments(index, query, path));            
+            db.ExecuteAsync(JsonCommands.QGET, CombineArguments(index, query, path));
     }
 }
