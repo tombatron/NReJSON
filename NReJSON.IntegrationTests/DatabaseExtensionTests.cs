@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Linq;
+﻿using NReJSON.IntegrationTests.Models;
 using StackExchange.Redis;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace NReJSON.IntegrationTests
@@ -69,6 +69,20 @@ namespace NReJSON.IntegrationTests
                 var result = _db.JsonGet(key, space: "+");
 
                 Assert.Contains("+", (string)result);
+            }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonGet<ExampleHelloWorld>(key);
+
+                Assert.NotNull(result);
+                Assert.Equal("world", result.Hello);
+                Assert.Equal("moon", result.GoodNight.Value);
             }
         }
 
@@ -387,9 +401,9 @@ namespace NReJSON.IntegrationTests
             public void CanExecute()
             {
                 var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();   
+                var key = Guid.NewGuid().ToString();
 
-                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index); 
+                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
                 _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
 
                 _db.JsonIndexAdd(index, "last", "$.last");
