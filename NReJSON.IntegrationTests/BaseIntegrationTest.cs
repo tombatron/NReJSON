@@ -5,7 +5,7 @@ namespace NReJSON.IntegrationTests
 {
     public abstract class BaseIntegrationTest : IDisposable
     {
-        private static ISerializerProxy _serializer = new TestJsonSerializer();
+        private static readonly ISerializerProxy _serializer = new TestJsonSerializer();
         private readonly ConnectionMultiplexer _muxer;
         protected readonly IDatabase _db;
 
