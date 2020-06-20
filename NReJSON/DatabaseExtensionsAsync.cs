@@ -208,9 +208,36 @@ namespace NReJSON
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
         /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
-        /// <returns></returns>
-        public static Task<RedisResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default, string index = "") =>
-            db.ExecuteAsync(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)));
+        /// <returns>An `OperationResult` indicating success or failure.</returns>
+        public static async Task<OperationResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default, string index = "")
+        {
+            var result = (await db.ExecuteAsync(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)))).ToString();
+
+            return new OperationResult(result == "OK", result);
+        }
+
+        /// <summary>
+        /// `JSON.SET`
+        /// 
+        /// Sets the JSON value at path in key
+        ///
+        /// For new Redis keys the path must be the root. 
+        /// 
+        /// For existing keys, when the entire path exists, the value that it contains is replaced with the json value.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonset
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">Key where JSON object is to be stored.</param>
+        /// <param name="obj">The object to serialize and send.</param>
+        /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
+        /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
+        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
+        /// <typeparam name="TObjectType">Type of the object being serialized.</typeparam>
+        /// <returns>An `OperationResult` indicating success or failure.</returns>
+        public static Task<OperationResult> JsonSetAsync<TObjectType>(this IDatabase db, RedisKey key, TObjectType obj, string path = ".", SetOption setOption = SetOption.Default, string index = "") =>
+            db.JsonSetAsync(key, SerializerProxy.Serialize(obj), path, setOption, index);
+
 
         /// <summary>
         /// `JSON.TYPE`

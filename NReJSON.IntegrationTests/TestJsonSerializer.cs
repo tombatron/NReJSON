@@ -7,5 +7,8 @@ namespace NReJSON.IntegrationTests
     {
         public TResult Deserialize<TResult>(RedisResult serializedValue) =>
             JsonSerializer.Deserialize<TResult>(serializedValue.ToString());
+
+        public string Serialize<TObjectType>(TObjectType obj) =>
+            JsonSerializer.Serialize(obj);
     }
 }

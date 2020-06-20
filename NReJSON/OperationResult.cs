@@ -15,20 +15,20 @@ namespace NReJSON
         public bool IsSuccess { get; }
 
         /// <summary>
-        /// Is an operation didn't succeed the error message will be found here.
+        /// The raw result of the operation will be stored here.
         /// </summary>
         /// <value></value>
-        public string ErrorMessage { get; }
+        public string RawResult { get; }
 
         /// <summary>
         /// Construct the OperationResult.
         /// </summary>
         /// <param name="isSuccess">True, if the operation succeeded and false, if the operation didn't succeed.</param>
         /// <param name="errorMessage">If the operation didn't succeed the error message will be found here.</param>
-        public OperationResult(bool isSuccess, string errorMessage)
+        public OperationResult(bool isSuccess, string rawResult)
         {
             IsSuccess = isSuccess;
-            ErrorMessage = errorMessage;
+            RawResult = rawResult;
         }
 
         /// <summary>
