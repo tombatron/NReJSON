@@ -17,7 +17,27 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonSet(key, "{}");
 
-                Assert.NotNull(result);
+                Assert.True(result);
+            }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                var obj = new ExampleHelloWorld 
+                { 
+                    Hello = "World", 
+
+                    GoodNight = new ExampleHelloWorld.InnerExample 
+                    { 
+                        Value = "Moon" 
+                    } 
+                };
+
+                var result = _db.JsonSet(key, obj);
+                
+                Assert.True(result);
             }
         }
 
@@ -73,6 +93,7 @@ namespace NReJSON.IntegrationTests
 
             [Fact]
             public void CanExecuteWithSerializer()
+
             {
                 var key = Guid.NewGuid().ToString("N");
 

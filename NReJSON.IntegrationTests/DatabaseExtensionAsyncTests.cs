@@ -20,6 +20,26 @@ namespace NReJSON.IntegrationTests
 
                 Assert.NotNull(result);
             }
+
+            [Fact]
+            public async Task CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                var obj = new ExampleHelloWorld 
+                { 
+                    Hello = "World", 
+
+                    GoodNight = new ExampleHelloWorld.InnerExample 
+                    { 
+                        Value = "Moon" 
+                    } 
+                };
+
+                var result = await _db.JsonSetAsync(key, obj);
+                
+                Assert.True(result);
+            }            
         }
 
         public class JsonGetAsync : BaseIntegrationTest
