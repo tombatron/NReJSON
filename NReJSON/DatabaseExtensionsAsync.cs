@@ -568,8 +568,13 @@ namespace NReJSON
         /// <param name="field">Name of the field being indexed.</param>
         /// <param name="path">Path of the field being indexed.</param>
         /// <returns></returns>
-        public static Task<RedisResult> JsonIndexAddAsync(this IDatabase db, string index, string field, string path) =>
-            db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("ADD", index, field, path));
+        public static async Task<OperationResult> JsonIndexAddAsync(this IDatabase db, string index, string field, string path)
+        {
+            var result = (await db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("ADD", index, field, path))).ToString();
+
+            return new OperationResult(result == "OK", result);
+        }
+            
 
         /// <summary>
         /// `JSON.INDEX DEL`

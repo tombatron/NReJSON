@@ -426,7 +426,8 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonIndexAdd(index, "test_field", "$.a");
 
-                Assert.Equal("OK", result.ToString());
+                Assert.True(result);
+                Assert.Equal("OK", result.RawResult);
             }
         }
 

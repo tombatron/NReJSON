@@ -564,8 +564,12 @@ namespace NReJSON
         /// <param name="field">Name of the field being indexed.</param>
         /// <param name="path">Path of the field being indexed.</param>
         /// <returns></returns>
-        public static RedisResult JsonIndexAdd(this IDatabase db, string index, string field, string path) =>
-            db.Execute(JsonCommands.INDEX, CombineArguments("ADD", index, field, path));
+        public static OperationResult JsonIndexAdd(this IDatabase db, string index, string field, string path)
+        {
+            var result = db.Execute(JsonCommands.INDEX, CombineArguments("ADD", index, field, path)).ToString();
+
+            return new OperationResult(result == "OK", result);
+        }
 
         /// <summary>
         /// `JSON.INDEX DEL`
