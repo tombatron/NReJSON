@@ -18,7 +18,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonSetAsync(key, "{}");
 
-                Assert.NotNull(result);
+                Assert.True(result);
             }
 
             [Fact]

@@ -24,7 +24,7 @@ namespace NReJSON
         /// Construct the OperationResult.
         /// </summary>
         /// <param name="isSuccess">True, if the operation succeeded and false, if the operation didn't succeed.</param>
-        /// <param name="errorMessage">If the operation didn't succeed the error message will be found here.</param>
+        /// <param name="rawResult">The result as handled by NReJSON.</param>
         public OperationResult(bool isSuccess, string rawResult)
         {
             IsSuccess = isSuccess;
