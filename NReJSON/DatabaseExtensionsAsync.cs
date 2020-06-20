@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using StackExchange.Redis;
+using static NReJSON.NReJSONSerializer;
 
 namespace NReJSON
 {
@@ -39,6 +40,23 @@ namespace NReJSON
         /// <returns></returns>
         public static Task<RedisResult> JsonGetAsync(this IDatabase db, RedisKey key, params string[] paths) =>
             db.JsonGetAsync(key, noEscape: true, paths: paths);
+
+        /// <summary>
+        /// `JSON.GET`
+        /// 
+        /// Return the value at `path` as a deserialized value.
+        /// 
+        /// `NOESCAPE` is `true` by default.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
+        /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns></returns>
+        public static Task<TResult> JsonGetAsync<TResult>(this IDatabase db, RedisKey key, params string[] paths) =>
+            db.JsonGetAsync<TResult>(key, noEscape: true, paths: paths);
 
         /// <summary>
         /// `JSON.GET`
@@ -88,6 +106,29 @@ namespace NReJSON
             }
 
             return db.ExecuteAsync(JsonCommands.GET, args);
+        }
+
+        /// <summary>
+        /// `JSON.GET`
+        /// 
+        /// Return the value at `path` as a deserialized value.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
+        /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
+        /// <param name="indent">Sets the indentation string for nested levels</param>
+        /// <param name="newline">Sets the string that's printed at the end of each line</param>
+        /// <param name="space">Sets the string that's put between a key and a value</param>
+        /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns></returns>
+        public static async Task<TResult> JsonGetAsync<TResult>(this IDatabase db, RedisKey key, bool noEscape = false, string indent = default, string newline = default, string space = default, params string[] paths)
+        {
+            var serializedResult  = await db.JsonGetAsync(key, noEscape, indent, newline, space, paths);
+
+            return SerializerProxy.Deserialize<TResult>(serializedResult);
         }
 
         /// <summary>

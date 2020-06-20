@@ -112,7 +112,11 @@ namespace NReJSON
         }
 
         /// <summary>
+        /// `JSON.GET`
         /// 
+        /// Return the value at `path` as a deserialized value.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is stored.</param>

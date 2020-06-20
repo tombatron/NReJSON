@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using NReJSON.IntegrationTests.Models;
 using StackExchange.Redis;
 using Xunit;
 
@@ -69,6 +70,20 @@ namespace NReJSON.IntegrationTests
                 var result = await _db.JsonGetAsync(key, space: "+");
 
                 Assert.Contains("+", (string)result);
+            }
+
+            [Fact]
+            public async Task CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = await _db.JsonGetAsync<ExampleHelloWorld>(key);
+
+                Assert.NotNull(result);
+                Assert.Equal("world", result.Hello);
+                Assert.Equal("moon", result.GoodNight.Value);
             }
         }
 
@@ -304,7 +319,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonObjectKeysAsync(key);
 
-                Assert.Equal(new [] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
+                Assert.Equal(new[] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
             }
         }
 
@@ -387,9 +402,9 @@ namespace NReJSON.IntegrationTests
             public async Task CanExecute()
             {
                 var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();   
+                var key = Guid.NewGuid().ToString();
 
-                await _db.JsonSetAsync($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index); 
+                await _db.JsonSetAsync($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
                 await _db.JsonSetAsync($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
 
                 await _db.JsonIndexAddAsync(index, "last", "$.last");
@@ -399,6 +414,6 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("Joe", result);
                 Assert.Contains("Joan", result);
             }
-        }        
+        }
     }
 }
