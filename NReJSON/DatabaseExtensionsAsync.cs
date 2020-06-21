@@ -607,5 +607,25 @@ namespace NReJSON
         /// <returns></returns>
         public static Task<RedisResult> JsonIndexGetAsync(this IDatabase db, string index, string query, string path = "") =>
             db.ExecuteAsync(JsonCommands.QGET, CombineArguments(index, query, path));
+
+        /// <summary>
+        /// `JSON.QGET`
+        /// 
+        /// Query a JSON index for an existing object.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index">Name of the index.</param>
+        /// <param name="query">Pattern being applied to the index.</param>
+        /// <param name="path">[Optional] Path to the expected value.</param>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
+        public static async Task<IDictionary<string, IEnumerable<TResult>>> JsonIndexGetAsync<TResult>(this IDatabase db, string index, string query, string path = "")
+        {
+            var result = await db.JsonIndexGetAsync(index, query, path);
+
+            return SerializerProxy.Deserialize<IDictionary<string, IEnumerable<TResult>>>(result);
+        }            
     }
 }
