@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using NReJSON.IntegrationTests.Models;
 using StackExchange.Redis;
 using Xunit;
 
@@ -17,8 +18,28 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonSetAsync(key, "{}");
 
-                Assert.NotNull(result);
+                Assert.True(result);
             }
+
+            [Fact]
+            public async Task CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                var obj = new ExampleHelloWorld 
+                { 
+                    Hello = "World", 
+
+                    GoodNight = new ExampleHelloWorld.InnerExample 
+                    { 
+                        Value = "Moon" 
+                    } 
+                };
+
+                var result = await _db.JsonSetAsync(key, obj);
+                
+                Assert.True(result);
+            }            
         }
 
         public class JsonGetAsync : BaseIntegrationTest
@@ -70,6 +91,20 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Contains("+", (string)result);
             }
+
+            [Fact]
+            public async Task CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = await _db.JsonGetAsync<ExampleHelloWorld>(key);
+
+                Assert.NotNull(result);
+                Assert.Equal("world", result.Hello);
+                Assert.Equal("moon", result.GoodNight.Value);
+            }
         }
 
         public class JsonDeleteAsync : BaseIntegrationTest
@@ -106,6 +141,23 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("world", result[0].ToString());
                 Assert.Contains("tom", result[1].ToString());
             }
+
+            [Fact]
+            public async Task CanExecuteWithSerializer()
+            {
+                var key1 = Guid.NewGuid().ToString("N");
+                var key2 = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+                await _db.JsonSetAsync(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
+
+                var result = (await _db.JsonMultiGetAsync<ExampleHelloWorld>(new RedisKey[] { key1, "say what?", key2 })).ToList();
+
+                Assert.Equal(3, result.Count);
+                Assert.Null(result[1]);
+                Assert.Contains("world", result[0].Hello);
+                Assert.Contains("tom", result[2].Hello);
+            }            
         }
 
         public class JsonTypeAsync : BaseIntegrationTest
@@ -276,6 +328,18 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal("\"world\"", result.ToString());
             }
+
+            [Fact]
+            public async Task CanExecuteWithSerializerAsync()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+
+                var result = await _db.JsonArrayPopAsync<string>(key, ".array", 1);
+
+                Assert.Equal("world", result);
+            }            
         }
 
         public class JsonArrayTrimAsync : BaseIntegrationTest
@@ -304,7 +368,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonObjectKeysAsync(key);
 
-                Assert.Equal(new [] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
+                Assert.Equal(new[] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
             }
         }
 
@@ -362,7 +426,8 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonIndexAddAsync(index, "test_field", "$.a");
 
-                Assert.Equal("OK", result.ToString());
+                Assert.True(result);
+                Assert.Equal("OK", result.RawResult);
             }
         }
 
@@ -377,7 +442,8 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonIndexDeleteAsync(index);
 
-                Assert.Equal("OK", result.ToString());
+                Assert.True(result);
+                Assert.Equal("OK", result.RawResult);
             }
         }
 
@@ -387,9 +453,9 @@ namespace NReJSON.IntegrationTests
             public async Task CanExecute()
             {
                 var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();   
+                var key = Guid.NewGuid().ToString();
 
-                await _db.JsonSetAsync($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index); 
+                await _db.JsonSetAsync($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
                 await _db.JsonSetAsync($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
 
                 await _db.JsonIndexAddAsync(index, "last", "$.last");
@@ -399,6 +465,23 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("Joe", result);
                 Assert.Contains("Joan", result);
             }
-        }        
+
+            [Fact]
+            public async Task CanExecuteWithSerializer()
+            {
+                var index = Guid.NewGuid().ToString().Substring(0, 4);
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
+                await _db.JsonSetAsync($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
+
+                await _db.JsonIndexAddAsync(index, "last", "$.last");
+
+                var result = await _db.JsonIndexGetAsync<ExamplePerson>(index, "Jo*");
+
+                Assert.Equal("Joe", result[$"{key}_1"].First().LastName);
+                Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
+            }              
+        }
     }
 }

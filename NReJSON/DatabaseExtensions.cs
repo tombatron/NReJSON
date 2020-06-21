@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using StackExchange.Redis;
+using static NReJSON.NReJSONSerializer;
 
 namespace NReJSON
 {
+    /// <summary>
+    /// This class defines the extension methods for StackExchange.Redis that allow
+    /// for the interaction with the RedisJson Redis module.
+    /// </summary>
     public static partial class DatabaseExtensions
     {
         /// <summary>
@@ -37,7 +42,24 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
-            db.JsonGet(key, noEscape : true, paths : paths);
+            db.JsonGet(key, noEscape: true, paths: paths);
+
+        /// <summary>
+        /// `JSON.GET`
+        /// 
+        /// Return the value at `path` as a deserialized value.
+        /// 
+        /// `NOESCAPE` is `true` by default.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
+        /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns></returns>
+        public static TResult JsonGet<TResult>(this IDatabase db, RedisKey key, params string[] paths) =>
+            db.JsonGet<TResult>(key, noEscape: true, paths: paths);
 
         /// <summary>
         /// `JSON.GET`
@@ -81,13 +103,32 @@ namespace NReJSON
                 args.Add(space);
             }
 
-            foreach (var path in PathsOrDefault(paths, new [] { "." }))
+            foreach (var path in PathsOrDefault(paths, new[] { "." }))
             {
                 args.Add(path);
             }
 
             return db.Execute(JsonCommands.GET, args);
         }
+
+        /// <summary>
+        /// `JSON.GET`
+        /// 
+        /// Return the value at `path` as a deserialized value.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">Key where JSON object is stored.</param>
+        /// <param name="noEscape">This option will disable the sending of \uXXXX escapes for non-ascii characters. This option should be used for efficiency if you deal mainly with such text.</param>
+        /// <param name="indent">Sets the indentation string for nested levels</param>
+        /// <param name="newline">Sets the string that's printed at the end of each line</param>
+        /// <param name="space">Sets the string that's put between a key and a value</param>
+        /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns></returns>
+        public static TResult JsonGet<TResult>(this IDatabase db, RedisKey key, bool noEscape = false, string indent = default, string newline = default, string space = default, params string[] paths) =>
+            SerializerProxy.Deserialize<TResult>(db.JsonGet(key, noEscape, indent, newline, space, paths));
 
         /// <summary>
         /// `JSON.MGET`
@@ -118,6 +159,35 @@ namespace NReJSON
             (RedisResult[])db.Execute(JsonCommands.MGET, CombineArguments(keys, path));
 
         /// <summary>
+        /// `JSON.MGET`
+        /// 
+        /// Returns an IEnumerable of the specified result type. Non-existing keys and non-existent paths are returnd as type default.
+        ///  
+        /// https://oss.redislabs.com/rejson/commands/#jsonmget
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="keys">Keys where JSON objects are stored.</param>
+        /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns>IEnumerable of TResult, non-existent paths/keys are returned as default(TResult).</returns>
+        public static IEnumerable<TResult> JsonMultiGet<TResult>(this IDatabase db, RedisKey[] keys, string path = ".")
+        {
+            var serializedResults = db.JsonMultiGet(keys, path);
+
+            foreach (var serializedResult in serializedResults)
+            {
+                if (serializedResult.IsNull)
+                {
+                    yield return default(TResult);
+                }
+                else
+                {
+                    yield return SerializerProxy.Deserialize<TResult>(serializedResult);
+                }
+            }
+        }
+
+        /// <summary>
         /// `JSON.SET`
         /// 
         /// Sets the JSON value at path in key
@@ -134,9 +204,35 @@ namespace NReJSON
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
         /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
-        /// <returns></returns>
-        public static RedisResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default, string index = "") =>
-            db.Execute(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)));
+        /// <returns>An `OperationResult` indicating success or failure.</returns>
+        public static OperationResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default, string index = "")
+        {
+            var result = db.Execute(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index))).ToString();
+
+            return new OperationResult(result == "OK", result);
+        }
+
+        /// <summary>
+        /// `JSON.SET`
+        /// 
+        /// Sets the JSON value at path in key
+        ///
+        /// For new Redis keys the path must be the root. 
+        /// 
+        /// For existing keys, when the entire path exists, the value that it contains is replaced with the json value.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonset
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">Key where JSON object is to be stored.</param>
+        /// <param name="obj">The object to serialize and send.</param>
+        /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
+        /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
+        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
+        /// <typeparam name="TObjectType">Type of the object being serialized.</typeparam>
+        /// <returns>An `OperationResult` indicating success or failure.</returns>
+        public static OperationResult JsonSet<TObjectType>(this IDatabase db, RedisKey key, TObjectType obj, string path = ".", SetOption setOption = SetOption.Default, string index = "") =>
+            db.JsonSet(key, SerializerProxy.Serialize(obj), path, setOption, index);
 
         /// <summary>
         /// `JSON.TYPE`
@@ -328,6 +424,28 @@ namespace NReJSON
             db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index));
 
         /// <summary>
+        /// `JSON.ARRPOP`
+        /// 
+        /// Remove and return element from the index in the array.
+        ///
+        /// Out of range indices are rounded to their respective array ends.Popping an empty array yields null.
+        /// 
+        /// https://oss.redislabs.com/rejson/commands/#jsonarrpop
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">The key of the JSON object that contains the array you want to pop an object off of.</param>
+        /// <param name="path">Defaults to root (".") if not provided.</param>
+        /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
+        /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
+        /// <returns></returns>
+        public static TResult JsonArrayPop<TResult>(this IDatabase db, RedisKey key, string path = ".", int index = -1)
+        {
+            var result = db.JsonArrayPop(key, path, index);
+
+            return SerializerProxy.Deserialize<TResult>(result);
+        }
+
+        /// <summary>
         /// `JSON.ARRTRIM`
         /// 
         /// Trim an array so that it contains only the specified inclusive range of elements.
@@ -446,8 +564,12 @@ namespace NReJSON
         /// <param name="field">Name of the field being indexed.</param>
         /// <param name="path">Path of the field being indexed.</param>
         /// <returns></returns>
-        public static RedisResult JsonIndexAdd(this IDatabase db, string index, string field, string path) =>
-            db.Execute(JsonCommands.INDEX, CombineArguments("ADD", index, field, path));
+        public static OperationResult JsonIndexAdd(this IDatabase db, string index, string field, string path)
+        {
+            var result = db.Execute(JsonCommands.INDEX, CombineArguments("ADD", index, field, path)).ToString();
+
+            return new OperationResult(result == "OK", result);
+        }
 
         /// <summary>
         /// `JSON.INDEX DEL`
@@ -459,8 +581,13 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        public static RedisResult JsonIndexDelete(this IDatabase db, string index) =>
-            db.Execute(JsonCommands.INDEX, CombineArguments("DEL", index));
+        public static OperationResult JsonIndexDelete(this IDatabase db, string index)
+        {
+            var result = db.Execute(JsonCommands.INDEX, CombineArguments("DEL", index)).ToString();
+
+            return new OperationResult(result == "OK", result);
+        }
+            
 
         /// <summary>
         /// `JSON.QGET`
@@ -476,5 +603,27 @@ namespace NReJSON
         /// <returns></returns>
         public static RedisResult JsonIndexGet(this IDatabase db, string index, string query, string path = "") =>
             db.Execute(JsonCommands.QGET, CombineArguments(index, query, path));
+
+        /// <summary>
+        /// `JSON.QGET`
+        /// 
+        /// Query a JSON index for an existing object.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index">Name of the index.</param>
+        /// <param name="query">Pattern being applied to the index.</param>
+        /// <param name="path">[Optional] Path to the expected value.</param>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
+        public static IndexedCollection<TResult> JsonIndexGet<TResult>(this IDatabase db, string index, string query, string path = "")
+        {
+            var result = db.JsonIndexGet(index, query, path);
+
+            var serializedResult = SerializerProxy.Deserialize<IDictionary<string, IEnumerable<TResult>>>(result);
+
+            return new IndexedCollection<TResult>(serializedResult);
+        }
     }
 }

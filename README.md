@@ -10,7 +10,7 @@ The following blog post by Marc Gravell was the inspiration behind this: [StackE
 
 ## Installation
 
-`PM> Install-Package NReJSON -Version 2.0.0`
+`PM> Install-Package NReJSON -Version 3.0.0`
 
 ## Usage
 
@@ -30,6 +30,65 @@ If RedisJSON is installed you should see output similar to the following:
 ```
 
 (The version of the module installed on your server obviously may vary.)
+
+## Major Changes in Version 3.0
+
+In version 3.0 support for serialization and deserialization was added in the form of new generic overloads for the following extension methods:
+
+- JsonGet/JsonGetAsync
+- JsonMultiGet/JsonMultiGetAsync
+- JsonSet/JsonSetAsync
+- JsonArrayPop/JsonArrayPopAsync
+- JsonIndexGet/JsonIndexGetAsync
+
+In order to leverage the serialization/deserialization support you must create an implementation of the `ISerializerProxy` interface. The following is a sample implementation taken from the integration tests:
+
+```csharp
+public sealed class TestJsonSerializer : ISerializerProxy
+{
+    public TResult Deserialize<TResult>(RedisResult serializedValue) =>
+        JsonSerializer.Deserialize<TResult>(serializedValue.ToString());
+
+    public string Serialize<TObjectType>(TObjectType obj) =>
+        JsonSerializer.Serialize(obj);
+}
+```
+
+Once that is implemented it can be assigned to the static property `SerializerProxy` found in the static class `NReJSONSerializer`. The following is an example of how to do this: 
+
+```csharp
+NReJSONSerializer.SerializerProxy = new TestJsonSerializer();
+
+```
+
+If this isn't setup before leveraging the extension methods that make use of it, an `NReJSONException` will be thrown in order to remind you that it needs to be done. 
+
+The result type for the following methods has change to `OperationResult`:
+
+- JsonSet/JsonSetAsync
+- JsonIndexAdd/JsonIndexAddAsync
+- JsonIndexDelete/JsonIndexDeleteAsync
+
+The `OperationResult` is a struct that will return and contain whether or not the operation was successful, and will also contain the raw response from Redis. This type is implicitly convertable to `bool` so it can be used in operations like:
+
+```csharp
+var result = await db.JsonSetAsync(key, obj);
+
+if (result)
+{
+   // Do something if there was success...
+} 
+else
+{
+   // Do something if there wasn't success...
+}
+```
+
+Last but not least, we have a new result type called `IndexedCollection` which is now returned by the overload which deserializes results on the following method:
+
+- JsonIndexGet/JsonIndexGetAsync
+
+This type is generic and allows for dealing with the result of the `JsonIndexGet` and `JsonIndexGetAsync` as a dictionary and as a collection. 
 
 ### Examples
 

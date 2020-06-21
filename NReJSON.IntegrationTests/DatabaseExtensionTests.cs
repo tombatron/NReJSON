@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Linq;
+﻿using NReJSON.IntegrationTests.Models;
 using StackExchange.Redis;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace NReJSON.IntegrationTests
@@ -17,7 +17,27 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonSet(key, "{}");
 
-                Assert.NotNull(result);
+                Assert.True(result);
+            }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                var obj = new ExampleHelloWorld 
+                { 
+                    Hello = "World", 
+
+                    GoodNight = new ExampleHelloWorld.InnerExample 
+                    { 
+                        Value = "Moon" 
+                    } 
+                };
+
+                var result = _db.JsonSet(key, obj);
+                
+                Assert.True(result);
             }
         }
 
@@ -70,6 +90,21 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Contains("+", (string)result);
             }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+
+                var result = _db.JsonGet<ExampleHelloWorld>(key);
+
+                Assert.NotNull(result);
+                Assert.Equal("world", result.Hello);
+                Assert.Equal("moon", result.GoodNight.Value);
+            }
         }
 
         public class JsonDelete : BaseIntegrationTest
@@ -105,6 +140,23 @@ namespace NReJSON.IntegrationTests
                 Assert.Equal(2, result.Length);
                 Assert.Contains("world", result[0].ToString());
                 Assert.Contains("tom", result[1].ToString());
+            }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var key1 = Guid.NewGuid().ToString("N");
+                var key2 = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
+                _db.JsonSet(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
+
+                var result = _db.JsonMultiGet<ExampleHelloWorld>(new RedisKey[] { key1, "say what?", key2 }).ToList();
+
+                Assert.Equal(3, result.Count);
+                Assert.Null(result[1]);
+                Assert.Contains("world", result[0].Hello);
+                Assert.Contains("tom", result[2].Hello);
             }
         }
 
@@ -276,6 +328,18 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal("\"world\"", result.ToString());
             }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+
+                var result = _db.JsonArrayPop<string>(key, ".array", 1);
+
+                Assert.Equal("world", result);
+            }            
         }
 
         public class JsonArrayTrim : BaseIntegrationTest
@@ -362,7 +426,8 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonIndexAdd(index, "test_field", "$.a");
 
-                Assert.Equal("OK", result.ToString());
+                Assert.True(result);
+                Assert.Equal("OK", result.RawResult);
             }
         }
 
@@ -377,7 +442,8 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonIndexDelete(index);
 
-                Assert.Equal("OK", result.ToString());
+                Assert.True(result);
+                Assert.Equal("OK", result.RawResult);
             }
         }
 
@@ -387,9 +453,9 @@ namespace NReJSON.IntegrationTests
             public void CanExecute()
             {
                 var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();   
+                var key = Guid.NewGuid().ToString();
 
-                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index); 
+                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
                 _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
 
                 _db.JsonIndexAdd(index, "last", "$.last");
@@ -399,6 +465,23 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("Joe", result);
                 Assert.Contains("Joan", result);
             }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var index = Guid.NewGuid().ToString().Substring(0, 4);
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
+                _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
+
+                _db.JsonIndexAdd(index, "last", "$.last");
+
+                var result = _db.JsonIndexGet<ExamplePerson>(index, "Jo*");
+
+                Assert.Equal("Joe", result[$"{key}_1"].First().LastName);
+                Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
+            }            
         }
     }
 }

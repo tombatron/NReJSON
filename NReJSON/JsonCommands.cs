@@ -1,6 +1,6 @@
 ﻿namespace NReJSON
 {
-    public static class JsonCommands
+    internal static class JsonCommands
     {
         public const string DEL = "JSON.DEL";
         public const string GET = "JSON.GET";
