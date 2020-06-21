@@ -479,8 +479,8 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonIndexGetAsync<ExamplePerson>(index, "Jo*");
 
-                Assert.Equal(result[$"{key}_1"].First().LastName, "Joe");
-                Assert.Equal(result[$"{key}_2"].First().LastName, "Joan");
+                Assert.Equal("Joe", result[$"{key}_1"].First().LastName);
+                Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
             }              
         }
     }
