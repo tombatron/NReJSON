@@ -621,11 +621,13 @@ namespace NReJSON
         /// <param name="path">[Optional] Path to the expected value.</param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
-        public static async Task<IDictionary<string, IEnumerable<TResult>>> JsonIndexGetAsync<TResult>(this IDatabase db, string index, string query, string path = "")
+        public static async Task<IndexedCollection<TResult>> JsonIndexGetAsync<TResult>(this IDatabase db, string index, string query, string path = "")
         {
             var result = await db.JsonIndexGetAsync(index, query, path);
 
-            return SerializerProxy.Deserialize<IDictionary<string, IEnumerable<TResult>>>(result);
+            var serializedResult = SerializerProxy.Deserialize<IDictionary<string, IEnumerable<TResult>>>(result);
+
+            return new IndexedCollection<TResult>(serializedResult);
         }            
     }
 }
