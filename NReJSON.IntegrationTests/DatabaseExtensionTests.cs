@@ -465,6 +465,23 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("Joe", result);
                 Assert.Contains("Joan", result);
             }
+
+            [Fact]
+            public void CanExecuteWithSerializer()
+            {
+                var index = Guid.NewGuid().ToString().Substring(0, 4);
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
+                _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
+
+                _db.JsonIndexAdd(index, "last", "$.last");
+
+                var result = _db.JsonIndexGet<ExamplePerson>(index, "Jo*");
+
+                Assert.Equal(result[$"{key}_1"].First().LastName, "Joe");
+                Assert.Equal(result[$"{key}_2"].First().LastName, "Joan");
+            }            
         }
     }
 }

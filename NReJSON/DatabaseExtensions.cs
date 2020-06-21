@@ -603,5 +603,12 @@ namespace NReJSON
         /// <returns></returns>
         public static RedisResult JsonIndexGet(this IDatabase db, string index, string query, string path = "") =>
             db.Execute(JsonCommands.QGET, CombineArguments(index, query, path));
+
+        public static IDictionary<string, IEnumerable<TResult>> JsonIndexGet<TResult>(this IDatabase db, string index, string query, string path = "")
+        {
+            var result = db.JsonIndexGet(index, query, path);
+
+            return SerializerProxy.Deserialize<IDictionary<string, IEnumerable<TResult>>>(result);
+        }
     }
 }
