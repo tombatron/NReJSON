@@ -604,6 +604,19 @@ namespace NReJSON
         public static RedisResult JsonIndexGet(this IDatabase db, string index, string query, string path = "") =>
             db.Execute(JsonCommands.QGET, CombineArguments(index, query, path));
 
+        /// <summary>
+        /// `JSON.QGET`
+        /// 
+        /// Query a JSON index for an existing object.
+        /// 
+        /// RedisJson documentation link forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="index">Name of the index.</param>
+        /// <param name="query">Pattern being applied to the index.</param>
+        /// <param name="path">[Optional] Path to the expected value.</param>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
         public static IDictionary<string, IEnumerable<TResult>> JsonIndexGet<TResult>(this IDatabase db, string index, string query, string path = "")
         {
             var result = db.JsonIndexGet(index, query, path);
