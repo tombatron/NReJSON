@@ -215,16 +215,44 @@ namespace NReJSON.IntegrationTests
 
         public class JsonAppendJsonStringAsync : BaseIntegrationTest
         {
-            [Fact(Skip = "This doesn't work, not sure what I'm doing wrong yet.")]
+            [Fact]
             public async Task CanExecuteAsync()
             {
                 var key = Guid.NewGuid().ToString("N");
 
                 await _db.JsonSetAsync(key, "{\"hello\":\"world\"}");
 
-                var result = await _db.JsonAppendJsonStringAsync(key, ".hello", "{\"t\":1}");
+                var result = await _db.JsonAppendJsonStringAsync(key, ".hello", "\"!\"");
 
-                Assert.Equal(4, result);
+                Assert.Equal(6, result);
+            }
+
+            [Fact]
+            public async Task WillAppendProvidedJsonStringIntoExistingJsonString()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key, "{\"hello\":\"world\"}");
+
+                await _db.JsonAppendJsonStringAsync(key, ".hello", "\"!\"");
+
+                var helloValue = await _db.JsonGetAsync<string>(key, ".hello");
+
+                Assert.Equal("world!", helloValue);
+            }
+
+            [Fact]
+            public async Task WillApendProvidedJsonStringIntoRootIfNoPathProvided()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key, "\"world\"");
+
+                await _db.JsonAppendJsonStringAsync(key, jsonString: "\"!\"");
+
+                var helloValue = await _db.JsonGetAsync<string>(key);
+
+                Assert.Equal("world!", helloValue);
             }
         }
 
