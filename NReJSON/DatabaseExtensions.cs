@@ -279,24 +279,20 @@ namespace NReJSON
             db.Execute(JsonCommands.NUMMULTBY, CombineArguments(key, path, number));
 
         /// <summary>
-        /// [Not implemented yet]
-        /// 
         /// `JSON.STRAPPEND`
         /// 
         /// Append the json-string value(s) the string at path.
-        ///
         /// path defaults to root if not provided.
         /// 
         /// https://oss.redislabs.com/rejson/commands/#jsonstrappend
         /// </summary>
         /// <param name="db"></param>
-        /// <param name="key"></param>
-        /// <param name="path"></param>
+        /// <param name="key">The key of the JSON object you need to append a string value.</param>
+        /// <param name="path">The path of the JSON string you want to append do.  This defaults to root.</param>
         /// <param name="jsonString"></param>
-        /// <returns>Length of the new JSON object.</returns>
-        public static int JsonAppendJsonString(this IDatabase db, RedisKey key, string path = ".", string jsonString = "{}") =>
-            //(int)db.Execute(GetCommandName(CommandType.Json.STRAPPEND), CombineArguments(key, path, jsonString));
-            throw new NotImplementedException("This doesn't work, not sure what I'm doing wrong here.");
+        /// <returns>Length of the new JSON string.</returns>
+        public static int JsonAppendJsonString(this IDatabase db, RedisKey key, string path = ".", string jsonString = "\"\"") =>
+            (int)db.Execute(JsonCommands.STRAPPEND, CombineArguments(key, path, jsonString));
 
         /// <summary>
         /// `JSON.STRLEN`

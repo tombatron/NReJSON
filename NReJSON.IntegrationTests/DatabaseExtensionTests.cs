@@ -215,16 +215,44 @@ namespace NReJSON.IntegrationTests
 
         public class JsonAppendJsonString : BaseIntegrationTest
         {
-            [Fact(Skip = "This doesn't work, not sure what I'm doing wrong yet.")]
-            public void ItCanAppendJsonString()
+            [Fact]
+            public void CanExecuteAsync()
             {
                 var key = Guid.NewGuid().ToString("N");
 
                 _db.JsonSet(key, "{\"hello\":\"world\"}");
 
-                var result = _db.JsonAppendJsonString(key, ".hello", "{\"t\":1}");
+                var result = _db.JsonAppendJsonString(key, ".hello", "\"!\"");
 
-                Assert.Equal(4, result);
+                Assert.Equal(6, result);
+            }
+
+            [Fact]
+            public void WillAppendProvidedJsonStringIntoExistingJsonString()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"hello\":\"world\"}");
+
+                _db.JsonAppendJsonString(key, ".hello", "\"!\"");
+
+                var helloValue = _db.JsonGet<string>(key, ".hello");
+
+                Assert.Equal("world!", helloValue);
+            }
+            
+            [Fact]
+            public void WillApendProvidedJsonStringIntoRootIfNoPathProvided()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "\"world\"");
+
+                _db.JsonAppendJsonString(key, jsonString: "\"!\"");
+
+                var helloValue = _db.JsonGet<string>(key);
+
+                Assert.Equal("world!", helloValue);
             }
         }
 

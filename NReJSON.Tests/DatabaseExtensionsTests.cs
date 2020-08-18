@@ -247,7 +247,25 @@ namespace NReJSON.Tests
 
         public class JsonAppendJsonString
         {
-            // TODO: Complete this once I figure out how this command is supposed to work.
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonAppendJsonString("fake_key", ".fake.path", "\"fake_string\"");
+
+                Assert.Equal(new[] { "JSON.STRAPPEND", "fake_key", ".fake.path", "\"fake_string\"" }, db.PreviousCommand);
+            }
+            
+            [Fact]
+            public void HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonAppendJsonString("fake_key", jsonString: "\"fake_string\"");
+
+                Assert.Equal(new[] { "JSON.STRAPPEND", "fake_key", ".", "\"fake_string\"" }, db.PreviousCommand);
+            }
         }
 
         public class JsonStringLength

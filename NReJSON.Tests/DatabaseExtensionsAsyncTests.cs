@@ -248,7 +248,25 @@ namespace NReJSON.Tests
 
         public class JsonAppendJsonStringAsync
         {
-            // TODO: Complete this once I figure out how this command is supposed to work.
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonAppendJsonStringAsync("fake_key", ".fake.path", "\"fake_string\"");
+
+                Assert.Equal(new[] { "JSON.STRAPPEND", "fake_key", ".fake.path", "\"fake_string\"" }, db.PreviousCommand);
+            }
+            
+            [Fact]
+            public async Task HasRootAsDefaultPath()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonAppendJsonStringAsync("fake_key", jsonString: "\"fake_string\"");
+
+                Assert.Equal(new[] { "JSON.STRAPPEND", "fake_key", ".", "\"fake_string\"" }, db.PreviousCommand);
+            }
         }
 
         public class JsonStringLengthAsync
