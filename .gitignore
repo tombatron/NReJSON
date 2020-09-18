@@ -335,3 +335,6 @@ ASALocalRun/
 
 .vscode
 .DS_Store
+
+
+global.json
