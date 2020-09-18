@@ -92,7 +92,7 @@ This type is generic and allows for dealing with the result of the `JsonIndexGet
 
 ### Examples
 
-[Sam Dzirasa]() has authored a blog post full of practical examples of how to use NReJSON in an application:
+Sam Dzirasa has authored a blog post full of practical examples of how to use NReJSON in an application:
 
 [Using RedisJson](https://blog.alumdb.org/using-redisjson/)
 
