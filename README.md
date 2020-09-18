@@ -92,10 +92,11 @@ This type is generic and allows for dealing with the result of the `JsonIndexGet
 
 ### Examples
 
-In this repository there are a suite of integration tests that should be sufficent to serve as examples on how to use all supported RedisJSON commands.
+[Sam Dzirasa]() has authored a blog post full of practical examples of how to use NReJSON in an application:
+
+[Using RedisJson](https://blog.alumdb.org/using-redisjson/)
+
+Also, in this repository there are a suite of integration tests that should be sufficent to serve as examples on how to use all supported RedisJSON commands.
 
 [Integration Tests](https://github.com/tombatron/NReJSON/blob/master/NReJSON.IntegrationTests/DatabaseExtensionAsyncTests.cs)
 
-## Major Issues
-
-The extension method for `JSON.STRAPPEND` doesn't work, because honestly I'm not really sure how to use the command. This is actually the first issue for the project which can be found [here](https://github.com/tombatron/NReJSON/issues/1). 
