@@ -560,6 +560,7 @@ namespace NReJSON
         /// <param name="field">Name of the field being indexed.</param>
         /// <param name="path">Path of the field being indexed.</param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static OperationResult JsonIndexAdd(this IDatabase db, string index, string field, string path)
         {
             var result = db.Execute(JsonCommands.INDEX, CombineArguments("ADD", index, field, path)).ToString();
@@ -577,6 +578,7 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="index"></param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static OperationResult JsonIndexDelete(this IDatabase db, string index)
         {
             var result = db.Execute(JsonCommands.INDEX, CombineArguments("DEL", index)).ToString();
@@ -597,6 +599,7 @@ namespace NReJSON
         /// <param name="query">Pattern being applied to the index.</param>
         /// <param name="path">[Optional] Path to the expected value.</param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static RedisResult JsonIndexGet(this IDatabase db, string index, string query, string path = "") =>
             db.Execute(JsonCommands.QGET, CombineArguments(index, query, path));
 
@@ -613,6 +616,7 @@ namespace NReJSON
         /// <param name="path">[Optional] Path to the expected value.</param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static IndexedCollection<TResult> JsonIndexGet<TResult>(this IDatabase db, string index, string query, string path = "")
         {
             var result = db.JsonIndexGet(index, query, path);

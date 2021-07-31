@@ -93,7 +93,6 @@ namespace NReJSON.IntegrationTests
 
             [Fact]
             public void CanExecuteWithSerializer()
-
             {
                 var key = Guid.NewGuid().ToString("N");
 
@@ -447,7 +446,7 @@ namespace NReJSON.IntegrationTests
 
         public class JsonIndexAdd : BaseIntegrationTest
         {
-            [Fact]
+            [Fact(Skip="This command has been deprecated and is removed in the latest version of RedisJson.")]
             public void CanExecute()
             {
                 var index = Guid.NewGuid().ToString();
@@ -461,7 +460,7 @@ namespace NReJSON.IntegrationTests
 
         public class JsonIndexDelete : BaseIntegrationTest
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void CanExecute()
             {
                 var index = Guid.NewGuid().ToString();
@@ -477,7 +476,7 @@ namespace NReJSON.IntegrationTests
 
         public class JsonIndexGet : BaseIntegrationTest
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void CanExecute()
             {
                 var index = Guid.NewGuid().ToString().Substring(0, 4);
@@ -494,7 +493,7 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("Joan", result);
             }
 
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void CanExecuteWithSerializer()
             {
                 var index = Guid.NewGuid().ToString().Substring(0, 4);
