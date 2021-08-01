@@ -503,7 +503,7 @@ namespace NReJSON.Tests
 
         public class JsonIndexAdd
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void EmitsCorrectParameters()
             {
                 var db = new FakeDatabase(true);
@@ -516,7 +516,7 @@ namespace NReJSON.Tests
 
         public class JsonIndexDelete
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void EmitsCorrectParameters()
             {
                 var db = new FakeDatabase(true);
@@ -529,7 +529,7 @@ namespace NReJSON.Tests
 
         public class JsonIndexGet
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void EmitsCorrectParameters()
             {
                 var db = new FakeDatabase(true);
@@ -539,7 +539,7 @@ namespace NReJSON.Tests
                 Assert.Equal(new[] { "JSON.QGET", "index", "hello*" }, db.PreviousCommand);
             }
 
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void EmitsCorrectParametersWithPathSpecified()
             {
                 var db = new FakeDatabase(true);
