@@ -625,5 +625,19 @@ namespace NReJSON
 
             return new IndexedCollection<TResult>(serializedResult);
         }
+    
+        /// <summary>
+        /// `JSON.TOGGLE`
+        /// 
+        /// Toggle the boolean property of a JSON object.
+        /// 
+        /// Official documentation forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">The key of the JSON object that contains the property that you'd like to toggle.</param>
+        /// <param name="path">The path to the boolean property on JSON object that you'd like to toggle.</param>
+        /// <returns></returns>
+        public static bool JsonToggle(this IDatabase db, RedisKey key, string path) =>
+            (bool)db.Execute(JsonCommands.TOGGLE, key, path);
     }
 }
