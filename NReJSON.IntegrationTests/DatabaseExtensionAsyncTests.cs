@@ -526,6 +526,19 @@ namespace NReJSON.IntegrationTests
                 Assert.False(await _db.JsonToggleAsync(key, ".foo"));
                 Assert.True(await _db.JsonToggleAsync(key, ".foo"));
             }
-        }        
+        }   
+
+        public class JsonClearAsync : BaseIntegrationTest
+        {
+            [Fact]
+            public async Task CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"foo\":[1,2,3,4]}");
+
+                Assert.Equal(1, await _db.JsonClearAsync(key, ".foo"));
+            }
+        }             
     }
 }

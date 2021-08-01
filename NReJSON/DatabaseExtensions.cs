@@ -643,5 +643,24 @@ namespace NReJSON
 
             return bool.Parse(result.ToString());
         }
+
+        /// <summary>
+        /// `JSON.CLEAR`
+        /// 
+        /// Clear/empty arrays and objects (to have zero slots/keys without deleting the array/object) returning the count 
+        /// of cleared paths (ignoring non-array and non-objects paths).
+        /// 
+        /// Official documentation forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static int JsonClear(this IDatabase db, RedisKey key, string path)
+        {
+            var result = db.Execute(JsonCommands.CLEAR, key, path);
+
+            return (int)result;
+        }
     }
 }
