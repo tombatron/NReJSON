@@ -24,15 +24,11 @@ namespace NReJSON
         public const string FORGET = "JSON.FORGET";
         public const string RESP = "JSON.RESP";
         public const string OBJLEN = "JSON.OBJLEN";
-
         [Obsolete("This command has been deprecated and will be removed in a future version of RedisJson.")]
         public const string INDEX = "JSON.INDEX";
-
         [Obsolete("This command has been deprecated and will be removed in a future version of RedisJson.")]
         public const string QGET = "JSON.QGET";
-
         public const string TOGGLE = "JSON.TOGGLE";
-
         public const string CLEAR = "JSON.CLEAR";
     }
 }
