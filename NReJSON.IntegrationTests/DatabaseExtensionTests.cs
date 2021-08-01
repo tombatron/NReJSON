@@ -25,18 +25,18 @@ namespace NReJSON.IntegrationTests
             {
                 var key = Guid.NewGuid().ToString("N");
 
-                var obj = new ExampleHelloWorld 
-                { 
-                    Hello = "World", 
+                var obj = new ExampleHelloWorld
+                {
+                    Hello = "World",
 
-                    GoodNight = new ExampleHelloWorld.InnerExample 
-                    { 
-                        Value = "Moon" 
-                    } 
+                    GoodNight = new ExampleHelloWorld.InnerExample
+                    {
+                        Value = "Moon"
+                    }
                 };
 
                 var result = _db.JsonSet(key, obj);
-                
+
                 Assert.True(result);
             }
         }
@@ -239,7 +239,7 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal("world!", helloValue);
             }
-            
+
             [Fact]
             public void WillApendProvidedJsonStringIntoRootIfNoPathProvided()
             {
@@ -366,7 +366,7 @@ namespace NReJSON.IntegrationTests
                 var result = _db.JsonArrayPop<string>(key, ".array", 1);
 
                 Assert.Equal("world", result);
-            }            
+            }
         }
 
         public class JsonArrayTrim : BaseIntegrationTest
@@ -446,7 +446,7 @@ namespace NReJSON.IntegrationTests
 
         public class JsonIndexAdd : BaseIntegrationTest
         {
-            [Fact(Skip="This command has been deprecated and is removed in the latest version of RedisJson.")]
+            [Fact(Skip = "This command has been deprecated and is removed in the latest version of RedisJson.")]
             public void CanExecute()
             {
                 var index = Guid.NewGuid().ToString();
@@ -508,7 +508,21 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal("Joe", result[$"{key}_1"].First().LastName);
                 Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
-            }            
+            }
+        }
+
+        public class JsonToggle : BaseIntegrationTest
+        {
+            [Fact]
+            public void CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"foo\":true}");
+
+                Assert.False(_db.JsonToggle(key, ".foo"));
+                Assert.True(_db.JsonToggle(key, ".foo"));
+            }
         }
     }
 }
