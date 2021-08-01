@@ -256,7 +256,7 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.STRAPPEND", "fake_key", ".fake.path", "\"fake_string\"" }, db.PreviousCommand);
             }
-            
+
             [Fact]
             public void HasRootAsDefaultPath()
             {
@@ -547,6 +547,32 @@ namespace NReJSON.Tests
                 db.JsonIndexGet("index", "hello*", "$.whatever");
 
                 Assert.Equal(new[] { "JSON.QGET", "index", "hello*", "$.whatever" }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonToggle
+        {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(expectBoolResult: true);
+
+                db.JsonToggle("whatever", ".path");
+
+                Assert.Equal(new[] { "JSON.TOGGLE", "whatever", ".path" }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonClear
+        {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonClear("whatever", ".path");
+
+                Assert.Equal(new[] { "JSON.CLEAR", "whatever", ".path" }, db.PreviousCommand);
             }
         }
     }

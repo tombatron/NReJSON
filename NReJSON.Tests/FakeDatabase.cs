@@ -10,11 +10,16 @@ namespace NReJSON.Tests
     public class FakeDatabase : IDatabase
     {
         private bool _expectArrayResult;
+        private bool _expectBoolResult;
 
         public string[] PreviousCommand { get; private set; }
 
-        public FakeDatabase(bool expectArrayResult = false) =>
+        public FakeDatabase(bool expectArrayResult = false, bool expectBoolResult = false)
+        {
             _expectArrayResult = expectArrayResult;
+            _expectBoolResult = expectBoolResult;
+        }
+            
 
         public RedisResult Execute(string command, params object[] args)
         {
@@ -29,7 +34,11 @@ namespace NReJSON.Tests
 
             if (_expectArrayResult)
             {
-                return RedisResult.Create(new [] { RedisResult.Create(0) });
+                return RedisResult.Create(new[] { RedisResult.Create(0) });
+            }
+            else if (_expectBoolResult) 
+            { 
+                return RedisResult.Create("false", ResultType.SimpleString);
             }
             else
             {
