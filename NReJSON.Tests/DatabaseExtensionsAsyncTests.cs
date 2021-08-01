@@ -500,6 +500,6 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new [] { "JSON.RESP", "fake_key", "." }, db.PreviousCommand);
             }
-        }
+        }        
     }
 }

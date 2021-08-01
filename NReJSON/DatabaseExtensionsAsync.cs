@@ -642,7 +642,11 @@ namespace NReJSON
         /// <param name="key">The key of the JSON object that contains the property that you'd like to toggle.</param>
         /// <param name="path">The path to the boolean property on JSON object that you'd like to toggle.</param>
         /// <returns></returns>
-        public static async Task<bool> JsonToggleAsync(this IDatabase db, RedisKey key, string path) =>
-            (bool)(await db.ExecuteAsync(JsonCommands.TOGGLE, key, path).ConfigureAwait(false));
+        public static async Task<bool> JsonToggleAsync(this IDatabase db, RedisKey key, string path)
+        {
+            var result = await db.ExecuteAsync(JsonCommands.TOGGLE, key, path).ConfigureAwait(false);
+
+            return bool.Parse(result.ToString());
+        }
     }
 }

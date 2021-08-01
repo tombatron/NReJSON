@@ -512,5 +512,20 @@ namespace NReJSON.IntegrationTests
                 Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
             }
         }
+
+        public class JsonToggleAsync : BaseIntegrationTest
+        {
+            [Fact]
+            public async Task CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"foo\":true}");
+
+
+                Assert.False(await _db.JsonToggleAsync(key, ".foo"));
+                Assert.True(await _db.JsonToggleAsync(key, ".foo"));
+            }
+        }        
     }
 }
