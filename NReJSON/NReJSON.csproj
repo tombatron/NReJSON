@@ -5,10 +5,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Tom Hanks</Authors>
     <Company />
-    <AssemblyVersion>3.2.0.0</AssemblyVersion>
-    <FileVersion>3.2.0.0</FileVersion>
-    <Version>3.2.0</Version>
-    <Description>A series of extension methods for use with StackExchange.Redis 2.x and the ReJSON Redis module.</Description>
+    <AssemblyVersion>3.3.0.0</AssemblyVersion>
+    <FileVersion>3.3.0.0</FileVersion>
+    <Version>3.3.0</Version>
+    <Description>A series of extension methods for use with StackExchange.Redis 2.x and the RedisJson Redis module.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/tombatron/NReJSON</RepositoryUrl>
     <PackageProjectUrl>https://github.com/tombatron/NReJSON</PackageProjectUrl>

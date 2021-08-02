@@ -560,6 +560,7 @@ namespace NReJSON
         /// <param name="field">Name of the field being indexed.</param>
         /// <param name="path">Path of the field being indexed.</param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static OperationResult JsonIndexAdd(this IDatabase db, string index, string field, string path)
         {
             var result = db.Execute(JsonCommands.INDEX, CombineArguments("ADD", index, field, path)).ToString();
@@ -577,13 +578,14 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="index"></param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static OperationResult JsonIndexDelete(this IDatabase db, string index)
         {
             var result = db.Execute(JsonCommands.INDEX, CombineArguments("DEL", index)).ToString();
 
             return new OperationResult(result == "OK", result);
         }
-            
+
 
         /// <summary>
         /// `JSON.QGET`
@@ -597,6 +599,7 @@ namespace NReJSON
         /// <param name="query">Pattern being applied to the index.</param>
         /// <param name="path">[Optional] Path to the expected value.</param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static RedisResult JsonIndexGet(this IDatabase db, string index, string query, string path = "") =>
             db.Execute(JsonCommands.QGET, CombineArguments(index, query, path));
 
@@ -613,6 +616,7 @@ namespace NReJSON
         /// <param name="path">[Optional] Path to the expected value.</param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static IndexedCollection<TResult> JsonIndexGet<TResult>(this IDatabase db, string index, string query, string path = "")
         {
             var result = db.JsonIndexGet(index, query, path);
@@ -620,6 +624,43 @@ namespace NReJSON
             var serializedResult = SerializerProxy.Deserialize<IDictionary<string, IEnumerable<TResult>>>(result);
 
             return new IndexedCollection<TResult>(serializedResult);
+        }
+
+        /// <summary>
+        /// `JSON.TOGGLE`
+        /// 
+        /// Toggle the boolean property of a JSON object.
+        /// 
+        /// Official documentation forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">The key of the JSON object that contains the property that you'd like to toggle.</param>
+        /// <param name="path">The path to the boolean property on JSON object that you'd like to toggle.</param>
+        /// <returns></returns>
+        public static bool JsonToggle(this IDatabase db, RedisKey key, string path)
+        {
+            var result = db.Execute(JsonCommands.TOGGLE, key, path);
+
+            return bool.Parse(result.ToString());
+        }
+
+        /// <summary>
+        /// `JSON.CLEAR`
+        /// 
+        /// Clear/empty arrays and objects (to have zero slots/keys without deleting the array/object) returning the count 
+        /// of cleared paths (ignoring non-array and non-objects paths).
+        /// 
+        /// Official documentation forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static int JsonClear(this IDatabase db, RedisKey key, string path)
+        {
+            var result = db.Execute(JsonCommands.CLEAR, key, path);
+
+            return (int)result;
         }
     }
 }

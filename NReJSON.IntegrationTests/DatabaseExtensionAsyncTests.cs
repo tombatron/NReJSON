@@ -26,20 +26,20 @@ namespace NReJSON.IntegrationTests
             {
                 var key = Guid.NewGuid().ToString("N");
 
-                var obj = new ExampleHelloWorld 
-                { 
-                    Hello = "World", 
+                var obj = new ExampleHelloWorld
+                {
+                    Hello = "World",
 
-                    GoodNight = new ExampleHelloWorld.InnerExample 
-                    { 
-                        Value = "Moon" 
-                    } 
+                    GoodNight = new ExampleHelloWorld.InnerExample
+                    {
+                        Value = "Moon"
+                    }
                 };
 
                 var result = await _db.JsonSetAsync(key, obj);
-                
+
                 Assert.True(result);
-            }            
+            }
         }
 
         public class JsonGetAsync : BaseIntegrationTest
@@ -157,7 +157,7 @@ namespace NReJSON.IntegrationTests
                 Assert.Null(result[1]);
                 Assert.Contains("world", result[0].Hello);
                 Assert.Contains("tom", result[2].Hello);
-            }            
+            }
         }
 
         public class JsonTypeAsync : BaseIntegrationTest
@@ -367,7 +367,7 @@ namespace NReJSON.IntegrationTests
                 var result = await _db.JsonArrayPopAsync<string>(key, ".array", 1);
 
                 Assert.Equal("world", result);
-            }            
+            }
         }
 
         public class JsonArrayTrimAsync : BaseIntegrationTest
@@ -445,9 +445,10 @@ namespace NReJSON.IntegrationTests
             }
         }
 
+
         public class JsonIndexAddAsync : BaseIntegrationTest
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public async Task CanExecute()
             {
                 var index = Guid.NewGuid().ToString();
@@ -461,7 +462,7 @@ namespace NReJSON.IntegrationTests
 
         public class JsonIndexDeleteAsync : BaseIntegrationTest
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public async Task CanExecute()
             {
                 var index = Guid.NewGuid().ToString();
@@ -477,7 +478,7 @@ namespace NReJSON.IntegrationTests
 
         public class JsonIndexGetAsync : BaseIntegrationTest
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public async Task CanExecute()
             {
                 var index = Guid.NewGuid().ToString().Substring(0, 4);
@@ -494,7 +495,7 @@ namespace NReJSON.IntegrationTests
                 Assert.Contains("Joan", result);
             }
 
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public async Task CanExecuteWithSerializer()
             {
                 var index = Guid.NewGuid().ToString().Substring(0, 4);
@@ -509,7 +510,35 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal("Joe", result[$"{key}_1"].First().LastName);
                 Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
-            }              
+            }
         }
+
+        public class JsonToggleAsync : BaseIntegrationTest
+        {
+            [Fact]
+            public async Task CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"foo\":true}");
+
+
+                Assert.False(await _db.JsonToggleAsync(key, ".foo"));
+                Assert.True(await _db.JsonToggleAsync(key, ".foo"));
+            }
+        }   
+
+        public class JsonClearAsync : BaseIntegrationTest
+        {
+            [Fact]
+            public async Task CanExecute()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"foo\":[1,2,3,4]}");
+
+                Assert.Equal(1, await _db.JsonClearAsync(key, ".foo"));
+            }
+        }             
     }
 }

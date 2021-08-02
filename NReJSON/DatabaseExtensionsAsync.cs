@@ -126,7 +126,7 @@ namespace NReJSON
         /// <returns></returns>
         public static async Task<TResult> JsonGetAsync<TResult>(this IDatabase db, RedisKey key, bool noEscape = false, string indent = default, string newline = default, string space = default, params string[] paths)
         {
-            var serializedResult = await db.JsonGetAsync(key, noEscape, indent, newline, space, paths);
+            var serializedResult = await db.JsonGetAsync(key, noEscape, indent, newline, space, paths).ConfigureAwait(false);
 
             return SerializerProxy.Deserialize<TResult>(serializedResult);
         }
@@ -188,7 +188,7 @@ namespace NReJSON
                 }
             }
 
-            return CreateResult(await db.JsonMultiGetAsync(keys, path));
+            return CreateResult(await db.JsonMultiGetAsync(keys, path).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace NReJSON
         /// <returns>An `OperationResult` indicating success or failure.</returns>
         public static async Task<OperationResult> JsonSetAsync(this IDatabase db, RedisKey key, string json, string path = ".", SetOption setOption = SetOption.Default, string index = "")
         {
-            var result = (await db.ExecuteAsync(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)))).ToString();
+            var result = (await db.ExecuteAsync(JsonCommands.SET, CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index))).ConfigureAwait(false)).ToString();
 
             return new OperationResult(result == "OK", result);
         }
@@ -297,7 +297,7 @@ namespace NReJSON
         /// <param name="jsonString"></param>
         /// <returns>Length of the new JSON string.</returns>
         public static async Task<int> JsonAppendJsonStringAsync(this IDatabase db, RedisKey key, string path = ".", string jsonString = "\"\"") =>
-            (int)(await db.ExecuteAsync(JsonCommands.STRAPPEND, CombineArguments(key, path, jsonString)));
+            (int)(await db.ExecuteAsync(JsonCommands.STRAPPEND, CombineArguments(key, path, jsonString)).ConfigureAwait(false));
 
         /// <summary>
         /// `JSON.STRLEN`
@@ -314,7 +314,7 @@ namespace NReJSON
         /// <returns>Integer, specifically the string's length.</returns>
         public static async Task<int?> JsonStringLengthAsync(this IDatabase db, RedisKey key, string path = ".")
         {
-            var result = await db.ExecuteAsync(JsonCommands.STRLEN, CombineArguments(key, path));
+            var result = await db.ExecuteAsync(JsonCommands.STRLEN, CombineArguments(key, path)).ConfigureAwait(false);
 
             if (result.IsNull)
             {
@@ -441,10 +441,10 @@ namespace NReJSON
         /// <returns></returns>
         public static async Task<TResult> JsonArrayPopAsync<TResult>(this IDatabase db, RedisKey key, string path = ".", int index = -1)
         {
-            var result = await db.JsonArrayPopAsync(key, path, index);
+            var result = await db.JsonArrayPopAsync(key, path, index).ConfigureAwait(false);
 
             return SerializerProxy.Deserialize<TResult>(result);
-        }            
+        }
 
         /// <summary>
         /// `JSON.ARRTRIM`
@@ -565,9 +565,10 @@ namespace NReJSON
         /// <param name="field">Name of the field being indexed.</param>
         /// <param name="path">Path of the field being indexed.</param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static async Task<OperationResult> JsonIndexAddAsync(this IDatabase db, string index, string field, string path)
         {
-            var result = (await db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("ADD", index, field, path))).ToString();
+            var result = (await db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("ADD", index, field, path)).ConfigureAwait(false)).ToString();
 
             return new OperationResult(result == "OK", result);
         }
@@ -582,13 +583,14 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="index"></param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static async Task<OperationResult> JsonIndexDeleteAsync(this IDatabase db, string index)
         {
-            var result = (await db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("DEL", index))).ToString();
+            var result = (await db.ExecuteAsync(JsonCommands.INDEX, CombineArguments("DEL", index)).ConfigureAwait(false)).ToString();
 
             return new OperationResult(result == "OK", result);
         }
-            
+
 
         /// <summary>
         /// `JSON.QGET`
@@ -602,6 +604,7 @@ namespace NReJSON
         /// <param name="query">Pattern being applied to the index.</param>
         /// <param name="path">[Optional] Path to the expected value.</param>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static Task<RedisResult> JsonIndexGetAsync(this IDatabase db, string index, string query, string path = "") =>
             db.ExecuteAsync(JsonCommands.QGET, CombineArguments(index, query, path));
 
@@ -618,13 +621,51 @@ namespace NReJSON
         /// <param name="path">[Optional] Path to the expected value.</param>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
+        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
         public static async Task<IndexedCollection<TResult>> JsonIndexGetAsync<TResult>(this IDatabase db, string index, string query, string path = "")
         {
-            var result = await db.JsonIndexGetAsync(index, query, path);
+            var result = await db.JsonIndexGetAsync(index, query, path).ConfigureAwait(false);
 
             var serializedResult = SerializerProxy.Deserialize<IDictionary<string, IEnumerable<TResult>>>(result);
 
             return new IndexedCollection<TResult>(serializedResult);
-        }            
+        }
+
+        /// <summary>
+        /// `JSON.TOGGLE`
+        /// 
+        /// Toggle the boolean property of a JSON object.
+        /// 
+        /// Official documentation forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key">The key of the JSON object that contains the property that you'd like to toggle.</param>
+        /// <param name="path">The path to the boolean property on JSON object that you'd like to toggle.</param>
+        /// <returns></returns>
+        public static async Task<bool> JsonToggleAsync(this IDatabase db, RedisKey key, string path)
+        {
+            var result = await db.ExecuteAsync(JsonCommands.TOGGLE, key, path).ConfigureAwait(false);
+
+            return bool.Parse(result.ToString());
+        }
+
+        /// <summary>
+        /// `JSON.CLEAR`
+        /// 
+        /// Clear/empty arrays and objects (to have zero slots/keys without deleting the array/object) returning the count 
+        /// of cleared paths (ignoring non-array and non-objects paths).
+        /// 
+        /// Official documentation forthcoming.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="key"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static async Task<int> JsonClearAsync(this IDatabase db, RedisKey key, string path)
+        {
+            var result = await db.ExecuteAsync(JsonCommands.CLEAR, key, path).ConfigureAwait(false);
+
+            return (int)result;
+        }
     }
 }

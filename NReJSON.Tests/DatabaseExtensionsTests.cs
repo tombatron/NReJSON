@@ -256,7 +256,7 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.STRAPPEND", "fake_key", ".fake.path", "\"fake_string\"" }, db.PreviousCommand);
             }
-            
+
             [Fact]
             public void HasRootAsDefaultPath()
             {
@@ -503,7 +503,7 @@ namespace NReJSON.Tests
 
         public class JsonIndexAdd
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void EmitsCorrectParameters()
             {
                 var db = new FakeDatabase(true);
@@ -516,7 +516,7 @@ namespace NReJSON.Tests
 
         public class JsonIndexDelete
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void EmitsCorrectParameters()
             {
                 var db = new FakeDatabase(true);
@@ -529,7 +529,7 @@ namespace NReJSON.Tests
 
         public class JsonIndexGet
         {
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void EmitsCorrectParameters()
             {
                 var db = new FakeDatabase(true);
@@ -539,7 +539,7 @@ namespace NReJSON.Tests
                 Assert.Equal(new[] { "JSON.QGET", "index", "hello*" }, db.PreviousCommand);
             }
 
-            [Fact]
+            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
             public void EmitsCorrectParametersWithPathSpecified()
             {
                 var db = new FakeDatabase(true);
@@ -547,6 +547,32 @@ namespace NReJSON.Tests
                 db.JsonIndexGet("index", "hello*", "$.whatever");
 
                 Assert.Equal(new[] { "JSON.QGET", "index", "hello*", "$.whatever" }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonToggle
+        {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(expectBoolResult: true);
+
+                db.JsonToggle("whatever", ".path");
+
+                Assert.Equal(new[] { "JSON.TOGGLE", "whatever", ".path" }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonClear
+        {
+            [Fact]
+            public void EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
+
+                db.JsonClear("whatever", ".path");
+
+                Assert.Equal(new[] { "JSON.CLEAR", "whatever", ".path" }, db.PreviousCommand);
             }
         }
     }

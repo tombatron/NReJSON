@@ -14,7 +14,7 @@ namespace NReJSON.Tests
 
                 await db.JsonDeleteAsync("fake_key", ".fakeObject");
 
-                Assert.Equal(new [] { "JSON.DEL", "fake_key", ".fakeObject" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.DEL", "fake_key", ".fakeObject" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -24,7 +24,7 @@ namespace NReJSON.Tests
 
                 await db.JsonDeleteAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.DEL", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.DEL", "fake_key", "." }, db.PreviousCommand);
             }
         }
 
@@ -37,7 +37,7 @@ namespace NReJSON.Tests
 
                 await db.JsonGetAsync("fake_key", ".firstPath", ".firstPath.secondItem");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "NOESCAPE", ".firstPath", ".firstPath.secondItem" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "NOESCAPE", ".firstPath", ".firstPath.secondItem" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -47,7 +47,7 @@ namespace NReJSON.Tests
 
                 await db.JsonGetAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "NOESCAPE", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "NOESCAPE", "." }, db.PreviousCommand);
             }
 
             [Fact]
@@ -57,7 +57,7 @@ namespace NReJSON.Tests
 
                 await db.JsonGetAsync("fake_key", false);
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "." }, db.PreviousCommand);
             }
 
             [Fact]
@@ -67,7 +67,7 @@ namespace NReJSON.Tests
 
                 await db.JsonGetAsync("fake_key", indent: "\t\t");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "INDENT", "\t\t", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "INDENT", "\t\t", "." }, db.PreviousCommand);
             }
 
             [Fact]
@@ -77,7 +77,7 @@ namespace NReJSON.Tests
 
                 await db.JsonGetAsync("fake_key", space: "  ");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "SPACE", "  ", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "SPACE", "  ", "." }, db.PreviousCommand);
             }
 
             [Fact]
@@ -87,7 +87,7 @@ namespace NReJSON.Tests
 
                 await db.JsonGetAsync("fake_key", newline: "\r\n");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "NEWLINE", "\r\n", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "NEWLINE", "\r\n", "." }, db.PreviousCommand);
             }
 
             [Fact]
@@ -97,7 +97,7 @@ namespace NReJSON.Tests
 
                 await db.JsonGetAsync("fake_key", indent: "\t", newline: "\r\n", space: "  ");
 
-                Assert.Equal(new [] { "JSON.GET", "fake_key", "INDENT", "\t", "NEWLINE", "\r\n", "SPACE", "  ", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.GET", "fake_key", "INDENT", "\t", "NEWLINE", "\r\n", "SPACE", "  ", "." }, db.PreviousCommand);
             }
         }
 
@@ -108,9 +108,9 @@ namespace NReJSON.Tests
             {
                 var db = new FakeDatabase(true);
 
-                await db.JsonMultiGetAsync(new [] { "fake_key::1", "fake_key::2" }, ".super.fake.path");
+                await db.JsonMultiGetAsync(new[] { "fake_key::1", "fake_key::2" }, ".super.fake.path");
 
-                Assert.Equal(new [] { "JSON.MGET", "fake_key::1", "fake_key::2", ".super.fake.path" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.MGET", "fake_key::1", "fake_key::2", ".super.fake.path" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -118,9 +118,9 @@ namespace NReJSON.Tests
             {
                 var db = new FakeDatabase(true);
 
-                await db.JsonMultiGetAsync(new [] { "fake_key::1", "fake_key::2" });
+                await db.JsonMultiGetAsync(new[] { "fake_key::1", "fake_key::2" });
 
-                Assert.Equal(new [] { "JSON.MGET", "fake_key::1", "fake_key::2", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.MGET", "fake_key::1", "fake_key::2", "." }, db.PreviousCommand);
             }
         }
 
@@ -133,7 +133,7 @@ namespace NReJSON.Tests
 
                 await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", ".fake");
 
-                Assert.Equal(new [] { "JSON.SET", "fake_key", ".fake", "{\"hello\":\"world\"}" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".fake", "{\"hello\":\"world\"}" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -143,7 +143,7 @@ namespace NReJSON.Tests
 
                 await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}");
 
-                Assert.Equal(new [] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -151,9 +151,9 @@ namespace NReJSON.Tests
             {
                 var db = new FakeDatabase();
 
-                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption : SetOption.SetIfNotExists);
+                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetIfNotExists);
 
-                Assert.Equal(new [] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "NX" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "NX" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -161,9 +161,9 @@ namespace NReJSON.Tests
             {
                 var db = new FakeDatabase();
 
-                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption : SetOption.SetOnlyIfExists);
+                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetOnlyIfExists);
 
-                Assert.Equal(new [] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -194,7 +194,7 @@ namespace NReJSON.Tests
                 await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetIfNotExists, index: "message");
 
                 Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "NX", "INDEX", "message" }, db.PreviousCommand);
-            }            
+            }
         }
 
         public class JsonTypeAsync
@@ -206,7 +206,7 @@ namespace NReJSON.Tests
 
                 await db.JsonTypeAsync("fake_key", ".fakePath");
 
-                Assert.Equal(new [] { "JSON.TYPE", "fake_key", ".fakePath" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.TYPE", "fake_key", ".fakePath" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -216,7 +216,7 @@ namespace NReJSON.Tests
 
                 await db.JsonTypeAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.TYPE", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.TYPE", "fake_key", "." }, db.PreviousCommand);
             }
         }
 
@@ -229,7 +229,7 @@ namespace NReJSON.Tests
 
                 await db.JsonIncrementNumberAsync("fake_key", ".fake.path", 2);
 
-                Assert.Equal(new [] { "JSON.NUMINCRBY", "fake_key", ".fake.path", "2" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.NUMINCRBY", "fake_key", ".fake.path", "2" }, db.PreviousCommand);
             }
         }
 
@@ -242,7 +242,7 @@ namespace NReJSON.Tests
 
                 await db.JsonMultiplyNumberAsync("fake_key", ".fake.path", 5);
 
-                Assert.Equal(new [] { "JSON.NUMMULTBY", "fake_key", ".fake.path", "5" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.NUMMULTBY", "fake_key", ".fake.path", "5" }, db.PreviousCommand);
             }
         }
 
@@ -257,7 +257,7 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.STRAPPEND", "fake_key", ".fake.path", "\"fake_string\"" }, db.PreviousCommand);
             }
-            
+
             [Fact]
             public async Task HasRootAsDefaultPath()
             {
@@ -278,7 +278,7 @@ namespace NReJSON.Tests
 
                 await db.JsonStringLengthAsync("fake_key", ".fake.path");
 
-                Assert.Equal(new [] { "JSON.STRLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.STRLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -288,7 +288,7 @@ namespace NReJSON.Tests
 
                 await db.JsonStringLengthAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.STRLEN", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.STRLEN", "fake_key", "." }, db.PreviousCommand);
             }
         }
 
@@ -301,7 +301,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayAppendAsync("fake_key", ".fake.path", "\"1\"", "\"2\"");
 
-                Assert.Equal(new [] { "JSON.ARRAPPEND", "fake_key", ".fake.path", "\"1\"", "\"2\"" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRAPPEND", "fake_key", ".fake.path", "\"1\"", "\"2\"" }, db.PreviousCommand);
             }
         }
 
@@ -314,7 +314,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayIndexOfAsync("fake_key", ".fake.path", "\"hello world\"", 10, 20);
 
-                Assert.Equal(new [] { "JSON.ARRINDEX", "fake_key", ".fake.path", "\"hello world\"", "10", "20" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRINDEX", "fake_key", ".fake.path", "\"hello world\"", "10", "20" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -324,7 +324,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayIndexOfAsync("fake_key", ".fake.path", "\"hello world\"");
 
-                Assert.Equal(new [] { "JSON.ARRINDEX", "fake_key", ".fake.path", "\"hello world\"", "0", "0" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRINDEX", "fake_key", ".fake.path", "\"hello world\"", "0", "0" }, db.PreviousCommand);
             }
         }
 
@@ -337,7 +337,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayInsertAsync("fake_key", ".fake.path", 15, "\"hello\"", "\"world\"");
 
-                Assert.Equal(new [] { "JSON.ARRINSERT", "fake_key", ".fake.path", "15", "\"hello\"", "\"world\"" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRINSERT", "fake_key", ".fake.path", "15", "\"hello\"", "\"world\"" }, db.PreviousCommand);
             }
         }
 
@@ -350,7 +350,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayLengthAsync("fake_key", ".fake.array.path");
 
-                Assert.Equal(new [] { "JSON.ARRLEN", "fake_key", ".fake.array.path" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRLEN", "fake_key", ".fake.array.path" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -360,7 +360,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayLengthAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.ARRLEN", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRLEN", "fake_key", "." }, db.PreviousCommand);
             }
         }
 
@@ -373,7 +373,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayPopAsync("fake_key", ".what.ever", 10);
 
-                Assert.Equal(new [] { "JSON.ARRPOP", "fake_key", ".what.ever", "10" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".what.ever", "10" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -381,9 +381,9 @@ namespace NReJSON.Tests
             {
                 var db = new FakeDatabase();
 
-                await db.JsonArrayPopAsync("fake_key", index : 10);
+                await db.JsonArrayPopAsync("fake_key", index: 10);
 
-                Assert.Equal(new [] { "JSON.ARRPOP", "fake_key", ".", "10" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".", "10" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -393,7 +393,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayPopAsync("fake_key", ".what.ever");
 
-                Assert.Equal(new [] { "JSON.ARRPOP", "fake_key", ".what.ever", "-1" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRPOP", "fake_key", ".what.ever", "-1" }, db.PreviousCommand);
             }
         }
 
@@ -406,7 +406,7 @@ namespace NReJSON.Tests
 
                 await db.JsonArrayTrimAsync("fake_key", ".fake.path", 1, 10);
 
-                Assert.Equal(new [] { "JSON.ARRTRIM", "fake_key", ".fake.path", "1", "10" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.ARRTRIM", "fake_key", ".fake.path", "1", "10" }, db.PreviousCommand);
             }
         }
 
@@ -419,7 +419,7 @@ namespace NReJSON.Tests
 
                 await db.JsonObjectKeysAsync("fake_key", ".fake.path");
 
-                Assert.Equal(new [] { "JSON.OBJKEYS", "fake_key", ".fake.path" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.OBJKEYS", "fake_key", ".fake.path" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -429,7 +429,7 @@ namespace NReJSON.Tests
 
                 await db.JsonObjectKeysAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.OBJKEYS", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.OBJKEYS", "fake_key", "." }, db.PreviousCommand);
             }
         }
 
@@ -442,7 +442,7 @@ namespace NReJSON.Tests
 
                 await db.JsonObjectLengthAsync("fake_key", ".fake.path");
 
-                Assert.Equal(new [] { "JSON.OBJLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.OBJLEN", "fake_key", ".fake.path" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -452,7 +452,7 @@ namespace NReJSON.Tests
 
                 await db.JsonObjectLengthAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.OBJLEN", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.OBJLEN", "fake_key", "." }, db.PreviousCommand);
             }
         }
 
@@ -465,7 +465,7 @@ namespace NReJSON.Tests
 
                 await db.JsonDebugMemoryAsync("fake_key", ".fake.path");
 
-                Assert.Equal(new [] { "JSON.DEBUG", "MEMORY", "fake_key", ".fake.path" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.DEBUG", "MEMORY", "fake_key", ".fake.path" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -475,7 +475,7 @@ namespace NReJSON.Tests
 
                 await db.JsonDebugMemoryAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.DEBUG", "MEMORY", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.DEBUG", "MEMORY", "fake_key", "." }, db.PreviousCommand);
             }
         }
 
@@ -488,7 +488,7 @@ namespace NReJSON.Tests
 
                 await db.JsonGetRespAsync("fake_key", ".hello.fake");
 
-                Assert.Equal(new [] { "JSON.RESP", "fake_key", ".hello.fake" }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.RESP", "fake_key", ".hello.fake" }, db.PreviousCommand);
             }
 
             [Fact]
@@ -498,7 +498,33 @@ namespace NReJSON.Tests
 
                 await db.JsonGetRespAsync("fake_key");
 
-                Assert.Equal(new [] { "JSON.RESP", "fake_key", "." }, db.PreviousCommand);
+                Assert.Equal(new[] { "JSON.RESP", "fake_key", "." }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonToggleAsync
+        {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase(expectBoolResult: true);
+
+                await db.JsonToggleAsync("whatever", ".path");
+
+                Assert.Equal(new[] { "JSON.TOGGLE", "whatever", ".path" }, db.PreviousCommand);
+            }
+        }
+
+        public class JsonClearAsync
+        {
+            [Fact]
+            public async Task EmitsCorrectParameters()
+            {
+                var db = new FakeDatabase();
+
+                await db.JsonClearAsync("whatever", ".path");
+
+                Assert.Equal(new[] { "JSON.CLEAR", "whatever", ".path" }, db.PreviousCommand);
             }
         }
     }
