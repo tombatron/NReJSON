@@ -41,7 +41,6 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is stored.</param>
-        /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <returns></returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
@@ -58,7 +57,6 @@ namespace NReJSON
         /// </summary>
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is stored.</param>
-        /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
@@ -370,7 +368,7 @@ namespace NReJSON
         /// <param name="json">The JSON values that you want to append.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path, params string[] json) =>
-            (int) db.Execute(JsonCommands.ARRAPPEND, CombineArguments(key, path, json), flags: CommandFlags.None);
+            JsonArrayAppend(db, key, path, CommandFlags.None, json);
 
         /// <summary>
         /// `JSON.ARRAPPEND`
@@ -430,8 +428,7 @@ namespace NReJSON
         /// <returns>Integer, specifically the array's new size.</returns>
         public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
             params string[] json) =>
-            (int) db.Execute(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json),
-                flags: CommandFlags.None);
+            JsonArrayInsert(db, key, path, index, CommandFlags.None, json);
 
         /// <summary>
         /// `JSON.ARRINSERT`
