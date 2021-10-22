@@ -13,6 +13,7 @@
     <RepositoryUrl>https://github.com/tombatron/NReJSON</RepositoryUrl>
     <PackageProjectUrl>https://github.com/tombatron/NReJSON</PackageProjectUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageVersion>3.4.0</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -28,6 +29,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="license\license.txt" Pack="true" PackagePath="$(PackageLicenseFile)"/>
+    <None Include="license\license.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 </Project>
