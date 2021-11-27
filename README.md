@@ -2,6 +2,8 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/fwah8euqttecil89?svg=true)](https://ci.appveyor.com/project/tombatron/nrejson)
 
+[![Build Status](https://github.com/tombatron/NReJSON/actions/workflows/dotnet.yml/badge.svg)](https://github.com/tombatron/NReJSON/actions/workflows/dotnet.yml)
+
 ## Overview
 
 NReJSON is a series of extension methods for the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) library that will enable you to interact with the [Redis](https://redis.io/) module [RedisJSON](https://github.com/RedisJSON/RedisJSON). This is made possible by the `Execute` and `ExecuteAsync` methods already present in the SE.Redis library. 
@@ -10,7 +12,7 @@ The following blog post by Marc Gravell was the inspiration behind this: [StackE
 
 ## Installation
 
-`PM> Install-Package NReJSON -Version 3.0.0`
+`PM> Install-Package NReJSON -Version 3.5.0`
 
 ## Usage
 
