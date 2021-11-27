@@ -1,0 +1,31 @@
+name: Publish Dotnet Package
+
+on:
+  workflow_dispatch:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: nuget/setup-nuget@v1
+      with:
+        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+        nuget-version: '5.x'
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Clean
+      run: dotnet clean ./NReJSON.sln --configuration Release && dotnet nuget locals all --clear
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore --configuration Release                
+    - name: Publish NuGet Package
+      env:
+        api_key: ${{secrets.NUGET_API_KEY}}
+      run: "nuget push NReJSON/bin/Release/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey $api_key"
