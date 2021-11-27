@@ -1,7 +1,5 @@
 # NReJSON
 
-[![Build status](https://ci.appveyor.com/api/projects/status/fwah8euqttecil89?svg=true)](https://ci.appveyor.com/project/tombatron/nrejson)
-
 [![Build Status](https://github.com/tombatron/NReJSON/actions/workflows/dotnet.yml/badge.svg)](https://github.com/tombatron/NReJSON/actions/workflows/dotnet.yml)
 
 ## Overview
