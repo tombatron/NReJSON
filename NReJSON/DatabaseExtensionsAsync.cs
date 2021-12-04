@@ -712,7 +712,7 @@ namespace NReJSON
         public static async Task<int> JsonClearAsync(this IDatabaseAsync db, RedisKey key, string path,
             CommandFlags commandFlags = CommandFlags.None)
         {
-            var result = await db.ExecuteAsync(JsonCommands.CLEAR, new object[] {key, path}, flags: commandFlags)
+            var result = await db.ExecuteAsync(JsonCommands.CLEAR, new object[] { key, path }, flags: commandFlags)
                 .ConfigureAwait(false);
 
             return (int) result;
