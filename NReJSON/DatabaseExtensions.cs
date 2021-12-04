@@ -422,7 +422,7 @@ namespace NReJSON
         /// <param name="json">The object that you want to insert.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
-            params string[] json) =>
+            params object[] json) =>
             JsonArrayInsert(db, key, path, index, CommandFlags.None, json);
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace NReJSON
         /// <returns>Integer, specifically the array's new size.</returns>
         public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
             CommandFlags commandFlags = CommandFlags.None,
-            params string[] json) =>
+            params object[] json) =>
             (int) db.Execute(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json), flags: commandFlags);
 
         /// <summary>

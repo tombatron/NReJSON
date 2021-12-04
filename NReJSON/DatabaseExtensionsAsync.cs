@@ -449,7 +449,7 @@ namespace NReJSON
         /// <param name="json">The object that you want to insert.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static Task<int> JsonArrayInsertAsync(this IDatabaseAsync db, RedisKey key, string path, int index,
-            params string[] json) =>
+            params object[] json) =>
             JsonArrayInsertAsync(db, key, path, index, CommandFlags.None, json);
 
         /// <summary>
@@ -469,7 +469,7 @@ namespace NReJSON
         /// <param name="json">The object that you want to insert.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static async Task<int> JsonArrayInsertAsync(this IDatabaseAsync db, RedisKey key, string path, int index,
-            CommandFlags commandFlags = CommandFlags.None, params string[] json) =>
+            CommandFlags commandFlags = CommandFlags.None, params object[] json) =>
             (int) (await db.ExecuteAsync(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json),
                     flags: commandFlags)
                 .ConfigureAwait(false));
