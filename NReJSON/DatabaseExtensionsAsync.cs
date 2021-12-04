@@ -295,9 +295,9 @@ namespace NReJSON
         /// <param name="path">The path of the JSON value you want to increment.</param>
         /// <param name="number">The value you want to increment by.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        public static Task<RedisResult> JsonIncrementNumberAsync(this IDatabaseAsync db, RedisKey key, string path,
+        public static async Task<PathedResult<double?>> JsonIncrementNumberAsync(this IDatabaseAsync db, RedisKey key, string path,
             double number, CommandFlags commandFlags = CommandFlags.None) =>
-            db.ExecuteAsync(JsonCommands.NUMINCRBY, CombineArguments(key, path, number), flags: commandFlags);
+            PathedResult<double?>.Create(await db.ExecuteAsync(JsonCommands.NUMINCRBY, CombineArguments(key, path, number), flags: commandFlags));
 
         /// <summary>
         /// `JSON.NUMMULTBY`
@@ -311,9 +311,9 @@ namespace NReJSON
         /// <param name="path">The path of the JSON value you want to multiply.</param>
         /// <param name="number">The value you want to multiply by.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        public static Task<RedisResult> JsonMultiplyNumberAsync(this IDatabaseAsync db, RedisKey key, string path,
+        public static async Task<PathedResult<double?>> JsonMultiplyNumberAsync(this IDatabaseAsync db, RedisKey key, string path,
             double number, CommandFlags commandFlags = CommandFlags.None) =>
-            db.ExecuteAsync(JsonCommands.NUMMULTBY, CombineArguments(key, path, number), flags: CommandFlags.None);
+            PathedResult<double?>.Create(await db.ExecuteAsync(JsonCommands.NUMMULTBY, CombineArguments(key, path, number), flags: CommandFlags.None));
 
         /// <summary>
         /// `JSON.STRAPPEND`

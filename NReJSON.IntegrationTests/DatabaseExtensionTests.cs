@@ -221,6 +221,19 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal(expectedResult, (double) result, 2);
             }
+
+            [Fact]
+            public void CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+                
+                _db.JsonSet(key, "{\"a\":1,\"number\":{\"a\":2}}");
+
+                var result = _db.JsonIncrementNumber(key, "$..a", 2).ToList();
+                
+                Assert.Equal(3, result.First());
+                Assert.Equal(4, result[1]);
+            }
         }
 
         public class JsonMultiplyNumber : BaseIntegrationTest
@@ -238,6 +251,19 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal(expectedResult, (double) result, 2);
             }
+            
+            [Fact]
+            public void CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+                
+                _db.JsonSet(key, "{\"a\":1,\"number\":{\"a\":2}}");
+
+                var result = _db.JsonMultiplyNumber(key, "$..a", 2).ToList();
+                
+                Assert.Equal(2, result.First());
+                Assert.Equal(4, result[1]);
+            }            
         }
 
         public class JsonAppendJsonString : BaseIntegrationTest

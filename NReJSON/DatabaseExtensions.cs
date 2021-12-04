@@ -282,9 +282,11 @@ namespace NReJSON
         /// <param name="path">The path of the JSON value you want to increment.</param>
         /// <param name="number">The value you want to increment by.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        public static RedisResult JsonIncrementNumber(this IDatabase db, RedisKey key, string path, double number,
+        public static PathedResult<double?> JsonIncrementNumber(this IDatabase db, RedisKey key, string path,
+            double number,
             CommandFlags commandFlags = CommandFlags.None) =>
-            db.Execute(JsonCommands.NUMINCRBY, CombineArguments(key, path, number), flags: commandFlags);
+            PathedResult<double?>.Create(db.Execute(JsonCommands.NUMINCRBY, CombineArguments(key, path, number),
+                flags: commandFlags));
 
         /// <summary>
         /// `JSON.NUMMULTBY`
@@ -298,9 +300,9 @@ namespace NReJSON
         /// <param name="path">The path of the JSON value you want to multiply.</param>
         /// <param name="number">The value you want to multiply by.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        public static RedisResult JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number,
+        public static PathedResult<double?> JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number,
             CommandFlags commandFlags = CommandFlags.None) =>
-            db.Execute(JsonCommands.NUMMULTBY, CombineArguments(key, path, number), flags: commandFlags);
+            PathedResult<double?>.Create(db.Execute(JsonCommands.NUMMULTBY, CombineArguments(key, path, number), flags: commandFlags));
 
         /// <summary>
         /// `JSON.STRAPPEND`
