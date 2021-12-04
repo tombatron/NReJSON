@@ -107,7 +107,7 @@ namespace NReJSON
                 args.Add(space);
             }
 
-            foreach (var path in PathsOrDefault(paths, new[] {"."}))
+            foreach (var path in PathsOrDefault(paths, RootPathStringArray))
             {
                 args.Add(path);
             }

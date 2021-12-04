@@ -19,14 +19,14 @@ namespace NReJSON
                 {
                     if (arg.GetType() == typeof(RedisKey[]))
                     {
-                        foreach (var aa in (RedisKey[])arg)
+                        foreach (var aa in (RedisKey[]) arg)
                         {
                             yield return aa.ToString();
                         }
                     }
                     else if (arg.GetType().IsArray)
                     {
-                        foreach (var aa in (object[])arg)
+                        foreach (var aa in (object[]) arg)
                         {
                             yield return aa.ToString();
                         }
@@ -63,12 +63,16 @@ namespace NReJSON
         {
             if (string.IsNullOrEmpty(index))
             {
-                return new[] { string.Empty };
+                return StringArrayWithBlankEntry;
             }
             else
             {
-                return new[] { "INDEX", index };
+                return new[] {"INDEX", index};
             }
         }
+
+        private static readonly string[] StringArrayWithBlankEntry = { string.Empty };
+
+        private static readonly string[] RootPathStringArray = { "." };
     }
 }
