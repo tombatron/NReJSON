@@ -164,36 +164,6 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX" }, db.PreviousCommand);
             }
-
-            [Fact]
-            public void SetIndexIsProperlyEmitted()
-            {
-                var db = new FakeDatabase();
-
-                db.JsonSet("fake_key", "{\"hello\":\"world\"}", index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "INDEX", "message" }, db.PreviousCommand);
-            }
-
-            [Fact]
-            public void SetIndexIsProperlyEmittedAfterSetOnlyIfExists()
-            {
-                var db = new FakeDatabase();
-
-                db.JsonSet("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetOnlyIfExists, index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX", "INDEX", "message" }, db.PreviousCommand);
-            }
-
-            [Fact]
-            public void SetIndexIsProperlyEmittedAfterSetIfNotExists()
-            {
-                var db = new FakeDatabase();
-
-                db.JsonSet("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetIfNotExists, index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "NX", "INDEX", "message" }, db.PreviousCommand);
-            }
         }
 
         public class JsonType

@@ -165,36 +165,6 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX" }, db.PreviousCommand);
             }
-
-            [Fact]
-            public async Task SetIndexIsProperlyEmitted()
-            {
-                var db = new FakeDatabase();
-
-                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "INDEX", "message" }, db.PreviousCommand);
-            }
-
-            [Fact]
-            public async Task SetIndexIsProperlyEmittedAfterSetOnlyIfExists()
-            {
-                var db = new FakeDatabase();
-
-                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetOnlyIfExists, index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX", "INDEX", "message" }, db.PreviousCommand);
-            }
-
-            [Fact]
-            public async Task SetIndexIsProperlyEmittedAfterSetIfNotExists()
-            {
-                var db = new FakeDatabase();
-
-                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetIfNotExists, index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "NX", "INDEX", "message" }, db.PreviousCommand);
-            }
         }
 
         public class JsonTypeAsync
