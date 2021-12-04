@@ -35,6 +35,8 @@ If RedisJSON is installed you should see output similar to the following:
 
 All deprecated RedisJson commands have been removed. 
 
+Changed param array in `JsonArrayAppend` and `JsonArrayAppendAsync` to be an array of type `object`.
+
 ## Major Changes in Version 3.0
 
 In version 3.0 support for serialization and deserialization was added in the form of new generic overloads for the following extension methods:
