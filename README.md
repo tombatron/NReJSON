@@ -33,14 +33,13 @@ If RedisJSON is installed you should see output similar to the following:
 
 ## Major Changes in Version 4.0
 
-- All deprecated RedisJson commands have been removed. 
+- All deprecated RedisJson commands have been removed.
 
+- Introduced `PathedResult<TResult>` in order to handle commands which can return multiple results based on a provided JSONPath specification.
+- **BREAKING CHANGE** : `JsonGet` and `JsonGetAsync` now return an instance of `PathedResult<TResult>`.
 - Removed ability to associate a JSON object with an index using the `JsonSet` and `JsonSetAsync` methods.
-
 - Changed param array in `JsonArrayAppend` and `JsonArrayAppendAsync` to be an array of type `object`.
-
 - Changed `jsonScalar` parameter in `JsonArrayIndexOf` and `JsonArrayIndexOfAsync` to be of type `object`.
-
 - Changed param array in `JsonArrayInsert` and `JsonArrayInsertAsync` to be an array of type `object`.
 
 ## Major Changes in Version 3.0
