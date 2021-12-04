@@ -31,6 +31,10 @@ If RedisJSON is installed you should see output similar to the following:
 
 (The version of the module installed on your server obviously may vary.)
 
+## Major Changes in Version 4.0
+
+All deprecated RedisJson commands have been removed. 
+
 ## Major Changes in Version 3.0
 
 In version 3.0 support for serialization and deserialization was added in the form of new generic overloads for the following extension methods:
