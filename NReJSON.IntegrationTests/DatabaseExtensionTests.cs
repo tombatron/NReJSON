@@ -304,11 +304,15 @@ namespace NReJSON.IntegrationTests
             {
                 var key = Guid.NewGuid().ToString();
 
-                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\", 2]}");
 
                 var result = _db.JsonArrayIndexOf(key, ".array", "\"world\"", 0, 2);
 
                 Assert.Equal(1, result);
+                
+                result = _db.JsonArrayIndexOf(key, ".array", 2, 0, 4);
+                
+                Assert.Equal(3, result);
             }
         }
 

@@ -424,10 +424,14 @@ namespace NReJSON
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
         public static async Task<int> JsonArrayIndexOfAsync(this IDatabaseAsync db, RedisKey key, string path,
-            string jsonScalar, int start = 0, int stop = 0, CommandFlags commandFlags = CommandFlags.None) =>
-            (int) (await db.ExecuteAsync(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop),
+            object jsonScalar, int start = 0, int stop = 0, CommandFlags commandFlags = CommandFlags.None)
+        {
+            var result = await db.ExecuteAsync(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop),
                     flags: commandFlags)
-                .ConfigureAwait(false));
+                .ConfigureAwait(false);
+
+            return (int) result;
+        }
 
         /// <summary>
         /// `JSON.ARRINSERT`

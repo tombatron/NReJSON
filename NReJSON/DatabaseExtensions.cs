@@ -401,7 +401,7 @@ namespace NReJSON
         /// <param name="stop">Where to stop searching, defaults to 0 (the end of the array).</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
-        public static int JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, string jsonScalar,
+        public static int JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, object jsonScalar,
             int start = 0, int stop = 0, CommandFlags commandFlags = CommandFlags.None) =>
             (int) db.Execute(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop),
                 flags: commandFlags);

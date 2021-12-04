@@ -305,11 +305,15 @@ namespace NReJSON.IntegrationTests
             {
                 var key = Guid.NewGuid().ToString();
 
-                await _db.JsonSetAsync(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+                await _db.JsonSetAsync(key, "{\"array\": [\"hi\", \"world\", \"!\", 1]}");
 
                 var result = await _db.JsonArrayIndexOfAsync(key, ".array", "\"world\"", 0, 2);
 
                 Assert.Equal(1, result);
+
+                result = await _db.JsonArrayIndexOfAsync(key, ".array", 1);
+                
+                Assert.Equal(3, result);
             }
         }
 
