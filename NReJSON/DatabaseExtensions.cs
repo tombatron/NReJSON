@@ -24,7 +24,7 @@ namespace NReJSON
         /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="path">Defaults to root if not provided.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Integer, specifically the number of paths deleted (0 or 1).</returns>
+        /// <returns>Integer, specifically the number of paths deleted (0 or more).</returns>
         public static int JsonDelete(this IDatabase db, RedisKey key, string path = ".",
             CommandFlags commandFlags = CommandFlags.None) =>
             (int) db.Execute(JsonCommands.DEL, CombineArguments(key, path), flags: commandFlags);
