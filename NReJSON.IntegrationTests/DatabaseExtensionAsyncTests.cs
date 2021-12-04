@@ -269,7 +269,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonAppendJsonStringAsync(key, ".hello", "\"!\"");
 
-                Assert.Equal(6, result);
+                Assert.Equal(6, result[0]);
             }
 
             [Fact]
@@ -287,7 +287,7 @@ namespace NReJSON.IntegrationTests
             }
 
             [Fact]
-            public async Task WillApendProvidedJsonStringIntoRootIfNoPathProvided()
+            public async Task WillAppendProvidedJsonStringIntoRootIfNoPathProvided()
             {
                 var key = Guid.NewGuid().ToString("N");
 
@@ -298,6 +298,22 @@ namespace NReJSON.IntegrationTests
                 var helloValue = await _db.JsonGetAsync<string>(key);
 
                 Assert.Equal("world!", helloValue);
+            }
+
+            [Fact]
+            public async Task CanAppendOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key,
+                    "{\"a\":\"foo\", \"nested\": {\"a\": \"hello\"}, \"nested2\": {\"a\": 31}}");
+
+                var result = await _db.JsonAppendJsonStringAsync(key, "$..a", "\"baz\"");
+
+                Assert.Equal(3, result.Length);
+                Assert.Equal(6, result[0]);
+                Assert.Equal(8, result[1]);
+                Assert.Null(result[2]);
             }
         }
 
@@ -312,7 +328,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonStringLengthAsync(key, ".hello");
 
-                Assert.Equal(5, result);
+                Assert.Equal(5, result[0]);
             }
 
             [Fact]
@@ -326,6 +342,21 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Null(result);
             }
+            
+            [Fact]
+            public async Task CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key, "{\"a\":\"foo\", \"nested\": {\"a\": \"hello\"}, \"nested2\": {\"a\": 31}}");
+
+                var result = await _db.JsonStringLengthAsync(key, "$..a");
+
+                Assert.Equal(3, result.Length);
+                Assert.Equal(3, result[0]);
+                Assert.Equal(5, result[1]);
+                Assert.Null(result[2]);
+            }            
         }
 
         public class JsonArrayAppendAsync : BaseIntegrationTest

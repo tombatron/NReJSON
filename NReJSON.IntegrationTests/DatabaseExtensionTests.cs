@@ -277,7 +277,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonAppendJsonString(key, ".hello", "\"!\"");
 
-                Assert.Equal(6, result);
+                Assert.Equal(6, result[0].Value);
             }
 
             [Fact]
@@ -295,7 +295,7 @@ namespace NReJSON.IntegrationTests
             }
 
             [Fact]
-            public void WillApendProvidedJsonStringIntoRootIfNoPathProvided()
+            public void WillAppendProvidedJsonStringIntoRootIfNoPathProvided()
             {
                 var key = Guid.NewGuid().ToString("N");
 
@@ -307,6 +307,22 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal("world!", helloValue);
             }
+            
+            [Fact]
+            public void CanAppendOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key,
+                    "{\"a\":\"foo\", \"nested\": {\"a\": \"hello\"}, \"nested2\": {\"a\": 31}}");
+
+                var result = _db.JsonAppendJsonString(key, "$..a", "\"baz\"");
+
+                Assert.Equal(3, result.Length);
+                Assert.Equal(6, result[0]);
+                Assert.Equal(8, result[1]);
+                Assert.Null(result[2]);
+            }            
         }
 
         public class JsonStringLength : BaseIntegrationTest
@@ -320,7 +336,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonStringLength(key, ".hello");
 
-                Assert.Equal(5, result);
+                Assert.Equal(5, result[0]);
             }
 
             [Fact]
@@ -333,6 +349,21 @@ namespace NReJSON.IntegrationTests
                 var result = _db.JsonStringLength("doesnt_exist", ".hello.doesnt.exist");
 
                 Assert.Null(result);
+            }
+
+            [Fact]
+            public void CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"a\":\"foo\", \"nested\": {\"a\": \"hello\"}, \"nested2\": {\"a\": 31}}");
+
+                var result = _db.JsonStringLength(key, "$..a");
+
+                Assert.Equal(3, result.Length);
+                Assert.Equal(3, result[0]);
+                Assert.Equal(5, result[1]);
+                Assert.Null(result[2]);
             }
         }
 

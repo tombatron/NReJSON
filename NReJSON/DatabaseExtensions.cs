@@ -315,12 +315,12 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object you need to append a string value.</param>
         /// <param name="path">The path of the JSON string you want to append do.  This defaults to root.</param>
-        /// <param name="jsonString"></param>
+        /// <param name="jsonString">JSON formatted string.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Length of the new JSON string.</returns>
-        public static int JsonAppendJsonString(this IDatabase db, RedisKey key, string path = ".",
+        public static int?[] JsonAppendJsonString(this IDatabase db, RedisKey key, string path = ".",
             string jsonString = "\"\"", CommandFlags commandFlags = CommandFlags.None) =>
-            (int) db.Execute(JsonCommands.STRAPPEND, CombineArguments(key, path, jsonString), flags: commandFlags);
+            NullableIntArrayFrom(db.Execute(JsonCommands.STRAPPEND, CombineArguments(key, path, jsonString), flags: commandFlags));
 
         /// <summary>
         /// `JSON.STRLEN`
@@ -336,20 +336,9 @@ namespace NReJSON
         /// <param name="path">The path of the JSON string you want the length of. This defaults to root.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Integer, specifically the string's length.</returns>
-        public static int? JsonStringLength(this IDatabase db, RedisKey key, string path = ".",
-            CommandFlags commandFlags = CommandFlags.None)
-        {
-            var result = db.Execute(JsonCommands.STRLEN, CombineArguments(key, path), flags: commandFlags);
-
-            if (result.IsNull)
-            {
-                return null;
-            }
-            else
-            {
-                return (int) result;
-            }
-        }
+        public static int?[] JsonStringLength(this IDatabase db, RedisKey key, string path = ".",
+            CommandFlags commandFlags = CommandFlags.None) =>
+            NullableIntArrayFrom(db.Execute(JsonCommands.STRLEN, CombineArguments(key, path), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRAPPEND`

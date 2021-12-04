@@ -1,4 +1,5 @@
-﻿using StackExchange.Redis;
+﻿using System;
+using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -59,6 +60,25 @@ namespace NReJSON
             }
         }
 
-        private static readonly string[] RootPathStringArray = { "." };
+        private static readonly string[] RootPathStringArray = {"."};
+
+        private static int?[] NullableIntArrayFrom(RedisResult result)
+        {
+            if (result.IsNull)
+            {
+                return null;
+            }
+            
+            switch (result.Type)
+            {
+                case ResultType.Integer:
+                    return new int?[] {(int) result};
+                case ResultType.MultiBulk:
+                    var resultArray = (RedisResult[]) result;
+                    return resultArray.Select(x => (int?) x).ToArray();
+                default:
+                    throw new ArgumentException(nameof(result), "Not sure how to handle this result.");
+            }
+        }
     }
 }
