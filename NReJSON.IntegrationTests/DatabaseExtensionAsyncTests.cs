@@ -99,12 +99,28 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = await _db.JsonGetAsync<ExampleHelloWorld>(key);
+                ExampleHelloWorld result = await _db.JsonGetAsync<ExampleHelloWorld>(key);
 
                 Assert.NotNull(result);
                 Assert.Equal("world", result.Hello);
                 Assert.Equal("moon", result.GoodNight.Value);
             }
+            
+            [Fact]
+            public async Task CanExecuteWithMultiplePathMatchesWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\r\n\"object\":{\r\n\"hello\":\"world\",\r\n\"goodnight\":{\r\n\"value\":\"moon\"\r\n}\r\n},\r\n\"nested\":{\r\n\"object\":{\r\n\"hello\": \"guy\",\r\n\"goodnight\": {\r\n\"value\": \"stuff\"\r\n}\r\n}\r\n}\r\n}");
+
+                var result = (await _db.JsonGetAsync<ExampleHelloWorld>(key, paths: "$..object")).ToList();
+
+                var firstResult = result[0];
+                var secondResult = result[1];
+                
+                Assert.Equal("world", firstResult.Hello);
+                Assert.Equal("guy", secondResult.Hello);
+            }            
         }
 
         public class JsonDeleteAsync : BaseIntegrationTest

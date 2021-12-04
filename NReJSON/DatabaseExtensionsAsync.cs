@@ -57,8 +57,7 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static Task<TResult>
-            JsonGetAsync<TResult>(this IDatabaseAsync db, RedisKey key, params string[] paths) =>
+        public static Task<PathedResult<TResult>> JsonGetAsync<TResult>(this IDatabaseAsync db, RedisKey key, params string[] paths) =>
             db.JsonGetAsync<TResult>(key, noEscape: true, paths: paths, commandFlags: CommandFlags.None);
 
         /// <summary>
@@ -131,15 +130,15 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static async Task<TResult> JsonGetAsync<TResult>(this IDatabaseAsync db, RedisKey key,
+        public static async Task<PathedResult<TResult>> JsonGetAsync<TResult>(this IDatabaseAsync db, RedisKey key,
             bool noEscape = false,
             string indent = default, string newline = default, string space = default,
             CommandFlags commandFlags = CommandFlags.None, params string[] paths)
         {
             var serializedResult =
                 await db.JsonGetAsync(key, noEscape, indent, newline, space, commandFlags, paths).ConfigureAwait(false);
-
-            return SerializerProxy.Deserialize<TResult>(serializedResult);
+            
+            return PathedResult<TResult>.Create(serializedResult);
         }
 
         /// <summary>

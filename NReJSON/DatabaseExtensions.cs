@@ -41,7 +41,7 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
-        /// <returns></returns>
+        /// <returns>Array of bulk strings.</returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
             db.JsonGet(key, noEscape: true, paths: paths, commandFlags: CommandFlags.None);
 
@@ -59,7 +59,7 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static TResult JsonGet<TResult>(this IDatabase db, RedisKey key, params string[] paths) =>
+        public static PathedResult<TResult> JsonGet<TResult>(this IDatabase db, RedisKey key, params string[] paths) =>
             db.JsonGet<TResult>(key, noEscape: true, paths: paths, commandFlags: CommandFlags.None);
 
         /// <summary>
@@ -132,11 +132,10 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static TResult JsonGet<TResult>(this IDatabase db, RedisKey key, bool noEscape = false,
+        public static PathedResult<TResult> JsonGet<TResult>(this IDatabase db, RedisKey key, bool noEscape = false,
             string indent = default, string newline = default, string space = default,
             CommandFlags commandFlags = CommandFlags.None, params string[] paths) =>
-            SerializerProxy.Deserialize<TResult>(db.JsonGet(key, noEscape, indent, newline, space, commandFlags,
-                paths));
+            PathedResult<TResult>.Create(db.JsonGet(key, noEscape, indent, newline, space, commandFlags, paths));
 
         /// <summary>
         /// `JSON.MGET`
