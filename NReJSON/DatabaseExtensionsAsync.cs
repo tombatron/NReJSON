@@ -57,7 +57,8 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static Task<TResult> JsonGetAsync<TResult>(this IDatabaseAsync db, RedisKey key, params string[] paths) =>
+        public static Task<TResult>
+            JsonGetAsync<TResult>(this IDatabaseAsync db, RedisKey key, params string[] paths) =>
             db.JsonGetAsync<TResult>(key, noEscape: true, paths: paths, commandFlags: CommandFlags.None);
 
         /// <summary>
@@ -130,7 +131,8 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static async Task<TResult> JsonGetAsync<TResult>(this IDatabaseAsync db, RedisKey key, bool noEscape = false,
+        public static async Task<TResult> JsonGetAsync<TResult>(this IDatabaseAsync db, RedisKey key,
+            bool noEscape = false,
             string indent = default, string newline = default, string space = default,
             CommandFlags commandFlags = CommandFlags.None, params string[] paths)
         {
@@ -168,7 +170,8 @@ namespace NReJSON
         /// <param name="path">The path of the JSON property that you want to return for each key. This is "root" by default.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Array of Bulk Strings, specifically the JSON serialization of the value at each key's path.</returns>
-        public static async Task<RedisResult[]> JsonMultiGetAsync(this IDatabaseAsync db, RedisKey[] keys, string path = ".",
+        public static async Task<RedisResult[]> JsonMultiGetAsync(this IDatabaseAsync db, RedisKey[] keys,
+            string path = ".",
             CommandFlags commandFlags = CommandFlags.None) =>
             (RedisResult[]) (await db.ExecuteAsync(JsonCommands.MGET, CombineArguments(keys, path), flags: commandFlags)
                 .ConfigureAwait(false));
@@ -186,7 +189,8 @@ namespace NReJSON
         /// <param name="commandFlags">Optional command flags.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns>IEnumerable of TResult, non-existent paths/keys are returned as default(TResult).</returns>
-        public static async Task<IEnumerable<TResult>> JsonMultiGetAsync<TResult>(this IDatabaseAsync db, RedisKey[] keys,
+        public static async Task<IEnumerable<TResult>> JsonMultiGetAsync<TResult>(this IDatabaseAsync db,
+            RedisKey[] keys,
             string path = ".", CommandFlags commandFlags = CommandFlags.None)
         {
             IEnumerable<TResult> CreateResult(RedisResult[] srs)
@@ -223,17 +227,16 @@ namespace NReJSON
         /// <param name="json">The JSON object which you want to persist.</param>
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
-        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>An `OperationResult` indicating success or failure.</returns>
         public static async Task<OperationResult> JsonSetAsync(this IDatabaseAsync db, RedisKey key, string json,
-            string path = ".", SetOption setOption = SetOption.Default, string index = "",
-            CommandFlags commandFlags = CommandFlags.None)
+            string path = ".", SetOption setOption = SetOption.Default, CommandFlags commandFlags = CommandFlags.None)
         {
             var result =
-                (await db.ExecuteAsync(JsonCommands.SET,
-                        CombineArguments(key, path, json, GetSetOptionString(setOption),
-                            ResolveIndexSpecification(index)), flags: commandFlags)
+                (await db.ExecuteAsync(
+                        JsonCommands.SET,
+                        CombineArguments(key, path, json, GetSetOptionString(setOption)), 
+                        flags: commandFlags)
                     .ConfigureAwait(false)).ToString();
 
             return new OperationResult(result == "OK", result);
@@ -255,15 +258,13 @@ namespace NReJSON
         /// <param name="obj">The object to serialize and send.</param>
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
-        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <param name="commandFlags"></param>
         /// <typeparam name="TObjectType">Type of the object being serialized.</typeparam>
         /// <returns>An `OperationResult` indicating success or failure.</returns>
-        public static Task<OperationResult> JsonSetAsync<TObjectType>(this IDatabaseAsync db, RedisKey key, TObjectType obj,
-            string path = ".", SetOption setOption = SetOption.Default, string index = "",
-            CommandFlags commandFlags = CommandFlags.None) =>
-            db.JsonSetAsync(key, SerializerProxy.Serialize(obj), path, setOption, index, commandFlags: commandFlags);
-
+        public static Task<OperationResult> JsonSetAsync<TObjectType>(this IDatabaseAsync db, RedisKey key,
+            TObjectType obj,
+            string path = ".", SetOption setOption = SetOption.Default, CommandFlags commandFlags = CommandFlags.None) =>
+            db.JsonSetAsync(key, SerializerProxy.Serialize(obj), path, setOption, commandFlags: commandFlags);
 
         /// <summary>
         /// `JSON.TYPE`
@@ -534,7 +535,8 @@ namespace NReJSON
         /// <param name="commandFlags">Optional command flags.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static async Task<TResult> JsonArrayPopAsync<TResult>(this IDatabaseAsync db, RedisKey key, string path = ".",
+        public static async Task<TResult> JsonArrayPopAsync<TResult>(this IDatabaseAsync db, RedisKey key,
+            string path = ".",
             int index = -1, CommandFlags commandFlags = CommandFlags.None)
         {
             var result = await db.JsonArrayPopAsync(key, path, index, commandFlags).ConfigureAwait(false);
@@ -584,7 +586,8 @@ namespace NReJSON
         /// <param name="path">The path to the JSON object you want the keys for, this defaults to root.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Array, specifically the key names in the object as Bulk Strings.</returns>
-        public static async Task<RedisResult[]> JsonObjectKeysAsync(this IDatabaseAsync db, RedisKey key, string path = ".",
+        public static async Task<RedisResult[]> JsonObjectKeysAsync(this IDatabaseAsync db, RedisKey key,
+            string path = ".",
             CommandFlags commandFlags = CommandFlags.None) =>
             (RedisResult[]) (await db
                 .ExecuteAsync(JsonCommands.OBJKEYS, CombineArguments(key, path), flags: commandFlags)
@@ -662,7 +665,8 @@ namespace NReJSON
         /// <param name="path">Defaults to root if not provided. </param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Array, specifically the JSON's RESP form as detailed.</returns>
-        public static async Task<RedisResult[]> JsonGetRespAsync(this IDatabaseAsync db, RedisKey key, string path = ".",
+        public static async Task<RedisResult[]> JsonGetRespAsync(this IDatabaseAsync db, RedisKey key,
+            string path = ".",
             CommandFlags commandFlags = CommandFlags.None) =>
             (RedisResult[]) (await db.ExecuteAsync(JsonCommands.RESP, new object[] {key, path}, flags: commandFlags)
                 .ConfigureAwait(false));

@@ -217,14 +217,13 @@ namespace NReJSON
         /// <param name="json">The JSON object which you want to persist.</param>
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
-        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>An `OperationResult` indicating success or failure.</returns>
         public static OperationResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".",
-            SetOption setOption = SetOption.Default, string index = "", CommandFlags commandFlags = CommandFlags.None)
+            SetOption setOption = SetOption.Default, CommandFlags commandFlags = CommandFlags.None)
         {
             var result = db.Execute(JsonCommands.SET,
-                    CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)),
+                    CombineArguments(key, path, json, GetSetOptionString(setOption)),
                     flags: commandFlags)
                 .ToString();
 
@@ -247,14 +246,12 @@ namespace NReJSON
         /// <param name="obj">The object to serialize and send.</param>
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
-        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <typeparam name="TObjectType">Type of the object being serialized.</typeparam>
         /// <returns>An `OperationResult` indicating success or failure.</returns>
         public static OperationResult JsonSet<TObjectType>(this IDatabase db, RedisKey key, TObjectType obj,
-            string path = ".", SetOption setOption = SetOption.Default, string index = "",
-            CommandFlags commandFlags = CommandFlags.None) =>
-            db.JsonSet(key, SerializerProxy.Serialize(obj), path, setOption, index, commandFlags: commandFlags);
+            string path = ".", SetOption setOption = SetOption.Default, CommandFlags commandFlags = CommandFlags.None) =>
+            db.JsonSet(key, SerializerProxy.Serialize(obj), path, setOption, commandFlags: commandFlags);
 
         /// <summary>
         /// `JSON.TYPE`
