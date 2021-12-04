@@ -59,20 +59,6 @@ namespace NReJSON
             }
         }
 
-        private static string[] ResolveIndexSpecification(string index)
-        {
-            if (string.IsNullOrEmpty(index))
-            {
-                return StringArrayWithBlankEntry;
-            }
-            else
-            {
-                return new[] {"INDEX", index};
-            }
-        }
-
-        private static readonly string[] StringArrayWithBlankEntry = { string.Empty };
-
         private static readonly string[] RootPathStringArray = { "." };
     }
 }
