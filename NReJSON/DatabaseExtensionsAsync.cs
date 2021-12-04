@@ -383,7 +383,7 @@ namespace NReJSON
         /// <param name="json">The JSON values that you want to append.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static Task<int> JsonArrayAppendAsync(this IDatabaseAsync db, RedisKey key, string path,
-            params string[] json) =>
+            params object[] json) =>
             JsonArrayAppendAsync(db, key, path, CommandFlags.None, json);
 
         /// <summary>
@@ -400,7 +400,7 @@ namespace NReJSON
         /// <param name="json">The JSON values that you want to append.</param>
         /// <returns>Integer, specifically the array's new size.</returns>
         public static async Task<int> JsonArrayAppendAsync(this IDatabaseAsync db, RedisKey key, string path,
-            CommandFlags commandFlags = CommandFlags.None, params string[] json) =>
+            CommandFlags commandFlags = CommandFlags.None, params object[] json) =>
             (int) (await db.ExecuteAsync(JsonCommands.ARRAPPEND, CombineArguments(key, path, json), flags: commandFlags)
                 .ConfigureAwait(false));
 

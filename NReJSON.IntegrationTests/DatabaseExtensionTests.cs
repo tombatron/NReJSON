@@ -291,9 +291,9 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"array\": []}");
 
-                var result = _db.JsonArrayAppend(key, ".array", "\"hello\"", "\"world\"");
+                var result = _db.JsonArrayAppend(key, ".array", "\"hello\"", "\"world\"", 2);
 
-                Assert.Equal(2, result);
+                Assert.Equal(3, result);
             }
         }
 

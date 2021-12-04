@@ -292,9 +292,9 @@ namespace NReJSON.IntegrationTests
 
                 await _db.JsonSetAsync(key, "{\"array\": []}");
 
-                var result = await _db.JsonArrayAppendAsync(key, ".array", "\"hello\"", "\"world\"");
+                var result = await _db.JsonArrayAppendAsync(key, ".array", "\"hello\"", "\"world\"", 23);
 
-                Assert.Equal(2, result);
+                Assert.Equal(3, result);
             }
         }
 
