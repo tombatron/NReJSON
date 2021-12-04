@@ -64,7 +64,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonGet(key, indent: "&");
 
-                Assert.Contains("&", (string)result);
+                Assert.Contains("&", (string) result);
             }
 
             [Fact]
@@ -76,7 +76,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonGet(key, newline: "=");
 
-                Assert.Contains("=", (string)result);
+                Assert.Contains("=", (string) result);
             }
 
             [Fact]
@@ -88,7 +88,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonGet(key, space: "+");
 
-                Assert.Contains("+", (string)result);
+                Assert.Contains("+", (string) result);
             }
 
             [Fact]
@@ -134,7 +134,7 @@ namespace NReJSON.IntegrationTests
                 _db.JsonSet(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
                 _db.JsonSet(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
 
-                var result = _db.JsonMultiGet(new RedisKey[] { key1, key2 });
+                var result = _db.JsonMultiGet(new RedisKey[] {key1, key2});
 
                 Assert.Equal(2, result.Length);
                 Assert.Contains("world", result[0].ToString());
@@ -150,7 +150,7 @@ namespace NReJSON.IntegrationTests
                 _db.JsonSet(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
                 _db.JsonSet(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
 
-                var result = _db.JsonMultiGet<ExampleHelloWorld>(new RedisKey[] { key1, "say what?", key2 }).ToList();
+                var result = _db.JsonMultiGet<ExampleHelloWorld>(new RedisKey[] {key1, "say what?", key2}).ToList();
 
                 Assert.Equal(3, result.Count);
                 Assert.Null(result[1]);
@@ -191,7 +191,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonIncrementNumber(key, path, number);
 
-                Assert.Equal(expectedResult, (double)result, 2);
+                Assert.Equal(expectedResult, (double) result, 2);
             }
         }
 
@@ -208,7 +208,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonMultiplyNumber(key, path, number);
 
-                Assert.Equal(expectedResult, (double)result, 2);
+                Assert.Equal(expectedResult, (double) result, 2);
             }
         }
 
@@ -395,7 +395,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonObjectKeys(key);
 
-                Assert.Equal(new[] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
+                Assert.Equal(new[] {"hello", "goodnight"}, result.Select(x => x.ToString()).ToArray());
             }
         }
 
@@ -441,73 +441,6 @@ namespace NReJSON.IntegrationTests
                 var result = _db.JsonGetResp(key)[2];
 
                 Assert.Equal("world", result.ToString());
-            }
-        }
-
-        public class JsonIndexAdd : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and is removed in the latest version of RedisJson.")]
-            public void CanExecute()
-            {
-                var index = Guid.NewGuid().ToString();
-
-                var result = _db.JsonIndexAdd(index, "test_field", "$.a");
-
-                Assert.True(result);
-                Assert.Equal("OK", result.RawResult);
-            }
-        }
-
-        public class JsonIndexDelete : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void CanExecute()
-            {
-                var index = Guid.NewGuid().ToString();
-
-                _db.JsonIndexAdd(index, "some_field", "$.a");
-
-                var result = _db.JsonIndexDelete(index);
-
-                Assert.True(result);
-                Assert.Equal("OK", result.RawResult);
-            }
-        }
-
-        public class JsonIndexGet : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void CanExecute()
-            {
-                var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();
-
-                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
-                _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
-
-                _db.JsonIndexAdd(index, "last", "$.last");
-
-                var result = _db.JsonIndexGet(index, "Jo*").ToString();
-
-                Assert.Contains("Joe", result);
-                Assert.Contains("Joan", result);
-            }
-
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void CanExecuteWithSerializer()
-            {
-                var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();
-
-                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
-                _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
-
-                _db.JsonIndexAdd(index, "last", "$.last");
-
-                var result = _db.JsonIndexGet<ExamplePerson>(index, "Jo*");
-
-                Assert.Equal("Joe", result[$"{key}_1"].First().LastName);
-                Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
             }
         }
 

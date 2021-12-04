@@ -501,55 +501,6 @@ namespace NReJSON.Tests
             }
         }
 
-        public class JsonIndexAdd
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void EmitsCorrectParameters()
-            {
-                var db = new FakeDatabase(true);
-
-                db.JsonIndexAdd("index", "field", "$.path");
-
-                Assert.Equal(new[] { "JSON.INDEX", "ADD", "index", "field", "$.path" }, db.PreviousCommand);
-            }
-        }
-
-        public class JsonIndexDelete
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void EmitsCorrectParameters()
-            {
-                var db = new FakeDatabase(true);
-
-                db.JsonIndexDelete("index");
-
-                Assert.Equal(new[] { "JSON.INDEX", "DEL", "index" }, db.PreviousCommand);
-            }
-        }
-
-        public class JsonIndexGet
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void EmitsCorrectParameters()
-            {
-                var db = new FakeDatabase(true);
-
-                db.JsonIndexGet("index", "hello*");
-
-                Assert.Equal(new[] { "JSON.QGET", "index", "hello*" }, db.PreviousCommand);
-            }
-
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void EmitsCorrectParametersWithPathSpecified()
-            {
-                var db = new FakeDatabase(true);
-
-                db.JsonIndexGet("index", "hello*", "$.whatever");
-
-                Assert.Equal(new[] { "JSON.QGET", "index", "hello*", "$.whatever" }, db.PreviousCommand);
-            }
-        }
-
         public class JsonToggle
         {
             [Fact]
