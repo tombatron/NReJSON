@@ -443,7 +443,22 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayInsert(key, ".array", 1, "\"there\"", 2);
 
-                Assert.Equal(5, result);
+                Assert.Equal(5, result[0]);
+            }
+
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayInsert(key, "$..a", 0, 1, 2);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
             }
         }
 

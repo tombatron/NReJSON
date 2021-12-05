@@ -43,6 +43,7 @@ If RedisJSON is installed you should see output similar to the following:
 - **BREAKING CHANGE** : `JsonStringLength` and `JsonStringLengthAsync` now return `int?[]` to support multiple JSONPath matches.
 - **BREAKING CHANGE** : `JsonArrayAppend` and `JsonArrayAppendAsync` now return `int?[]` to support multiple JSONPath matches.
 - **BREAKING CHANGE** : `JsonArrayIndexOf` and `JsonArrayIndexOfAsync` now return `int?[]` to support multiple JSONPath matches.
+- **BREAKING CHANGE** : `JsonArrayInsert` and `JsonArrayInsertAsync` now return `int?[]` to support multiple JSONPath matches.
 - Removed ability to associate a JSON object with an index using the `JsonSet` and `JsonSetAsync` methods.
 - Changed param array in `JsonArrayAppend` and `JsonArrayAppendAsync` to be an array of type `object`.
 - Changed `jsonScalar` parameter in `JsonArrayIndexOf` and `JsonArrayIndexOfAsync` to be of type `object`.

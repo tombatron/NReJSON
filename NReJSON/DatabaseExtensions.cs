@@ -390,7 +390,7 @@ namespace NReJSON
         /// <param name="start">Where to start searching, defaults to 0 (the beginning of the array).</param>
         /// <param name="stop">Where to stop searching, defaults to 0 (the end of the array).</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Array of nullable integers, specifically, for each JSON value matching the path, the first position of the scalar value in the array, -1 if unfound in the array, or null if the matching JSON value is not an array.</returns>
+        /// <returns>Array of nullable integers, specifically, for each JSON value matching the path, the first position     of the scalar value in the array, -1 if unfound in the array, or null if the matching JSON value is not an array.</returns>
         public static int?[] JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, object jsonScalar,
             int start = 0, int stop = 0, CommandFlags commandFlags = CommandFlags.None) =>
             NullableIntArrayFrom(db.Execute(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop),
@@ -410,8 +410,8 @@ namespace NReJSON
         /// <param name="path">The path of the JSON array that you want to insert into.</param>
         /// <param name="index">The index at which you want to insert, 0 prepends and negative values are interpreted as starting from the end.</param>
         /// <param name="json">The object that you want to insert.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
+        /// <returns>Array of nullable integer, specifically, for each path, the array's new size, or null element if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
             params object[] json) =>
             JsonArrayInsert(db, key, path, index, CommandFlags.None, json);
 
@@ -430,11 +430,12 @@ namespace NReJSON
         /// <param name="index">The index at which you want to insert, 0 prepends and negative values are interpreted as starting from the end.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="json">The object that you want to insert.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
+        /// <returns>Array of nullable integer, specifically, for each path, the array's new size, or null element if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
             CommandFlags commandFlags = CommandFlags.None,
             params object[] json) =>
-            (int) db.Execute(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json), flags: commandFlags);
+            NullableIntArrayFrom(db.Execute(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json),
+                flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRLEN`

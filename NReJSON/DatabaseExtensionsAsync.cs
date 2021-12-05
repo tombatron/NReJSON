@@ -446,8 +446,8 @@ namespace NReJSON
         /// <param name="path">The path of the JSON array that you want to insert into.</param>
         /// <param name="index">The index at which you want to insert, 0 prepends and negative values are interpreted as starting from the end.</param>
         /// <param name="json">The object that you want to insert.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static Task<int> JsonArrayInsertAsync(this IDatabaseAsync db, RedisKey key, string path, int index,
+        /// <returns>Array of nullable integer, specifically, for each path, the array's new size, or null element if the matching JSON value is not an array.</returns>
+        public static Task<int?[]> JsonArrayInsertAsync(this IDatabaseAsync db, RedisKey key, string path, int index,
             params object[] json) =>
             JsonArrayInsertAsync(db, key, path, index, CommandFlags.None, json);
 
@@ -466,12 +466,12 @@ namespace NReJSON
         /// <param name="index">The index at which you want to insert, 0 prepends and negative values are interpreted as starting from the end.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="json">The object that you want to insert.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static async Task<int> JsonArrayInsertAsync(this IDatabaseAsync db, RedisKey key, string path, int index,
+        /// <returns>Array of nullable integer, specifically, for each path, the array's new size, or null element if the matching JSON value is not an array.</returns>
+        public static async Task<int?[]> JsonArrayInsertAsync(this IDatabaseAsync db, RedisKey key, string path, int index,
             CommandFlags commandFlags = CommandFlags.None, params object[] json) =>
-            (int) (await db.ExecuteAsync(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json),
+            NullableIntArrayFrom((await db.ExecuteAsync(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json),
                     flags: commandFlags)
-                .ConfigureAwait(false));
+                .ConfigureAwait(false)));
 
         /// <summary>
         /// `JSON.ARRLEN`

@@ -435,8 +435,23 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayInsertAsync(key, ".array", 1, "\"there\"", 6);
 
-                Assert.Equal(5, result);
+                Assert.Equal(5, result[0]);
             }
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayInsertAsync(key, "$..a", 0, 1, 2);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
+            }            
         }
 
         public class JsonArrayLengthAsync : BaseIntegrationTest
