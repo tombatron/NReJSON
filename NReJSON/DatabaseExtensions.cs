@@ -351,8 +351,8 @@ namespace NReJSON
         /// <param name="key">The key of the JSON object that contains the array you want to append to.</param>
         /// <param name="path">The path to the JSON array you want to append to.</param>
         /// <param name="json">The JSON values that you want to append.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path, params object[] json) =>
+        /// <returns>Array of nullable integers indicating the array's new size at each matched path.</returns>
+        public static int?[] JsonArrayAppend(this IDatabase db, RedisKey key, string path, params object[] json) =>
             JsonArrayAppend(db, key, path, CommandFlags.None, json);
 
         /// <summary>
@@ -367,10 +367,10 @@ namespace NReJSON
         /// <param name="path">The path to the JSON array you want to append to.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="json">The JSON values that you want to append.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path,
+        /// <returns>Array of nullable integers indicating the array's new size at each matched path.</returns>
+        public static int?[] JsonArrayAppend(this IDatabase db, RedisKey key, string path,
             CommandFlags commandFlags = CommandFlags.None, params object[] json) =>
-            (int) db.Execute(JsonCommands.ARRAPPEND, CombineArguments(key, path, json), flags: commandFlags);
+            NullableIntArrayFrom(db.Execute(JsonCommands.ARRAPPEND, CombineArguments(key, path, json), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRINDEX`

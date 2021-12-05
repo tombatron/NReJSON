@@ -379,8 +379,8 @@ namespace NReJSON
         /// <param name="key">The key of the JSON object that contains the array you want to append to.</param>
         /// <param name="path">The path to the JSON array you want to append to.</param>
         /// <param name="json">The JSON values that you want to append.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static Task<int> JsonArrayAppendAsync(this IDatabaseAsync db, RedisKey key, string path,
+        /// <returns>Array of nullable integers indicating the array's new size at each matched path.</returns>
+        public static Task<int?[]> JsonArrayAppendAsync(this IDatabaseAsync db, RedisKey key, string path,
             params object[] json) =>
             JsonArrayAppendAsync(db, key, path, CommandFlags.None, json);
 
@@ -396,11 +396,11 @@ namespace NReJSON
         /// <param name="path">The path to the JSON array you want to append to.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="json">The JSON values that you want to append.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static async Task<int> JsonArrayAppendAsync(this IDatabaseAsync db, RedisKey key, string path,
+        /// <returns>Array of nullable integers indicating the array's new size at each matched path.</returns>
+        public static async Task<int?[]> JsonArrayAppendAsync(this IDatabaseAsync db, RedisKey key, string path,
             CommandFlags commandFlags = CommandFlags.None, params object[] json) =>
-            (int) (await db.ExecuteAsync(JsonCommands.ARRAPPEND, CombineArguments(key, path, json), flags: commandFlags)
-                .ConfigureAwait(false));
+            NullableIntArrayFrom((await db.ExecuteAsync(JsonCommands.ARRAPPEND, CombineArguments(key, path, json), flags: commandFlags)
+                .ConfigureAwait(false)));
 
         /// <summary>
         /// `JSON.ARRINDEX`
