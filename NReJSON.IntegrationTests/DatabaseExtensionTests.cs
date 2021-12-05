@@ -607,8 +607,23 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayTrim(key, ".array", 0, 1);
 
-                Assert.Equal(2, result);
+                Assert.Equal(2, result[0]);
             }
+            
+            [Fact]
+            public void CanExecuteForMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": false}}");
+
+                var result = _db.JsonArrayTrim(key, "$..a", 1, 1);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Null(result[1]);
+            }            
         }
 
         public class JsonObjectKeys : BaseIntegrationTest

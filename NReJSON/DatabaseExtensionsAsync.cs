@@ -563,12 +563,12 @@ namespace NReJSON
         /// <param name="start">The inclusive start index.</param>
         /// <param name="stop">The inclusive stop index.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns></returns>
-        public static async Task<int> JsonArrayTrimAsync(this IDatabaseAsync db, RedisKey key, string path, int start,
+        /// <returns>Array of nullable integer, specifically for each path, the array's new size, or null element if the matching JSON value is not an array.</returns>
+        public static async Task<int?[]> JsonArrayTrimAsync(this IDatabaseAsync db, RedisKey key, string path, int start,
             int stop, CommandFlags commandFlags = CommandFlags.None) =>
-            (int) (await db.ExecuteAsync(JsonCommands.ARRTRIM, CombineArguments(key, path, start, stop),
+            NullableIntArrayFrom((await db.ExecuteAsync(JsonCommands.ARRTRIM, CombineArguments(key, path, start, stop),
                     flags: commandFlags)
-                .ConfigureAwait(false));
+                .ConfigureAwait(false)));
 
         /// <summary>
         /// `JSON.OBJKEYS`

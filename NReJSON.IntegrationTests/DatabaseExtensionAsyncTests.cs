@@ -599,7 +599,22 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayTrimAsync(key, ".array", 0, 1);
 
-                Assert.Equal(2, result);
+                Assert.Equal(2, result[0]);
+            }
+
+            [Fact]
+            public async Task CanExecuteForMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": false}}");
+
+                var result = await _db.JsonArrayTrimAsync(key, "$..a", 1, 1);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Null(result[1]);
             }
         }
 
