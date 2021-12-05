@@ -518,7 +518,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayPop(key, ".array", 1);
 
-                Assert.Equal("\"world\"", result.ToString());
+                Assert.Equal("\"world\"", result[0]);
             }
 
             [Fact]
@@ -530,8 +530,70 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayPop<string>(key, ".array", 1);
 
-                Assert.Equal("world", result);
+                Assert.Equal("world", result[0]);
             }
+
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayPop(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal("3", result[0]);
+                Assert.Equal("4", result[1]);
+            }
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPathsWithNulls()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[\"foo\", \"bar\"], \"nested\": {\"a\": false}, \"nested2\": {\"a\":[]}}");
+
+                var result = _db.JsonArrayPop(key, "$..a");
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal("\"bar\"", result[0]);
+                Assert.Null(result[1]);
+                Assert.Null(result[2]);
+            }               
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPathsWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayPop<int?>(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
+            } 
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPathsWithSerializerWithNulls()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[\"foo\", \"bar\"], \"nested\": {\"a\": false}, \"nested2\": {\"a\":[]}}");
+
+                var result = _db.JsonArrayPop<string>(key, "$..a");
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal("bar", result[0]);
+                Assert.Null(result[1]);
+                Assert.Null(result[2]);
+            }               
         }
 
         public class JsonArrayTrim : BaseIntegrationTest

@@ -338,7 +338,7 @@ namespace NReJSON.Tests
             [Fact]
             public void EmitsCorrectParameters()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 db.JsonArrayPop("fake_key", ".what.ever", 10);
 
@@ -348,7 +348,7 @@ namespace NReJSON.Tests
             [Fact]
             public void HasRootAsDefaultPath()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 db.JsonArrayPop("fake_key", index: 10);
 
@@ -358,7 +358,7 @@ namespace NReJSON.Tests
             [Fact]
             public void HasNegativeOneAsDefaultIndex()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 db.JsonArrayPop("fake_key", ".what.ever");
 

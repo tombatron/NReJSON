@@ -339,7 +339,7 @@ namespace NReJSON.Tests
             [Fact]
             public async Task EmitsCorrectParameters()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 await db.JsonArrayPopAsync("fake_key", ".what.ever", 10);
 
@@ -349,7 +349,7 @@ namespace NReJSON.Tests
             [Fact]
             public async Task HasRootAsDefaultPath()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 await db.JsonArrayPopAsync("fake_key", index: 10);
 
@@ -359,7 +359,7 @@ namespace NReJSON.Tests
             [Fact]
             public async Task HasNegativeOneAsDefaultIndex()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 await db.JsonArrayPopAsync("fake_key", ".what.ever");
 

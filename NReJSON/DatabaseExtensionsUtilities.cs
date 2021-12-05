@@ -2,6 +2,7 @@
 using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
+using static NReJSON.NReJSONSerializer;
 
 namespace NReJSON
 {
@@ -76,6 +77,60 @@ namespace NReJSON
                 case ResultType.MultiBulk:
                     var resultArray = (RedisResult[]) result;
                     return resultArray.Select(x => (int?) x).ToArray();
+                default:
+                    throw new ArgumentException(nameof(result), "Not sure how to handle this result.");
+            }
+        }
+
+        private static string[] StringArrayFrom(RedisResult result)
+        {
+            if (result.IsNull)
+            {
+                return null;
+            }
+
+            switch (result.Type)
+            {
+                case ResultType.BulkString:
+                    return new[] {(string) result};
+                case ResultType.MultiBulk:
+                    var resultArray = (RedisResult[]) result;
+                    return resultArray.Select(x => (string) x).ToArray();
+                default:
+                    throw new ArgumentException(nameof(result), "Not sure how to handle this result.");
+            }
+        }
+
+        private static TResult[] TypedArrayFrom<TResult>(RedisResult result)
+        {
+            if (result.IsNull)
+            {
+                return default;
+            }
+
+            switch (result.Type)
+            {
+                case ResultType.BulkString:
+                    return new TResult[] { SerializerProxy.Deserialize<TResult>(result) };
+                case ResultType.MultiBulk:
+                    var resultArray = (RedisResult[]) result;
+                    var typedResult = new TResult[resultArray.Length];
+
+                    for (var i = 0; i < typedResult.Length; i++)
+                    {
+                        var current = resultArray[i];
+
+                        if (current.IsNull)
+                        {
+                            typedResult[i] = default;
+                        }
+                        else
+                        {
+                            typedResult[i] = SerializerProxy.Deserialize<TResult>(current);
+                        }
+                    }
+
+                    return typedResult;
                 default:
                     throw new ArgumentException(nameof(result), "Not sure how to handle this result.");
             }

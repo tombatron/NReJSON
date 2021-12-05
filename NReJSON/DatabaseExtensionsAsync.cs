@@ -517,10 +517,10 @@ namespace NReJSON
         /// <param name="path">Defaults to root (".") if not provided.</param>
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Bulk String, specifically the popped JSON value.</returns>
-        public static Task<RedisResult> JsonArrayPopAsync(this IDatabaseAsync db, RedisKey key, string path = ".",
+        /// <returns>Array of strings, specifically, for each path, the popped JSON value, or null element if the matching JSON value is not an array.</returns>
+        public static async Task<string[]> JsonArrayPopAsync(this IDatabaseAsync db, RedisKey key, string path = ".",
             int index = -1, CommandFlags commandFlags = CommandFlags.None) =>
-            db.ExecuteAsync(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags);
+            StringArrayFrom(await db.ExecuteAsync(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRPOP`
@@ -537,15 +537,10 @@ namespace NReJSON
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
-        /// <returns></returns>
-        public static async Task<TResult> JsonArrayPopAsync<TResult>(this IDatabaseAsync db, RedisKey key,
-            string path = ".",
-            int index = -1, CommandFlags commandFlags = CommandFlags.None)
-        {
-            var result = await db.JsonArrayPopAsync(key, path, index, commandFlags).ConfigureAwait(false);
-
-            return SerializerProxy.Deserialize<TResult>(result);
-        }
+        /// <returns>Array of `TResult`, specifically, for each path, the popped JSON value, or null element if the matching JSON value is not an array.</returns>
+        public static async Task<TResult[]> JsonArrayPopAsync<TResult>(this IDatabaseAsync db, RedisKey key,
+            string path = ".", int index = -1, CommandFlags commandFlags = CommandFlags.None) =>
+            TypedArrayFrom<TResult>(await db.ExecuteAsync(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRTRIM`

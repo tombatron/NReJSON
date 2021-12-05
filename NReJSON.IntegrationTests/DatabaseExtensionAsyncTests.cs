@@ -510,7 +510,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayPopAsync(key, ".array", 1);
 
-                Assert.Equal("\"world\"", result.ToString());
+                Assert.Equal("\"world\"", result[0]);
             }
 
             [Fact]
@@ -522,8 +522,70 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayPopAsync<string>(key, ".array", 1);
 
-                Assert.Equal("world", result);
+                Assert.Equal("world", result[0]);
             }
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayPopAsync(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal("3", result[0]);
+                Assert.Equal("4", result[1]);
+            }
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPathsWithNulls()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[\"foo\", \"bar\"], \"nested\": {\"a\": false}, \"nested2\": {\"a\":[]}}");
+
+                var result = await _db.JsonArrayPopAsync(key, "$..a");
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal("\"bar\"", result[0]);
+                Assert.Null(result[1]);
+                Assert.Null(result[2]);
+            }            
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPathsWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayPopAsync<int?>(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
+            }        
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPathsWithSerializerWithNulls()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[\"foo\", \"bar\"], \"nested\": {\"a\": false}, \"nested2\": {\"a\":[]}}");
+
+                var result = await _db.JsonArrayPopAsync<string>(key, "$..a");
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal("bar", result[0]);
+                Assert.Null(result[1]);
+                Assert.Null(result[2]);
+            }   
         }
 
         public class JsonArrayTrimAsync : BaseIntegrationTest

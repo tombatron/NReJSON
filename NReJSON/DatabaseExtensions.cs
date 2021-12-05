@@ -480,10 +480,10 @@ namespace NReJSON
         /// <param name="path">Defaults to root (".") if not provided.</param>
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Bulk String, specifically the popped JSON value.</returns>
-        public static RedisResult JsonArrayPop(this IDatabase db, RedisKey key, string path = ".", int index = -1,
+        /// <returns>Array of strings, specifically, for each path, the popped JSON value, or null element if the matching JSON value is not an array.</returns>
+        public static string[] JsonArrayPop(this IDatabase db, RedisKey key, string path = ".", int index = -1,
             CommandFlags commandFlags = CommandFlags.None) =>
-            db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags);
+            StringArrayFrom(db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRPOP`
@@ -500,14 +500,10 @@ namespace NReJSON
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
-        /// <returns></returns>
-        public static TResult JsonArrayPop<TResult>(this IDatabase db, RedisKey key, string path = ".", int index = -1,
-            CommandFlags commandFlags = CommandFlags.None)
-        {
-            var result = db.JsonArrayPop(key, path, index, commandFlags: commandFlags);
-
-            return SerializerProxy.Deserialize<TResult>(result);
-        }
+        /// <returns>Array of `TResult`, specifically, for each path, the popped JSON value, or null element if the matching JSON value is not an array.</returns>
+        public static TResult[] JsonArrayPop<TResult>(this IDatabase db, RedisKey key, string path = ".",
+            int index = -1, CommandFlags commandFlags = CommandFlags.None) =>
+            TypedArrayFrom<TResult>(db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRTRIM`
