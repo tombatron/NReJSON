@@ -409,12 +409,27 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayIndexOf(key, ".array", "\"world\"", 0, 2);
 
-                Assert.Equal(1, result);
+                Assert.Equal(1, result[0]);
                 
                 result = _db.JsonArrayIndexOf(key, ".array", 2, 0, 4);
                 
-                Assert.Equal(3, result);
+                Assert.Equal(3, result[0]);
             }
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayIndexOf(key, "$..a", 2);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Equal(-1, result[1]);
+            }            
         }
 
         public class JsonArrayInsert : BaseIntegrationTest

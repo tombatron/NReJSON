@@ -401,11 +401,26 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayIndexOfAsync(key, ".array", "\"world\"", 0, 2);
 
-                Assert.Equal(1, result);
+                Assert.Equal(1, result[0]);
 
                 result = await _db.JsonArrayIndexOfAsync(key, ".array", 1);
 
-                Assert.Equal(3, result);
+                Assert.Equal(3, result[0]);
+            }
+
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayIndexOfAsync(key, "$..a", 2);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Equal(-1, result[1]);
             }
         }
 

@@ -390,11 +390,11 @@ namespace NReJSON
         /// <param name="start">Where to start searching, defaults to 0 (the beginning of the array).</param>
         /// <param name="stop">Where to stop searching, defaults to 0 (the end of the array).</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
-        public static int JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, object jsonScalar,
+        /// <returns>Array of nullable integers, specifically, for each JSON value matching the path, the first position of the scalar value in the array, -1 if unfound in the array, or null if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, object jsonScalar,
             int start = 0, int stop = 0, CommandFlags commandFlags = CommandFlags.None) =>
-            (int) db.Execute(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop),
-                flags: commandFlags);
+            NullableIntArrayFrom(db.Execute(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop),
+                flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRINSERT`
