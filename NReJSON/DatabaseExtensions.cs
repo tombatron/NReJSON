@@ -450,8 +450,8 @@ namespace NReJSON
         /// <param name="key">The key of the JSON object that contains the array you want the length of.</param>
         /// <param name="path">The path to the JSON array that you want the length of.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Integer, specifically the array's length.</returns>
-        public static int? JsonArrayLength(this IDatabase db, RedisKey key, string path = ".",
+        /// <returns>Array of nullable integer, specifically, for each path, the array's length, or null element if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayLength(this IDatabase db, RedisKey key, string path = ".",
             CommandFlags commandFlags = CommandFlags.None)
         {
             var result = db.Execute(JsonCommands.ARRLEN, CombineArguments(key, path), flags: commandFlags);
@@ -462,7 +462,7 @@ namespace NReJSON
             }
             else
             {
-                return (int) result;
+                return NullableIntArrayFrom(result);
             }
         }
 

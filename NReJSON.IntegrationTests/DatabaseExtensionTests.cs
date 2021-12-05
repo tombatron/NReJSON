@@ -473,8 +473,38 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayLength(key, ".array");
 
-                Assert.Equal(3, result);
+                Assert.Equal(3, result[0]);
             }
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayLength(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Equal(2, result[1]);
+            }
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPathsWithOneNonArrayMatch()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": false}}");
+
+                var result = _db.JsonArrayLength(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(4, result[0]);
+                Assert.Null(result[1]);
+            }              
         }
 
         public class JsonArrayPop : BaseIntegrationTest
