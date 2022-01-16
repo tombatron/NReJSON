@@ -33,6 +33,7 @@ If RedisJSON is installed you should see output similar to the following:
 
 ## Major Changes in Version 4.0
 
+- Required RedisJson 2.0.
 - All deprecated RedisJson commands have been removed.
 
 - Introduced `PathedResult<TResult>` in order to handle commands which can return multiple results in the format of a JSON array based on a provided JSONPath specification.
