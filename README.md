@@ -31,6 +31,27 @@ If RedisJSON is installed you should see output similar to the following:
 
 (The version of the module installed on your server obviously may vary.)
 
+## Major Changes in Version 4.0
+
+- All deprecated RedisJson commands have been removed.
+
+- Introduced `PathedResult<TResult>` in order to handle commands which can return multiple results in the format of a JSON array based on a provided JSONPath specification.
+- **BREAKING CHANGE** : The generic overloads for `JsonGet` and `JsonGetAsync` now return an instance of `PathedResult<TResult>`.
+- **BREAKING CHANGE** : `JsonIncrementNumber` and `JsonIncrementNumberAsync` now return an instance of `PathedResult<double?>`.
+- **BREAKING CHANGE** : `JsonMultiplyNumber` and `JsonMultiplyNumberAsync` now return an instance of `PathedResult<double?>`.
+- **BREAKING CHANGE** : `JsonAppendJsonString` and `JsonAppendJsonStringAsync` now return `int?[]` to support multiple JSONPath matches.
+- **BREAKING CHANGE** : `JsonStringLength` and `JsonStringLengthAsync` now return `int?[]` to support multiple JSONPath matches.
+- **BREAKING CHANGE** : `JsonArrayAppend` and `JsonArrayAppendAsync` now return `int?[]` to support multiple JSONPath matches.
+- **BREAKING CHANGE** : `JsonArrayIndexOf` and `JsonArrayIndexOfAsync` now return `int?[]` to support multiple JSONPath matches.
+- **BREAKING CHANGE** : `JsonArrayInsert` and `JsonArrayInsertAsync` now return `int?[]` to support multiple JSONPath matches.
+- **BREAKING CHANGE** : `JsonArrayLength` and `JsonArrayLengthAsync` now return `int?[]` to support multiple JSONPath matches.
+- **BREAKING CHANGE** : `JsonArrayPop` and `JsonArrayPopAsync` now return `string?[]` or `TResult[]` for the generic overloads to support multiple JSONPath matches.
+- **BREAKING CHANGE** : `JsonArrayTrim` and `JsonArrayTrimAsync` now return `int?[]` to support multiple JSONPath matches.
+- Removed ability to associate a JSON object with an index using the `JsonSet` and `JsonSetAsync` methods.
+- Changed param array in `JsonArrayAppend` and `JsonArrayAppendAsync` to be an array of type `object`.
+- Changed `jsonScalar` parameter in `JsonArrayIndexOf` and `JsonArrayIndexOfAsync` to be of type `object`.
+- Changed param array in `JsonArrayInsert` and `JsonArrayInsertAsync` to be an array of type `object`.
+
 ## Major Changes in Version 3.0
 
 In version 3.0 support for serialization and deserialization was added in the form of new generic overloads for the following extension methods:

@@ -165,36 +165,6 @@ namespace NReJSON.Tests
 
                 Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX" }, db.PreviousCommand);
             }
-
-            [Fact]
-            public async Task SetIndexIsProperlyEmitted()
-            {
-                var db = new FakeDatabase();
-
-                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "INDEX", "message" }, db.PreviousCommand);
-            }
-
-            [Fact]
-            public async Task SetIndexIsProperlyEmittedAfterSetOnlyIfExists()
-            {
-                var db = new FakeDatabase();
-
-                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetOnlyIfExists, index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "XX", "INDEX", "message" }, db.PreviousCommand);
-            }
-
-            [Fact]
-            public async Task SetIndexIsProperlyEmittedAfterSetIfNotExists()
-            {
-                var db = new FakeDatabase();
-
-                await db.JsonSetAsync("fake_key", "{\"hello\":\"world\"}", setOption: SetOption.SetIfNotExists, index: "message");
-
-                Assert.Equal(new[] { "JSON.SET", "fake_key", ".", "{\"hello\":\"world\"}", "NX", "INDEX", "message" }, db.PreviousCommand);
-            }
         }
 
         public class JsonTypeAsync
@@ -369,7 +339,7 @@ namespace NReJSON.Tests
             [Fact]
             public async Task EmitsCorrectParameters()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 await db.JsonArrayPopAsync("fake_key", ".what.ever", 10);
 
@@ -379,7 +349,7 @@ namespace NReJSON.Tests
             [Fact]
             public async Task HasRootAsDefaultPath()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 await db.JsonArrayPopAsync("fake_key", index: 10);
 
@@ -389,7 +359,7 @@ namespace NReJSON.Tests
             [Fact]
             public async Task HasNegativeOneAsDefaultIndex()
             {
-                var db = new FakeDatabase();
+                var db = new FakeDatabase(expectArrayResult: true);
 
                 await db.JsonArrayPopAsync("fake_key", ".what.ever");
 

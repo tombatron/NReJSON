@@ -65,7 +65,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonGetAsync(key, indent: "&");
 
-                Assert.Contains("&", (string)result);
+                Assert.Contains("&", (string) result);
             }
 
             [Fact]
@@ -77,7 +77,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonGetAsync(key, newline: "=");
 
-                Assert.Contains("=", (string)result);
+                Assert.Contains("=", (string) result);
             }
 
             [Fact]
@@ -89,7 +89,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonGetAsync(key, space: "+");
 
-                Assert.Contains("+", (string)result);
+                Assert.Contains("+", (string) result);
             }
 
             [Fact]
@@ -99,11 +99,28 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = await _db.JsonGetAsync<ExampleHelloWorld>(key);
+                ExampleHelloWorld result = await _db.JsonGetAsync<ExampleHelloWorld>(key);
 
                 Assert.NotNull(result);
                 Assert.Equal("world", result.Hello);
                 Assert.Equal("moon", result.GoodNight.Value);
+            }
+
+            [Fact]
+            public async Task CanExecuteWithMultiplePathMatchesWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key,
+                    "{\r\n\"object\":{\r\n\"hello\":\"world\",\r\n\"goodnight\":{\r\n\"value\":\"moon\"\r\n}\r\n},\r\n\"nested\":{\r\n\"object\":{\r\n\"hello\": \"guy\",\r\n\"goodnight\": {\r\n\"value\": \"stuff\"\r\n}\r\n}\r\n}\r\n}");
+
+                var result = (await _db.JsonGetAsync<ExampleHelloWorld>(key, paths: "$..object")).ToList();
+
+                var firstResult = result[0];
+                var secondResult = result[1];
+
+                Assert.Equal("world", firstResult.Hello);
+                Assert.Equal("guy", secondResult.Hello);
             }
         }
 
@@ -135,7 +152,7 @@ namespace NReJSON.IntegrationTests
                 await _db.JsonSetAsync(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
                 await _db.JsonSetAsync(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
 
-                var result = await _db.JsonMultiGetAsync(new RedisKey[] { key1, key2 });
+                var result = await _db.JsonMultiGetAsync(new RedisKey[] {key1, key2});
 
                 Assert.Equal(2, result.Length);
                 Assert.Contains("world", result[0].ToString());
@@ -151,7 +168,8 @@ namespace NReJSON.IntegrationTests
                 await _db.JsonSetAsync(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
                 await _db.JsonSetAsync(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
 
-                var result = (await _db.JsonMultiGetAsync<ExampleHelloWorld>(new RedisKey[] { key1, "say what?", key2 })).ToList();
+                var result = (await _db.JsonMultiGetAsync<ExampleHelloWorld>(new RedisKey[] {key1, "say what?", key2}))
+                    .ToList();
 
                 Assert.Equal(3, result.Count);
                 Assert.Null(result[1]);
@@ -171,7 +189,8 @@ namespace NReJSON.IntegrationTests
             {
                 var key = Guid.NewGuid().ToString("N");
 
-                await _db.JsonSetAsync(key, "{\"string\":\"hello world\", \"integer\":5, \"boolean\": true, \"number\":4.7}");
+                await _db.JsonSetAsync(key,
+                    "{\"string\":\"hello world\", \"integer\":5, \"boolean\": true, \"number\":4.7}");
 
                 var typeResult = await _db.JsonTypeAsync(key, path);
 
@@ -192,7 +211,20 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonIncrementNumberAsync(key, path, number);
 
-                Assert.Equal(expectedResult, (double)result, 2);
+                Assert.Equal(expectedResult, (double) result, 2);
+            }
+
+            [Fact]
+            public async Task CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"a\":1,\"number\":{\"a\":2}}");
+
+                var result = (await _db.JsonIncrementNumberAsync(key, "$..a", 2)).ToList();
+
+                Assert.Equal(3, result.First());
+                Assert.Equal(4, result[1]);
             }
         }
 
@@ -209,8 +241,21 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonMultiplyNumberAsync(key, path, number);
 
-                Assert.Equal(expectedResult, (double)result, 2);
+                Assert.Equal(expectedResult, (double) result, 2);
             }
+            
+            [Fact]
+            public async Task CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"a\":1,\"number\":{\"a\":2}}");
+
+                var result = (await _db.JsonMultiplyNumberAsync(key, "$..a", 2)).ToList();
+
+                Assert.Equal(2, result.First());
+                Assert.Equal(4, result[1]);
+            }            
         }
 
         public class JsonAppendJsonStringAsync : BaseIntegrationTest
@@ -224,7 +269,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonAppendJsonStringAsync(key, ".hello", "\"!\"");
 
-                Assert.Equal(6, result);
+                Assert.Equal(6, result[0]);
             }
 
             [Fact]
@@ -242,7 +287,7 @@ namespace NReJSON.IntegrationTests
             }
 
             [Fact]
-            public async Task WillApendProvidedJsonStringIntoRootIfNoPathProvided()
+            public async Task WillAppendProvidedJsonStringIntoRootIfNoPathProvided()
             {
                 var key = Guid.NewGuid().ToString("N");
 
@@ -253,6 +298,22 @@ namespace NReJSON.IntegrationTests
                 var helloValue = await _db.JsonGetAsync<string>(key);
 
                 Assert.Equal("world!", helloValue);
+            }
+
+            [Fact]
+            public async Task CanAppendOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key,
+                    "{\"a\":\"foo\", \"nested\": {\"a\": \"hello\"}, \"nested2\": {\"a\": 31}}");
+
+                var result = await _db.JsonAppendJsonStringAsync(key, "$..a", "\"baz\"");
+
+                Assert.Equal(3, result.Length);
+                Assert.Equal(6, result[0]);
+                Assert.Equal(8, result[1]);
+                Assert.Null(result[2]);
             }
         }
 
@@ -267,7 +328,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonStringLengthAsync(key, ".hello");
 
-                Assert.Equal(5, result);
+                Assert.Equal(5, result[0]);
             }
 
             [Fact]
@@ -281,6 +342,21 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Null(result);
             }
+            
+            [Fact]
+            public async Task CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key, "{\"a\":\"foo\", \"nested\": {\"a\": \"hello\"}, \"nested2\": {\"a\": 31}}");
+
+                var result = await _db.JsonStringLengthAsync(key, "$..a");
+
+                Assert.Equal(3, result.Length);
+                Assert.Equal(3, result[0]);
+                Assert.Equal(5, result[1]);
+                Assert.Null(result[2]);
+            }            
         }
 
         public class JsonArrayAppendAsync : BaseIntegrationTest
@@ -292,10 +368,26 @@ namespace NReJSON.IntegrationTests
 
                 await _db.JsonSetAsync(key, "{\"array\": []}");
 
-                var result = await _db.JsonArrayAppendAsync(key, ".array", "\"hello\"", "\"world\"");
+                var result = await _db.JsonArrayAppendAsync(key, ".array", "\"hello\"", "\"world\"", 23);
 
-                Assert.Equal(2, result);
+                Assert.Equal(3, result[0]);
             }
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                await _db.JsonSetAsync(key, "{\"a\":[1], \"nested\": {\"a\": [1,2]}, \"nested2\": {\"a\": 42}}");
+
+                var result = await _db.JsonArrayAppendAsync(key, "$..a", 3, 4);
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
+                Assert.Null(result[2]);
+            }            
         }
 
         public class JsonArrayIndexOfAsync : BaseIntegrationTest
@@ -305,11 +397,30 @@ namespace NReJSON.IntegrationTests
             {
                 var key = Guid.NewGuid().ToString();
 
-                await _db.JsonSetAsync(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+                await _db.JsonSetAsync(key, "{\"array\": [\"hi\", \"world\", \"!\", 1]}");
 
                 var result = await _db.JsonArrayIndexOfAsync(key, ".array", "\"world\"", 0, 2);
 
-                Assert.Equal(1, result);
+                Assert.Equal(1, result[0]);
+
+                result = await _db.JsonArrayIndexOfAsync(key, ".array", 1);
+
+                Assert.Equal(3, result[0]);
+            }
+
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayIndexOfAsync(key, "$..a", 2);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Equal(-1, result[1]);
             }
         }
 
@@ -322,10 +433,25 @@ namespace NReJSON.IntegrationTests
 
                 await _db.JsonSetAsync(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
 
-                var result = await _db.JsonArrayInsertAsync(key, ".array", 1, "\"there\"");
+                var result = await _db.JsonArrayInsertAsync(key, ".array", 1, "\"there\"", 6);
 
-                Assert.Equal(4, result);
+                Assert.Equal(5, result[0]);
             }
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayInsertAsync(key, "$..a", 0, 1, 2);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
+            }            
         }
 
         public class JsonArrayLengthAsync : BaseIntegrationTest
@@ -339,8 +465,38 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayLengthAsync(key, ".array");
 
-                Assert.Equal(3, result);
+                Assert.Equal(3, result[0]);
             }
+
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayLengthAsync(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Equal(2, result[1]);
+            }
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPathsWithOneNonArrayMatch()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": false}}");
+
+                var result = await _db.JsonArrayLengthAsync(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(4, result[0]);
+                Assert.Null(result[1]);
+            }            
         }
 
         public class JsonArrayPopAsync : BaseIntegrationTest
@@ -354,7 +510,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayPopAsync(key, ".array", 1);
 
-                Assert.Equal("\"world\"", result.ToString());
+                Assert.Equal("\"world\"", result[0]);
             }
 
             [Fact]
@@ -366,8 +522,70 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayPopAsync<string>(key, ".array", 1);
 
-                Assert.Equal("world", result);
+                Assert.Equal("world", result[0]);
             }
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayPopAsync(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal("3", result[0]);
+                Assert.Equal("4", result[1]);
+            }
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPathsWithNulls()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[\"foo\", \"bar\"], \"nested\": {\"a\": false}, \"nested2\": {\"a\":[]}}");
+
+                var result = await _db.JsonArrayPopAsync(key, "$..a");
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal("\"bar\"", result[0]);
+                Assert.Null(result[1]);
+                Assert.Null(result[2]);
+            }            
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPathsWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = await _db.JsonArrayPopAsync<int?>(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
+            }        
+            
+            [Fact]
+            public async Task CanExecuteOnMultipleMatchingPathsWithSerializerWithNulls()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[\"foo\", \"bar\"], \"nested\": {\"a\": false}, \"nested2\": {\"a\":[]}}");
+
+                var result = await _db.JsonArrayPopAsync<string>(key, "$..a");
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal("bar", result[0]);
+                Assert.Null(result[1]);
+                Assert.Null(result[2]);
+            }   
         }
 
         public class JsonArrayTrimAsync : BaseIntegrationTest
@@ -381,7 +599,22 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonArrayTrimAsync(key, ".array", 0, 1);
 
-                Assert.Equal(2, result);
+                Assert.Equal(2, result[0]);
+            }
+
+            [Fact]
+            public async Task CanExecuteForMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                await _db.JsonSetAsync(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": false}}");
+
+                var result = await _db.JsonArrayTrimAsync(key, "$..a", 1, 1);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Null(result[1]);
             }
         }
 
@@ -396,7 +629,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = await _db.JsonObjectKeysAsync(key);
 
-                Assert.Equal(new[] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
+                Assert.Equal(new[] {"hello", "goodnight"}, result.Select(x => x.ToString()).ToArray());
             }
         }
 
@@ -445,74 +678,6 @@ namespace NReJSON.IntegrationTests
             }
         }
 
-
-        public class JsonIndexAddAsync : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public async Task CanExecute()
-            {
-                var index = Guid.NewGuid().ToString();
-
-                var result = await _db.JsonIndexAddAsync(index, "test_field", "$.a");
-
-                Assert.True(result);
-                Assert.Equal("OK", result.RawResult);
-            }
-        }
-
-        public class JsonIndexDeleteAsync : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public async Task CanExecute()
-            {
-                var index = Guid.NewGuid().ToString();
-
-                await _db.JsonIndexAddAsync(index, "some_field", "$.a");
-
-                var result = await _db.JsonIndexDeleteAsync(index);
-
-                Assert.True(result);
-                Assert.Equal("OK", result.RawResult);
-            }
-        }
-
-        public class JsonIndexGetAsync : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public async Task CanExecute()
-            {
-                var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();
-
-                await _db.JsonSetAsync($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
-                await _db.JsonSetAsync($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
-
-                await _db.JsonIndexAddAsync(index, "last", "$.last");
-
-                var result = (await _db.JsonIndexGetAsync(index, "Jo*")).ToString();
-
-                Assert.Contains("Joe", result);
-                Assert.Contains("Joan", result);
-            }
-
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public async Task CanExecuteWithSerializer()
-            {
-                var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();
-
-                await _db.JsonSetAsync($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
-                await _db.JsonSetAsync($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
-
-                await _db.JsonIndexAddAsync(index, "last", "$.last");
-
-                var result = await _db.JsonIndexGetAsync<ExamplePerson>(index, "Jo*");
-
-                Assert.Equal("Joe", result[$"{key}_1"].First().LastName);
-                Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
-            }
-        }
-
         public class JsonToggleAsync : BaseIntegrationTest
         {
             [Fact]
@@ -526,7 +691,7 @@ namespace NReJSON.IntegrationTests
                 Assert.False(await _db.JsonToggleAsync(key, ".foo"));
                 Assert.True(await _db.JsonToggleAsync(key, ".foo"));
             }
-        }   
+        }
 
         public class JsonClearAsync : BaseIntegrationTest
         {
@@ -539,6 +704,6 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal(1, await _db.JsonClearAsync(key, ".foo"));
             }
-        }             
+        }
     }
 }

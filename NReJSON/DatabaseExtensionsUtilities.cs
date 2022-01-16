@@ -1,6 +1,8 @@
-﻿using StackExchange.Redis;
+﻿using System;
+using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
+using static NReJSON.NReJSONSerializer;
 
 namespace NReJSON
 {
@@ -19,14 +21,14 @@ namespace NReJSON
                 {
                     if (arg.GetType() == typeof(RedisKey[]))
                     {
-                        foreach (var aa in (RedisKey[])arg)
+                        foreach (var aa in (RedisKey[]) arg)
                         {
                             yield return aa.ToString();
                         }
                     }
                     else if (arg.GetType().IsArray)
                     {
-                        foreach (var aa in (object[])arg)
+                        foreach (var aa in (object[]) arg)
                         {
                             yield return aa.ToString();
                         }
@@ -59,15 +61,78 @@ namespace NReJSON
             }
         }
 
-        private static string[] ResolveIndexSpecification(string index)
+        private static readonly string[] RootPathStringArray = {"."};
+
+        private static int?[] NullableIntArrayFrom(RedisResult result)
         {
-            if (string.IsNullOrEmpty(index))
+            if (result.IsNull)
             {
-                return new[] { string.Empty };
+                return null;
             }
-            else
+            
+            switch (result.Type)
             {
-                return new[] { "INDEX", index };
+                case ResultType.Integer:
+                    return new int?[] {(int) result};
+                case ResultType.MultiBulk:
+                    var resultArray = (RedisResult[]) result;
+                    return resultArray.Select(x => (int?) x).ToArray();
+                default:
+                    throw new ArgumentException(nameof(result), "Not sure how to handle this result.");
+            }
+        }
+
+        private static string[] StringArrayFrom(RedisResult result)
+        {
+            if (result.IsNull)
+            {
+                return null;
+            }
+
+            switch (result.Type)
+            {
+                case ResultType.BulkString:
+                    return new[] {(string) result};
+                case ResultType.MultiBulk:
+                    var resultArray = (RedisResult[]) result;
+                    return resultArray.Select(x => (string) x).ToArray();
+                default:
+                    throw new ArgumentException(nameof(result), "Not sure how to handle this result.");
+            }
+        }
+
+        private static TResult[] TypedArrayFrom<TResult>(RedisResult result)
+        {
+            if (result.IsNull)
+            {
+                return default;
+            }
+
+            switch (result.Type)
+            {
+                case ResultType.BulkString:
+                    return new TResult[] { SerializerProxy.Deserialize<TResult>(result) };
+                case ResultType.MultiBulk:
+                    var resultArray = (RedisResult[]) result;
+                    var typedResult = new TResult[resultArray.Length];
+
+                    for (var i = 0; i < typedResult.Length; i++)
+                    {
+                        var current = resultArray[i];
+
+                        if (current.IsNull)
+                        {
+                            typedResult[i] = default;
+                        }
+                        else
+                        {
+                            typedResult[i] = SerializerProxy.Deserialize<TResult>(current);
+                        }
+                    }
+
+                    return typedResult;
+                default:
+                    throw new ArgumentException(nameof(result), "Not sure how to handle this result.");
             }
         }
     }

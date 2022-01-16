@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using StackExchange.Redis;
 using static NReJSON.NReJSONSerializer;
@@ -25,7 +24,7 @@ namespace NReJSON
         /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="path">Defaults to root if not provided.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Integer, specifically the number of paths deleted (0 or 1).</returns>
+        /// <returns>Integer, specifically the number of paths deleted (0 or more).</returns>
         public static int JsonDelete(this IDatabase db, RedisKey key, string path = ".",
             CommandFlags commandFlags = CommandFlags.None) =>
             (int) db.Execute(JsonCommands.DEL, CombineArguments(key, path), flags: commandFlags);
@@ -42,7 +41,7 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="key">Key where JSON object is stored.</param>
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
-        /// <returns></returns>
+        /// <returns>Array of bulk strings.</returns>
         public static RedisResult JsonGet(this IDatabase db, RedisKey key, params string[] paths) =>
             db.JsonGet(key, noEscape: true, paths: paths, commandFlags: CommandFlags.None);
 
@@ -60,7 +59,7 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static TResult JsonGet<TResult>(this IDatabase db, RedisKey key, params string[] paths) =>
+        public static PathedResult<TResult> JsonGet<TResult>(this IDatabase db, RedisKey key, params string[] paths) =>
             db.JsonGet<TResult>(key, noEscape: true, paths: paths, commandFlags: CommandFlags.None);
 
         /// <summary>
@@ -108,7 +107,7 @@ namespace NReJSON
                 args.Add(space);
             }
 
-            foreach (var path in PathsOrDefault(paths, new[] {"."}))
+            foreach (var path in PathsOrDefault(paths, RootPathStringArray))
             {
                 args.Add(path);
             }
@@ -133,11 +132,10 @@ namespace NReJSON
         /// <param name="paths">The path(s) of the JSON properties that you want to return. By default, the entire JSON object will be returned.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
         /// <returns></returns>
-        public static TResult JsonGet<TResult>(this IDatabase db, RedisKey key, bool noEscape = false,
+        public static PathedResult<TResult> JsonGet<TResult>(this IDatabase db, RedisKey key, bool noEscape = false,
             string indent = default, string newline = default, string space = default,
             CommandFlags commandFlags = CommandFlags.None, params string[] paths) =>
-            SerializerProxy.Deserialize<TResult>(db.JsonGet(key, noEscape, indent, newline, space, commandFlags,
-                paths));
+            PathedResult<TResult>.Create(db.JsonGet(key, noEscape, indent, newline, space, commandFlags, paths));
 
         /// <summary>
         /// `JSON.MGET`
@@ -218,14 +216,13 @@ namespace NReJSON
         /// <param name="json">The JSON object which you want to persist.</param>
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
-        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>An `OperationResult` indicating success or failure.</returns>
         public static OperationResult JsonSet(this IDatabase db, RedisKey key, string json, string path = ".",
-            SetOption setOption = SetOption.Default, string index = "", CommandFlags commandFlags = CommandFlags.None)
+            SetOption setOption = SetOption.Default, CommandFlags commandFlags = CommandFlags.None)
         {
             var result = db.Execute(JsonCommands.SET,
-                    CombineArguments(key, path, json, GetSetOptionString(setOption), ResolveIndexSpecification(index)),
+                    CombineArguments(key, path, json, GetSetOptionString(setOption)),
                     flags: commandFlags)
                 .ToString();
 
@@ -248,14 +245,12 @@ namespace NReJSON
         /// <param name="obj">The object to serialize and send.</param>
         /// <param name="path">The path which you want to persist the JSON object. For new objects this must be root.</param>
         /// <param name="setOption">By default the object will be overwritten, but you can specify that the object be set only if it doesn't already exist or to set only IF it exists.</param>
-        /// <param name="index">By default the JSON object will not be assigned to an index, specify this value and it will.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <typeparam name="TObjectType">Type of the object being serialized.</typeparam>
         /// <returns>An `OperationResult` indicating success or failure.</returns>
         public static OperationResult JsonSet<TObjectType>(this IDatabase db, RedisKey key, TObjectType obj,
-            string path = ".", SetOption setOption = SetOption.Default, string index = "",
-            CommandFlags commandFlags = CommandFlags.None) =>
-            db.JsonSet(key, SerializerProxy.Serialize(obj), path, setOption, index, commandFlags: commandFlags);
+            string path = ".", SetOption setOption = SetOption.Default, CommandFlags commandFlags = CommandFlags.None) =>
+            db.JsonSet(key, SerializerProxy.Serialize(obj), path, setOption, commandFlags: commandFlags);
 
         /// <summary>
         /// `JSON.TYPE`
@@ -287,9 +282,11 @@ namespace NReJSON
         /// <param name="path">The path of the JSON value you want to increment.</param>
         /// <param name="number">The value you want to increment by.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        public static RedisResult JsonIncrementNumber(this IDatabase db, RedisKey key, string path, double number,
+        public static PathedResult<double?> JsonIncrementNumber(this IDatabase db, RedisKey key, string path,
+            double number,
             CommandFlags commandFlags = CommandFlags.None) =>
-            db.Execute(JsonCommands.NUMINCRBY, CombineArguments(key, path, number), flags: commandFlags);
+            PathedResult<double?>.Create(db.Execute(JsonCommands.NUMINCRBY, CombineArguments(key, path, number),
+                flags: commandFlags));
 
         /// <summary>
         /// `JSON.NUMMULTBY`
@@ -303,9 +300,9 @@ namespace NReJSON
         /// <param name="path">The path of the JSON value you want to multiply.</param>
         /// <param name="number">The value you want to multiply by.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        public static RedisResult JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number,
+        public static PathedResult<double?> JsonMultiplyNumber(this IDatabase db, RedisKey key, string path, double number,
             CommandFlags commandFlags = CommandFlags.None) =>
-            db.Execute(JsonCommands.NUMMULTBY, CombineArguments(key, path, number), flags: commandFlags);
+            PathedResult<double?>.Create(db.Execute(JsonCommands.NUMMULTBY, CombineArguments(key, path, number), flags: commandFlags));
 
         /// <summary>
         /// `JSON.STRAPPEND`
@@ -318,12 +315,12 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object you need to append a string value.</param>
         /// <param name="path">The path of the JSON string you want to append do.  This defaults to root.</param>
-        /// <param name="jsonString"></param>
+        /// <param name="jsonString">JSON formatted string.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Length of the new JSON string.</returns>
-        public static int JsonAppendJsonString(this IDatabase db, RedisKey key, string path = ".",
+        public static int?[] JsonAppendJsonString(this IDatabase db, RedisKey key, string path = ".",
             string jsonString = "\"\"", CommandFlags commandFlags = CommandFlags.None) =>
-            (int) db.Execute(JsonCommands.STRAPPEND, CombineArguments(key, path, jsonString), flags: commandFlags);
+            NullableIntArrayFrom(db.Execute(JsonCommands.STRAPPEND, CombineArguments(key, path, jsonString), flags: commandFlags));
 
         /// <summary>
         /// `JSON.STRLEN`
@@ -339,20 +336,9 @@ namespace NReJSON
         /// <param name="path">The path of the JSON string you want the length of. This defaults to root.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <returns>Integer, specifically the string's length.</returns>
-        public static int? JsonStringLength(this IDatabase db, RedisKey key, string path = ".",
-            CommandFlags commandFlags = CommandFlags.None)
-        {
-            var result = db.Execute(JsonCommands.STRLEN, CombineArguments(key, path), flags: commandFlags);
-
-            if (result.IsNull)
-            {
-                return null;
-            }
-            else
-            {
-                return (int) result;
-            }
-        }
+        public static int?[] JsonStringLength(this IDatabase db, RedisKey key, string path = ".",
+            CommandFlags commandFlags = CommandFlags.None) =>
+            NullableIntArrayFrom(db.Execute(JsonCommands.STRLEN, CombineArguments(key, path), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRAPPEND`
@@ -364,10 +350,9 @@ namespace NReJSON
         /// <param name="db"></param>
         /// <param name="key">The key of the JSON object that contains the array you want to append to.</param>
         /// <param name="path">The path to the JSON array you want to append to.</param>
-        /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="json">The JSON values that you want to append.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path, params string[] json) =>
+        /// <returns>Array of nullable integers indicating the array's new size at each matched path.</returns>
+        public static int?[] JsonArrayAppend(this IDatabase db, RedisKey key, string path, params object[] json) =>
             JsonArrayAppend(db, key, path, CommandFlags.None, json);
 
         /// <summary>
@@ -382,10 +367,10 @@ namespace NReJSON
         /// <param name="path">The path to the JSON array you want to append to.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="json">The JSON values that you want to append.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static int JsonArrayAppend(this IDatabase db, RedisKey key, string path,
-            CommandFlags commandFlags = CommandFlags.None, params string[] json) =>
-            (int) db.Execute(JsonCommands.ARRAPPEND, CombineArguments(key, path, json), flags: commandFlags);
+        /// <returns>Array of nullable integers indicating the array's new size at each matched path.</returns>
+        public static int?[] JsonArrayAppend(this IDatabase db, RedisKey key, string path,
+            CommandFlags commandFlags = CommandFlags.None, params object[] json) =>
+            NullableIntArrayFrom(db.Execute(JsonCommands.ARRAPPEND, CombineArguments(key, path, json), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRINDEX`
@@ -405,11 +390,11 @@ namespace NReJSON
         /// <param name="start">Where to start searching, defaults to 0 (the beginning of the array).</param>
         /// <param name="stop">Where to stop searching, defaults to 0 (the end of the array).</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Integer, specifically the position of the scalar value in the array, or -1 if unfound.</returns>
-        public static int JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, string jsonScalar,
+        /// <returns>Array of nullable integers, specifically, for each JSON value matching the path, the first position     of the scalar value in the array, -1 if unfound in the array, or null if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayIndexOf(this IDatabase db, RedisKey key, string path, object jsonScalar,
             int start = 0, int stop = 0, CommandFlags commandFlags = CommandFlags.None) =>
-            (int) db.Execute(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop),
-                flags: commandFlags);
+            NullableIntArrayFrom(db.Execute(JsonCommands.ARRINDEX, CombineArguments(key, path, jsonScalar, start, stop),
+                flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRINSERT`
@@ -425,9 +410,9 @@ namespace NReJSON
         /// <param name="path">The path of the JSON array that you want to insert into.</param>
         /// <param name="index">The index at which you want to insert, 0 prepends and negative values are interpreted as starting from the end.</param>
         /// <param name="json">The object that you want to insert.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
-            params string[] json) =>
+        /// <returns>Array of nullable integer, specifically, for each path, the array's new size, or null element if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
+            params object[] json) =>
             JsonArrayInsert(db, key, path, index, CommandFlags.None, json);
 
         /// <summary>
@@ -445,11 +430,12 @@ namespace NReJSON
         /// <param name="index">The index at which you want to insert, 0 prepends and negative values are interpreted as starting from the end.</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <param name="json">The object that you want to insert.</param>
-        /// <returns>Integer, specifically the array's new size.</returns>
-        public static int JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
+        /// <returns>Array of nullable integer, specifically, for each path, the array's new size, or null element if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayInsert(this IDatabase db, RedisKey key, string path, int index,
             CommandFlags commandFlags = CommandFlags.None,
-            params string[] json) =>
-            (int) db.Execute(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json), flags: commandFlags);
+            params object[] json) =>
+            NullableIntArrayFrom(db.Execute(JsonCommands.ARRINSERT, CombineArguments(key, path, index, json),
+                flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRLEN`
@@ -464,8 +450,8 @@ namespace NReJSON
         /// <param name="key">The key of the JSON object that contains the array you want the length of.</param>
         /// <param name="path">The path to the JSON array that you want the length of.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Integer, specifically the array's length.</returns>
-        public static int? JsonArrayLength(this IDatabase db, RedisKey key, string path = ".",
+        /// <returns>Array of nullable integer, specifically, for each path, the array's length, or null element if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayLength(this IDatabase db, RedisKey key, string path = ".",
             CommandFlags commandFlags = CommandFlags.None)
         {
             var result = db.Execute(JsonCommands.ARRLEN, CombineArguments(key, path), flags: commandFlags);
@@ -476,7 +462,7 @@ namespace NReJSON
             }
             else
             {
-                return (int) result;
+                return NullableIntArrayFrom(result);
             }
         }
 
@@ -494,10 +480,10 @@ namespace NReJSON
         /// <param name="path">Defaults to root (".") if not provided.</param>
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns>Bulk String, specifically the popped JSON value.</returns>
-        public static RedisResult JsonArrayPop(this IDatabase db, RedisKey key, string path = ".", int index = -1,
+        /// <returns>Array of strings, specifically, for each path, the popped JSON value, or null element if the matching JSON value is not an array.</returns>
+        public static string[] JsonArrayPop(this IDatabase db, RedisKey key, string path = ".", int index = -1,
             CommandFlags commandFlags = CommandFlags.None) =>
-            db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags);
+            StringArrayFrom(db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRPOP`
@@ -514,14 +500,10 @@ namespace NReJSON
         /// <param name="index">Is the position in the array to start popping from (defaults to -1, meaning the last element).</param>
         /// <param name="commandFlags">Optional command flags.</param>
         /// <typeparam name="TResult">The type to deserialize the value as.</typeparam>
-        /// <returns></returns>
-        public static TResult JsonArrayPop<TResult>(this IDatabase db, RedisKey key, string path = ".", int index = -1,
-            CommandFlags commandFlags = CommandFlags.None)
-        {
-            var result = db.JsonArrayPop(key, path, index, commandFlags: commandFlags);
-
-            return SerializerProxy.Deserialize<TResult>(result);
-        }
+        /// <returns>Array of `TResult`, specifically, for each path, the popped JSON value, or null element if the matching JSON value is not an array.</returns>
+        public static TResult[] JsonArrayPop<TResult>(this IDatabase db, RedisKey key, string path = ".",
+            int index = -1, CommandFlags commandFlags = CommandFlags.None) =>
+            TypedArrayFrom<TResult>(db.Execute(JsonCommands.ARRPOP, CombineArguments(key, path, index), flags: commandFlags));
 
         /// <summary>
         /// `JSON.ARRTRIM`
@@ -544,10 +526,11 @@ namespace NReJSON
         /// <param name="start">The inclusive start index.</param>
         /// <param name="stop">The inclusive stop index.</param>
         /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns></returns>
-        public static int JsonArrayTrim(this IDatabase db, RedisKey key, string path, int start, int stop,
+        /// <returns>Array of nullable integer, specifically for each path, the array's new size, or null element if the matching JSON value is not an array.</returns>
+        public static int?[] JsonArrayTrim(this IDatabase db, RedisKey key, string path, int start, int stop,
             CommandFlags commandFlags = CommandFlags.None) =>
-            (int) db.Execute(JsonCommands.ARRTRIM, CombineArguments(key, path, start, stop), flags: commandFlags);
+            NullableIntArrayFrom(db.Execute(JsonCommands.ARRTRIM, CombineArguments(key, path, start, stop),
+                flags: commandFlags));
 
         /// <summary>
         /// `JSON.OBJKEYS`
@@ -642,89 +625,6 @@ namespace NReJSON
             {
                 key, path
             }, flags: commandFlags);
-
-        /// <summary>
-        /// `JSON.INDEX ADD`
-        /// 
-        /// Adds a JSON index.
-        /// 
-        /// RedisJson documentation link forthcoming.
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="index">Name of the index.</param>
-        /// <param name="field">Name of the field being indexed.</param>
-        /// <param name="path">Path of the field being indexed.</param>
-        /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns></returns>
-        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
-        public static OperationResult JsonIndexAdd(this IDatabase db, string index, string field, string path,
-            CommandFlags commandFlags = CommandFlags.None)
-        {
-            var result = db.Execute(JsonCommands.INDEX, CombineArguments("ADD", index, field, path)).ToString();
-
-            return new OperationResult(result == "OK", result);
-        }
-
-        /// <summary>
-        /// `JSON.INDEX DEL`
-        /// 
-        /// Deletes a JSON index.
-        /// 
-        /// RedisJson documentation link forthcoming.
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="index"></param>
-        /// <param name="commandFlags">Optional command flags.</param>
-        /// <returns></returns>
-        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
-        public static OperationResult JsonIndexDelete(this IDatabase db, string index,
-            CommandFlags commandFlags = CommandFlags.None)
-        {
-            var result = db.Execute(JsonCommands.INDEX, CombineArguments("DEL", index)).ToString();
-
-            return new OperationResult(result == "OK", result);
-        }
-
-
-        /// <summary>
-        /// `JSON.QGET`
-        /// 
-        /// Query a JSON index for an existing object.
-        /// 
-        /// RedisJson documentation link forthcoming.
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="index">Name of the index.</param>
-        /// <param name="query">Pattern being applied to the index.</param>
-        /// <param name="path">[Optional] Path to the expected value.</param>
-        /// <returns></returns>
-        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
-        public static RedisResult JsonIndexGet(this IDatabase db, string index, string query, string path = "") =>
-            db.Execute(JsonCommands.QGET, CombineArguments(index, query, path));
-
-        /// <summary>
-        /// `JSON.QGET`
-        /// 
-        /// Query a JSON index for an existing object.
-        /// 
-        /// RedisJson documentation link forthcoming.
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="index">Name of the index.</param>
-        /// <param name="query">Pattern being applied to the index.</param>
-        /// <param name="path">[Optional] Path to the expected value.</param>
-        /// <typeparam name="TResult"></typeparam>
-        /// <returns></returns>
-        [Obsolete("This command is deprecated and is removed in future version of RedisJson.")]
-        public static IndexedCollection<TResult> JsonIndexGet<TResult>(this IDatabase db, string index, string query,
-            string path = "")
-        {
-            var result = db.JsonIndexGet(index, query, path);
-
-            var serializedResult = SerializerProxy.Deserialize<IDictionary<string, IEnumerable<TResult>>>(result);
-
-            return new IndexedCollection<TResult>(serializedResult);
-        }
 
         /// <summary>
         /// `JSON.TOGGLE`

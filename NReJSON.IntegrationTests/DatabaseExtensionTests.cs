@@ -64,7 +64,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonGet(key, indent: "&");
 
-                Assert.Contains("&", (string)result);
+                Assert.Contains("&", (string) result);
             }
 
             [Fact]
@@ -76,7 +76,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonGet(key, newline: "=");
 
-                Assert.Contains("=", (string)result);
+                Assert.Contains("=", (string) result);
             }
 
             [Fact]
@@ -88,7 +88,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonGet(key, space: "+");
 
-                Assert.Contains("+", (string)result);
+                Assert.Contains("+", (string) result);
             }
 
             [Fact]
@@ -98,11 +98,39 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
 
-                var result = _db.JsonGet<ExampleHelloWorld>(key);
+                ExampleHelloWorld result = _db.JsonGet<ExampleHelloWorld>(key);
 
                 Assert.NotNull(result);
                 Assert.Equal("world", result.Hello);
                 Assert.Equal("moon", result.GoodNight.Value);
+            }
+
+            [Fact]
+            public void CanExecuteWithMultiplePathMatches()
+            {
+                var key = Guid.NewGuid().ToString("N");
+                
+                _db.JsonSet(key, "{\"hello\": \"world\", \"goodnight\": {\"hello\": \"moon\"}}");
+
+                var result = _db.JsonGet(key, paths: "$..hello");
+                
+                Assert.Equal("[\"world\",\"moon\"]", result.ToString());
+            }
+
+            [Fact]
+            public void CanExecuteWithMultiplePathMatchesWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\r\n\"object\":{\r\n\"hello\":\"world\",\r\n\"goodnight\":{\r\n\"value\":\"moon\"\r\n}\r\n},\r\n\"nested\":{\r\n\"object\":{\r\n\"hello\": \"guy\",\r\n\"goodnight\": {\r\n\"value\": \"stuff\"\r\n}\r\n}\r\n}\r\n}");
+
+                var result = _db.JsonGet<ExampleHelloWorld>(key, paths: "$..object").ToList();
+
+                var firstResult = result[0];
+                var secondResult = result[1];
+                
+                Assert.Equal("world", firstResult.Hello);
+                Assert.Equal("guy", secondResult.Hello);
             }
         }
 
@@ -134,7 +162,7 @@ namespace NReJSON.IntegrationTests
                 _db.JsonSet(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
                 _db.JsonSet(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
 
-                var result = _db.JsonMultiGet(new RedisKey[] { key1, key2 });
+                var result = _db.JsonMultiGet(new RedisKey[] {key1, key2});
 
                 Assert.Equal(2, result.Length);
                 Assert.Contains("world", result[0].ToString());
@@ -150,7 +178,7 @@ namespace NReJSON.IntegrationTests
                 _db.JsonSet(key1, "{\"hello\": \"world\", \"goodnight\": {\"value\": \"moon\"}}");
                 _db.JsonSet(key2, "{\"hello\": \"tom\", \"goodnight\": {\"value\": \"tom\"}}");
 
-                var result = _db.JsonMultiGet<ExampleHelloWorld>(new RedisKey[] { key1, "say what?", key2 }).ToList();
+                var result = _db.JsonMultiGet<ExampleHelloWorld>(new RedisKey[] {key1, "say what?", key2}).ToList();
 
                 Assert.Equal(3, result.Count);
                 Assert.Null(result[1]);
@@ -191,7 +219,20 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonIncrementNumber(key, path, number);
 
-                Assert.Equal(expectedResult, (double)result, 2);
+                Assert.Equal(expectedResult, (double) result, 2);
+            }
+
+            [Fact]
+            public void CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+                
+                _db.JsonSet(key, "{\"a\":1,\"number\":{\"a\":2}}");
+
+                var result = _db.JsonIncrementNumber(key, "$..a", 2).ToList();
+                
+                Assert.Equal(3, result.First());
+                Assert.Equal(4, result[1]);
             }
         }
 
@@ -208,8 +249,21 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonMultiplyNumber(key, path, number);
 
-                Assert.Equal(expectedResult, (double)result, 2);
+                Assert.Equal(expectedResult, (double) result, 2);
             }
+            
+            [Fact]
+            public void CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+                
+                _db.JsonSet(key, "{\"a\":1,\"number\":{\"a\":2}}");
+
+                var result = _db.JsonMultiplyNumber(key, "$..a", 2).ToList();
+                
+                Assert.Equal(2, result.First());
+                Assert.Equal(4, result[1]);
+            }            
         }
 
         public class JsonAppendJsonString : BaseIntegrationTest
@@ -223,7 +277,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonAppendJsonString(key, ".hello", "\"!\"");
 
-                Assert.Equal(6, result);
+                Assert.Equal(6, result[0].Value);
             }
 
             [Fact]
@@ -241,7 +295,7 @@ namespace NReJSON.IntegrationTests
             }
 
             [Fact]
-            public void WillApendProvidedJsonStringIntoRootIfNoPathProvided()
+            public void WillAppendProvidedJsonStringIntoRootIfNoPathProvided()
             {
                 var key = Guid.NewGuid().ToString("N");
 
@@ -253,6 +307,22 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Equal("world!", helloValue);
             }
+            
+            [Fact]
+            public void CanAppendOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key,
+                    "{\"a\":\"foo\", \"nested\": {\"a\": \"hello\"}, \"nested2\": {\"a\": 31}}");
+
+                var result = _db.JsonAppendJsonString(key, "$..a", "\"baz\"");
+
+                Assert.Equal(3, result.Length);
+                Assert.Equal(6, result[0]);
+                Assert.Equal(8, result[1]);
+                Assert.Null(result[2]);
+            }            
         }
 
         public class JsonStringLength : BaseIntegrationTest
@@ -266,7 +336,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonStringLength(key, ".hello");
 
-                Assert.Equal(5, result);
+                Assert.Equal(5, result[0]);
             }
 
             [Fact]
@@ -280,6 +350,21 @@ namespace NReJSON.IntegrationTests
 
                 Assert.Null(result);
             }
+
+            [Fact]
+            public void CanExecuteOnMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"a\":\"foo\", \"nested\": {\"a\": \"hello\"}, \"nested2\": {\"a\": 31}}");
+
+                var result = _db.JsonStringLength(key, "$..a");
+
+                Assert.Equal(3, result.Length);
+                Assert.Equal(3, result[0]);
+                Assert.Equal(5, result[1]);
+                Assert.Null(result[2]);
+            }
         }
 
         public class JsonArrayAppend : BaseIntegrationTest
@@ -291,9 +376,25 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"array\": []}");
 
-                var result = _db.JsonArrayAppend(key, ".array", "\"hello\"", "\"world\"");
+                var result = _db.JsonArrayAppend(key, ".array", "\"hello\"", "\"world\"", 2);
 
-                Assert.Equal(2, result);
+                Assert.Equal(3, result[0]);
+            }
+
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString("N");
+
+                _db.JsonSet(key, "{\"a\":[1], \"nested\": {\"a\": [1,2]}, \"nested2\": {\"a\": 42}}");
+
+                var result = _db.JsonArrayAppend(key, "$..a", 3, 4);
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
+                Assert.Null(result[2]);
             }
         }
 
@@ -304,12 +405,31 @@ namespace NReJSON.IntegrationTests
             {
                 var key = Guid.NewGuid().ToString();
 
-                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
+                _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\", 2]}");
 
                 var result = _db.JsonArrayIndexOf(key, ".array", "\"world\"", 0, 2);
 
-                Assert.Equal(1, result);
+                Assert.Equal(1, result[0]);
+                
+                result = _db.JsonArrayIndexOf(key, ".array", 2, 0, 4);
+                
+                Assert.Equal(3, result[0]);
             }
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayIndexOf(key, "$..a", 2);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Equal(-1, result[1]);
+            }            
         }
 
         public class JsonArrayInsert : BaseIntegrationTest
@@ -321,9 +441,24 @@ namespace NReJSON.IntegrationTests
 
                 _db.JsonSet(key, "{\"array\": [\"hi\", \"world\", \"!\"]}");
 
-                var result = _db.JsonArrayInsert(key, ".array", 1, "\"there\"");
+                var result = _db.JsonArrayInsert(key, ".array", 1, "\"there\"", 2);
 
-                Assert.Equal(4, result);
+                Assert.Equal(5, result[0]);
+            }
+
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayInsert(key, "$..a", 0, 1, 2);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
             }
         }
 
@@ -338,8 +473,38 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayLength(key, ".array");
 
-                Assert.Equal(3, result);
+                Assert.Equal(3, result[0]);
             }
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayLength(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Equal(2, result[1]);
+            }
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPathsWithOneNonArrayMatch()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": false}}");
+
+                var result = _db.JsonArrayLength(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(4, result[0]);
+                Assert.Null(result[1]);
+            }              
         }
 
         public class JsonArrayPop : BaseIntegrationTest
@@ -353,7 +518,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayPop(key, ".array", 1);
 
-                Assert.Equal("\"world\"", result.ToString());
+                Assert.Equal("\"world\"", result[0]);
             }
 
             [Fact]
@@ -365,8 +530,70 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayPop<string>(key, ".array", 1);
 
-                Assert.Equal("world", result);
+                Assert.Equal("world", result[0]);
             }
+
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayPop(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal("3", result[0]);
+                Assert.Equal("4", result[1]);
+            }
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPathsWithNulls()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[\"foo\", \"bar\"], \"nested\": {\"a\": false}, \"nested2\": {\"a\":[]}}");
+
+                var result = _db.JsonArrayPop(key, "$..a");
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal("\"bar\"", result[0]);
+                Assert.Null(result[1]);
+                Assert.Null(result[2]);
+            }               
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPathsWithSerializer()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[3], \"nested\": {\"a\": [3,4]}}");
+
+                var result = _db.JsonArrayPop<int?>(key, "$..a");
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(3, result[0]);
+                Assert.Equal(4, result[1]);
+            } 
+            
+            [Fact]
+            public void CanExecuteOnMultipleMatchingPathsWithSerializerWithNulls()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[\"foo\", \"bar\"], \"nested\": {\"a\": false}, \"nested2\": {\"a\":[]}}");
+
+                var result = _db.JsonArrayPop<string>(key, "$..a");
+                
+                Assert.Equal(3, result.Length);
+                
+                Assert.Equal("bar", result[0]);
+                Assert.Null(result[1]);
+                Assert.Null(result[2]);
+            }               
         }
 
         public class JsonArrayTrim : BaseIntegrationTest
@@ -380,8 +607,23 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonArrayTrim(key, ".array", 0, 1);
 
-                Assert.Equal(2, result);
+                Assert.Equal(2, result[0]);
             }
+            
+            [Fact]
+            public void CanExecuteForMultiplePaths()
+            {
+                var key = Guid.NewGuid().ToString();
+
+                _db.JsonSet(key, "{\"a\":[1,2,3,2], \"nested\": {\"a\": false}}");
+
+                var result = _db.JsonArrayTrim(key, "$..a", 1, 1);
+                
+                Assert.Equal(2, result.Length);
+                
+                Assert.Equal(1, result[0]);
+                Assert.Null(result[1]);
+            }            
         }
 
         public class JsonObjectKeys : BaseIntegrationTest
@@ -395,7 +637,7 @@ namespace NReJSON.IntegrationTests
 
                 var result = _db.JsonObjectKeys(key);
 
-                Assert.Equal(new[] { "hello", "goodnight" }, result.Select(x => x.ToString()).ToArray());
+                Assert.Equal(new[] {"hello", "goodnight"}, result.Select(x => x.ToString()).ToArray());
             }
         }
 
@@ -441,73 +683,6 @@ namespace NReJSON.IntegrationTests
                 var result = _db.JsonGetResp(key)[2];
 
                 Assert.Equal("world", result.ToString());
-            }
-        }
-
-        public class JsonIndexAdd : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and is removed in the latest version of RedisJson.")]
-            public void CanExecute()
-            {
-                var index = Guid.NewGuid().ToString();
-
-                var result = _db.JsonIndexAdd(index, "test_field", "$.a");
-
-                Assert.True(result);
-                Assert.Equal("OK", result.RawResult);
-            }
-        }
-
-        public class JsonIndexDelete : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void CanExecute()
-            {
-                var index = Guid.NewGuid().ToString();
-
-                _db.JsonIndexAdd(index, "some_field", "$.a");
-
-                var result = _db.JsonIndexDelete(index);
-
-                Assert.True(result);
-                Assert.Equal("OK", result.RawResult);
-            }
-        }
-
-        public class JsonIndexGet : BaseIntegrationTest
-        {
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void CanExecute()
-            {
-                var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();
-
-                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
-                _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
-
-                _db.JsonIndexAdd(index, "last", "$.last");
-
-                var result = _db.JsonIndexGet(index, "Jo*").ToString();
-
-                Assert.Contains("Joe", result);
-                Assert.Contains("Joan", result);
-            }
-
-            [Fact(Skip = "This command has been deprecated and will be removed in a future version of RedisJson.")]
-            public void CanExecuteWithSerializer()
-            {
-                var index = Guid.NewGuid().ToString().Substring(0, 4);
-                var key = Guid.NewGuid().ToString();
-
-                _db.JsonSet($"{key}_1", "{\"last\":\"Joe\", \"first\":\"Mc\"}", index: index);
-                _db.JsonSet($"{key}_2", "{\"last\":\"Joan\", \"first\":\"Mc\"}", index: index);
-
-                _db.JsonIndexAdd(index, "last", "$.last");
-
-                var result = _db.JsonIndexGet<ExamplePerson>(index, "Jo*");
-
-                Assert.Equal("Joe", result[$"{key}_1"].First().LastName);
-                Assert.Equal("Joan", result[$"{key}_2"].First().LastName);
             }
         }
 
